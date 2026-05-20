@@ -7,13 +7,111 @@ ordering: reverse-chronological (newest entry first)
 
 # Diagram Alley — Decisions Log
 
-This file is the canonical record of all user-approved decisions. It **overrides** specs and `outline.md` when there is a conflict. The spec should be updated to match the log, not the other way around.
+This file is the canonical record of all user-approved decisions. It **overrides** specs and `OUTLINE.md` when there is a conflict. The spec should be updated to match the log, not the other way around.
 
 **Rules:**
 - Entries are in reverse-chronological order (newest first).
 - Rejected options are recorded to prevent repeat debates.
 - Superseded decisions get a new entry; the old entry is not deleted.
 - Deferred decisions record what triggers revisiting them.
+
+---
+
+## 2026-05-20 — Audit Reconciliation Decisions
+
+### DEC-025: Stripe Cancellation — Active Until Access Ends
+
+**Decision:** Stripe cancellation uses Stripe's native cancel-at-period-end model. A Pro subscription remains `status = 'active'` while the user retains access. The subscription row records `cancel_at_period_end = true` and `access_ends_at = current_period_end`. When access actually ends, the subscription becomes `status = 'canceled'`.
+
+**Source:** Documentation audit resolution, user decision 2026-05-20.
+
+**Rationale:** This matches Stripe semantics without inventing a separate `canceling` status or treating canceled users as active through side conditions.
+
+**Affects:** F1 (`subscriptions` fields and state machine), F3 (webhook handling and feature gate), D7 (cancellation UX and access rules), A1 (subscription override fields)
+
+---
+
+### DEC-024: Ownership — F1 Owns Tables; F3 Owns Audit Events
+
+**Decision:** F1 owns every database table definition. F3 owns every audit event constant and audit-write convention. Domain specs may define domain behavior and request additions, but they must reference F1/F3 rather than redefining tables or audit events.
+
+**Source:** Documentation audit resolution, user decision 2026-05-20.
+
+**Rationale:** Central table ownership in F1 and central audit-event ownership in F3 best satisfies the "one owner per concept" rule and prevents drift between domain specs and foundations.
+
+**Affects:** SPEC-INDEX, F1, F3, D1, D4, D5, D6, D7, A1
+
+---
+
+### DEC-023: Text Output Modes — Strict ASCII plus UTF-8 Text
+
+**Decision:** Diagram Alley supports two text rendering modes: strict ASCII mode and UTF-8 text mode. Strict ASCII mode uses printable ASCII only. UTF-8 text mode may use Unicode box-drawing/tree characters when they materially improve readability. Specs must not call UTF-8 text output "ASCII output."
+
+**Source:** Documentation audit resolution, user decision 2026-05-20.
+
+**Rationale:** Documentation workflows often need strict ASCII, but file trees and similar structures are significantly more readable with UTF-8 tree glyphs.
+
+**Affects:** glossary, F2, D4, share/export wording
+
+---
+
+### DEC-022: Expired Trial Access — Read, Export, and Share Only
+
+**Decision:** After trial expiry (`status = 'canceled'`), users can view existing saved diagrams, export them, and manage share links. They cannot edit `spec_json`, use AI generation/modification, or create new diagrams until upgrading.
+
+**Source:** Documentation audit resolution, user decision 2026-05-20.
+
+**Rationale:** This preserves access to the user's existing work while keeping continued creation and editing behind an active trial or Pro subscription.
+
+**Affects:** F3 (feature gate), D2 (PATCH/edit gate), D6 (share remains allowed), D7 (trial-expiry UX)
+
+---
+
+### DEC-021: Auto-Save — Persist Edits Without Versioning
+
+**Decision:** Editor changes are auto-saved to the live `diagrams.spec_json` but do not create version snapshots. The Save action means "create a version snapshot" after flushing any pending live persistence.
+
+**Source:** Documentation audit resolution, user decision 2026-05-20.
+
+**Rationale:** This protects user work without flooding version history. Version history remains meaningful because snapshots are deliberate milestones.
+
+**Affects:** F1 (snapshot triggers), D2 (dirty state, auto-save, manual Save), D3 (version snapshot rules)
+
+---
+
+### DEC-020: Initial AI Generation Creates a Version Snapshot
+
+**Decision:** A successful new AI generation creates the persisted diagram row and immediately creates the initial `diagram_versions` snapshot.
+
+**Source:** Documentation audit resolution, user decision 2026-05-20.
+
+**Rationale:** AI-generated diagrams are persisted immediately, so the first accepted generated spec should have a history anchor before later edits occur.
+
+**Affects:** F1 (snapshot triggers), D1 (generation flow), D3 (version snapshot rules)
+
+---
+
+### DEC-019: V1 Exports Include SVG and PNG
+
+**Decision:** V1 includes both SVG and PNG visual exports, in addition to ASCII/text, Markdown, Mermaid, JSON, and YAML. PDF remains deferred to V2.
+
+**Source:** Documentation audit resolution, user decision 2026-05-20.
+
+**Rationale:** PNG is part of the paid V1 value proposition and is useful for wikis, slide decks, and documentation systems that do not embed SVG cleanly.
+
+**Affects:** F0 (render/export dependencies), F2 (visual export renderer), F4 (export controls), F5 (background/export standards), D4 (export format contract), README/SPEC-INDEX
+
+---
+
+### DEC-018: F1 Schema and Migration Contract Frozen for Draft 0.1
+
+**Decision:** The F1 Draft 0.1 JSON schema field names, nesting, required fields, and `spec_version` migration function contract are frozen for current planning. The earlier F1 open question is resolved.
+
+**Source:** Documentation audit resolution, user decision 2026-05-20.
+
+**Rationale:** F1 already defines concrete schemas and the migration contract. Downstream specs are written against those shapes and should no longer treat them as open.
+
+**Affects:** README (open questions), F1 (open questions), DEC-011 and DEC-008 open notes, all domain specs that consume data shapes
 
 ---
 
@@ -119,7 +217,7 @@ This file is the canonical record of all user-approved decisions. It **overrides
 
 **Rejected:** YAML primary storage (more complex migration code paths); dual storage per diagram (two migration paths, more edge cases).
 
-**Open (still in F1):** The exact JSON schema structure and `spec_version` migration path must be fully defined in F1 before any domain spec finalizes data shapes.
+**Resolved by DEC-018:** The exact JSON schema structure and `spec_version` migration path are frozen for F1 Draft 0.1.
 
 ---
 
@@ -170,7 +268,7 @@ This file is the canonical record of all user-approved decisions. It **overrides
 
 **Affects:** F1 (spec schema definition and migration logic)
 
-**Open:** Exact JSON/YAML schema format and migration path must be resolved in F1. See `[OPEN — F1]` in `README.md`.
+**Resolved by DEC-018:** Exact JSON schema format and migration path are frozen for F1 Draft 0.1.
 
 ---
 
@@ -228,7 +326,7 @@ This file is the canonical record of all user-approved decisions. It **overrides
 
 **Affects:** F3 (Stripe setup, free trial limits, subscription lifecycle), D7 (billing domain spec)
 
-**Open:** Exact free trial limits (number of saved diagrams, hosted AI credits, trial duration in days) must be resolved in F3 before the billing integration is built. See `[OPEN — F3]` in `README.md`.
+**Resolved by DEC-010:** Free trial limits are 14 days, unlimited saved diagrams, no hosted AI credits, full export/editor access during trial.
 
 ---
 
@@ -258,7 +356,7 @@ This file is the canonical record of all user-approved decisions. It **overrides
 
 **Affects:** F0, F4
 
-**Open:** Production cloud Postgres provider and secret-management solution to be resolved in F0.
+**Resolved by DEC-014 and DEC-015:** Production Postgres uses Neon free tier; production secrets are platform-injected environment variables on Fly.io/Vercel.
 
 ---
 
@@ -277,4 +375,3 @@ This file is the canonical record of all user-approved decisions. It **overrides
 **Affects:** F1 (users table, subscriptions table), F3 (auth, billing), D7
 
 ---
-

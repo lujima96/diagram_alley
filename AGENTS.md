@@ -3,13 +3,13 @@
 ## Source of Truth Hierarchy
 
 1. **Specs are the source of truth** once created. A spec is any file under `docs/diagram-alley/specs/` that has been written and not marked `status: draft-abandoned`.
-2. **`outline.md`** is the pre-spec product intent document. It is authoritative for decisions that have not yet been promoted into a spec.
-3. **`decisions-log.md`** records locked choices. A decision in the log overrides both the spec and `outline.md` if there is a conflict — the log entry is the authoritative version; update the spec to match.
-4. **Chat history is not authoritative.** If something was discussed but not written into a spec, the log, or `outline.md`, it does not exist.
+2. **`OUTLINE.md`** is the pre-spec product intent document. It is authoritative for decisions that have not yet been promoted into a spec.
+3. **`decisions-log.md`** records locked choices. A decision in the log overrides both the spec and `OUTLINE.md` if there is a conflict — the log entry is the authoritative version; update the spec to match.
+4. **Chat history is not authoritative.** If something was discussed but not written into a spec, the log, or `OUTLINE.md`, it does not exist.
 
 ## Decision Protocol
 
-**When a decision is already defined** (in a spec, `decisions-log.md`, or the Closed Technical Decisions block of `outline.md`):
+**When a decision is already defined** (in a spec, `decisions-log.md`, or the Closed Technical Decisions block of `OUTLINE.md`):
 - Use the recorded decision. Do not re-open it.
 - Do not ask the user to re-decide something already decided.
 
@@ -45,7 +45,7 @@ Specs may only be changed if one of the following is true:
 
 Before proposing or implementing anything:
 
-1. Read `outline.md` (product intent and closed decisions).
+1. Read `OUTLINE.md` (product intent and closed decisions).
 2. Read `docs/diagram-alley/SPEC-INDEX.md` (what exists and what it depends on).
 3. Read `docs/diagram-alley/decisions-log.md` (locked choices).
 4. Read the relevant foundation spec(s) before any domain spec.
@@ -57,7 +57,7 @@ Every model, enum, permission key, audit event, API operation, and UI route has 
 
 ## When You Find Drift
 
-If a spec, the decisions log, and `outline.md` contradict each other:
+If a spec, the decisions log, and `OUTLINE.md` contradict each other:
 
 1. Flag the contradiction to the user with the specific files and lines involved.
 2. Do not silently pick a winner.

@@ -30,7 +30,7 @@ Define the canonical JSON schema for every diagram type, the `spec_version` migr
 
 ## Owned Concepts
 
-`users`, `projects`, `diagrams`, `diagram_versions`, `templates`, `model_providers`, `user_settings`, `subscriptions` tables; all Diagram Spec JSON schemas; `spec_version` migration contract; diagram lifecycle states.
+`users`, `projects`, `diagrams`, `diagram_versions`, `templates`, `model_providers`, `user_settings`, `diagram_shares`, `subscriptions`, `audit_log` tables; all Diagram Spec JSON schemas; `spec_version` migration contract; diagram lifecycle states.
 
 ---
 
@@ -459,11 +459,36 @@ Stores public share links for diagrams. One active link per diagram enforced at 
 | `trial_ends_at` | TIMESTAMPTZ | NULLABLE | Trial expiry timestamp |
 | `current_period_start` | TIMESTAMPTZ | NULLABLE | Billing period start |
 | `current_period_end` | TIMESTAMPTZ | NULLABLE | Billing period end |
+| `cancel_at_period_end` | BOOLEAN | NOT NULL, default false | True when Pro access remains active until `access_ends_at` after cancellation |
+| `access_ends_at` | TIMESTAMPTZ | NULLABLE | Time paid/trial access ends; for cancel-at-period-end this equals `current_period_end` |
 | `canceled_at` | TIMESTAMPTZ | NULLABLE | Cancellation timestamp |
 | `created_at` | TIMESTAMPTZ | NOT NULL, default now() | — |
 | `updated_at` | TIMESTAMPTZ | NOT NULL, default now() | — |
 
-**Trial logic:** `status = 'trialing'` and `trial_ends_at` is set 14 days from registration (DEC-010). On expiry, a Stripe webhook fires and updates `status` to `canceled` unless the user has upgraded.
+**Trial logic:** `status = 'trialing'`, `trial_ends_at` is set 14 days from registration, and `access_ends_at = trial_ends_at` (DEC-010). On expiry, a daily job updates `status` to `canceled` unless the user has upgraded.
+
+**Cancellation logic:** Pro cancellation at period end keeps `status = 'active'`, sets `cancel_at_period_end = true`, and sets `access_ends_at = current_period_end` until access actually ends (DEC-025).
+
+---
+
+### 4.10 `audit_log`
+
+Stores append-only audit events. F3 owns the event constants and write convention; F1 owns this table shape (DEC-024).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | UUID | PK | — |
+| `user_id` | UUID | FK → users.id, NULLABLE | Actor; null for system or anonymous events |
+| `event` | TEXT | NOT NULL | Event constant owned by F3 |
+| `entity_type` | TEXT | NOT NULL | Table/entity name, e.g. `diagrams` |
+| `entity_id` | UUID | NULLABLE | Affected row ID when applicable |
+| `detail` | JSONB | NOT NULL, default `{}` | Event-specific context |
+| `ip_address` | TEXT | NULLABLE | Request IP when logged |
+| `created_at` | TIMESTAMPTZ | NOT NULL, default now() | Event timestamp |
+
+**Index:** `(created_at DESC)` for admin audit list; `(user_id, created_at DESC)` for user support views; `(entity_type, entity_id)` for entity history lookup.
+
+**Immutability:** Audit log rows are append-only. No update or delete operations are exposed in V1.
 
 ---
 
@@ -481,7 +506,7 @@ archived (is_archived = true, hidden from library but not deleted)
 deleted (hard delete, performed only by user via account deletion flow)
 ```
 
-A diagram in `created` state only exists in the browser — it has not been persisted. The API creates a persisted diagram on first explicit save or on first AI generation (auto-save).
+A diagram in `created` state only exists in the browser — it has not been persisted. The API creates a persisted diagram on first explicit save, successful AI generation, or import.
 
 ### 5.2 Subscription States
 
@@ -491,7 +516,8 @@ trialing → canceled     (trial expires without payment)
 active   → past_due     (payment fails; Stripe retries)
 past_due → active       (payment retry succeeds)
 past_due → canceled     (all retries exhausted)
-active   → canceled     (user cancels)
+active   → active       (user cancels at period end; cancel_at_period_end = true)
+active   → canceled     (access_ends_at reached or subscription deleted immediately)
 canceled → active       (user resubscribes)
 ```
 
@@ -499,10 +525,11 @@ canceled → active       (user resubscribes)
 
 A new `diagram_versions` row is created when:
 1. User clicks "Save" explicitly.
-2. User triggers an AI modification and accepts the result.
-3. User restores a previous version (creates a new version with the restored spec).
+2. A new AI-generated diagram is accepted and persisted.
+3. User triggers an AI modification and accepts the result.
+4. User restores a previous version (creates pre-restore and restored snapshots).
 
-A version is **not** created on every keystroke, every render call, or on auto-save. Auto-save (D2 §5.3) fires after 30 seconds of inactivity and persists the spec via PATCH without creating a version row.
+A version is **not** created on every keystroke, every render call, or on live auto-save. Auto-save (D2 §5.3) persists the spec via PATCH without creating a version row (DEC-021).
 
 ---
 
@@ -521,7 +548,7 @@ When this spec changes version (e.g., 1.0 → 1.1):
 
 ## Open Questions
 
-None. All field names in §3 have been verified consistent with F2 validation rules (all F2 path references match F1 schema fields with no ambiguity). F1 field names are frozen.
+None. All field names in §3 have been verified consistent with F2 validation rules (all F2 path references match F1 schema fields with no ambiguity). F1 field names and the migration function contract are frozen for Draft 0.1 by DEC-018.
 
 ---
 

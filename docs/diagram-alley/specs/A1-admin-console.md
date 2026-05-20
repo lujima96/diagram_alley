@@ -146,13 +146,16 @@ For support cases (e.g., extend a trial, manually activate a subscription for a 
 {
   "plan": "trial | pro",
   "status": "trialing | active | canceled",
-  "trial_ends_at": "2026-06-20T10:00:00Z"
+  "trial_ends_at": "2026-06-20T10:00:00Z",
+  "cancel_at_period_end": false,
+  "access_ends_at": "2026-06-20T10:00:00Z"
 }
 ```
 
 Rules:
 - Setting `status = 'active'` without a Stripe subscription ID records the subscription as manually activated (`stripe_subscription_id` stays null — Stripe is not involved).
 - Setting `trial_ends_at` extends the trial.
+- Setting `cancel_at_period_end` or `access_ends_at` is a support override for DEC-025 cancellation/access-end handling.
 - All changes emit `admin.subscription.update` audit detail.
 
 Returns the updated subscription object.
@@ -260,32 +263,6 @@ Action buttons: Extend Trial, Activate Pro, Verify Email (sets `is_verified = tr
 ### 5.5 Audit Log Page
 
 Filterable table. Columns: Time, User, Event, Entity Type, Entity ID, IP. Clicking a row shows the full `detail` JSON.
-
----
-
-## 6. Reconciliation Notes
-
-### 6.1 New Routes in F4/Route Map
-
-Admin routes (`/admin`, `/admin/users`, etc.) must be added to F4 §2 route map.
-
-**Action required:** Add admin routes to F4 §2 with `Auth: Required + superuser`.
-
-### 6.2 New Endpoints in F5
-
-The following endpoints must be added to F5 §10 admin section:
-
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/api/v1/admin/users` | List all users |
-| GET | `/api/v1/admin/users/{id}` | Get user |
-| PATCH | `/api/v1/admin/users/{id}` | Update user |
-| PATCH | `/api/v1/admin/users/{id}/subscription` | Override subscription |
-| GET | `/api/v1/admin/audit-log` | List audit events |
-| GET | `/api/v1/admin/audit-log/{id}` | Get audit event |
-| GET | `/api/v1/admin/users/export` | Export users CSV |
-
-The first three (`GET`, `GET`, `PATCH /api/v1/admin/users*`) are already in F5 §10. The subscription override, audit log, and CSV export endpoints are new and must be added.
 
 ---
 

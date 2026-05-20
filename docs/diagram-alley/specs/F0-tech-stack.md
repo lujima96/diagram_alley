@@ -63,6 +63,7 @@ All decisions in this spec are locked in `decisions-log.md`. References are cite
 - **Validation:** Pydantic v2 (already a FastAPI dependency)
 - **Auth:** FastAPI Users — DEC-017
 - **HTTP client (for provider calls):** `httpx` (async)
+- **SVG/PNG conversion:** `cairosvg` or equivalent lightweight SVG-to-PNG converter for V1 PNG export — DEC-019
 - **Task queue:** None in V1. Long-running export jobs run inline if under 5s; async background tasks via FastAPI's `BackgroundTasks` for anything longer. A proper queue (Celery + Redis, or Dramatiq) is deferred to V2 if needed.
 
 ### 2.2 Frontend — Vite + React
@@ -261,6 +262,7 @@ These constraints are locked for planning. Implementations must not violate them
 4. **Team accounts are V2.** All data models include forward-compat columns but V1 code must not implement team-scoped queries or permissions (DEC-001, DEC-009).
 5. **Neon free tier limits.** Free Neon allows 3 GB storage and 10 branches. If these are hit before revenue, upgrade to Neon's paid tier. This is not an architecture concern — just an ops watch item.
 6. **Fly.io free tier limits.** 3 shared VMs, 160 GB/month outbound. Monitor with Fly.io metrics. No code changes required if limits are hit — upgrade to a paid machine.
+7. **PNG export is V1.** PNG export is generated from the deterministic SVG export path, not from a screenshot-only browser workflow (DEC-019).
 
 ---
 

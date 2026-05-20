@@ -32,7 +32,7 @@ Define the prompt → structured spec flow, provider routing, BYOK configuration
 
 ## Owned Concepts
 
-Prompt → spec pipeline; system prompt template; provider adapter interface; provider routing; AI generation endpoint contract; AI improve endpoint contract; AI failure handling; retry policy; generation audit events.
+Prompt → spec pipeline; system prompt template; provider adapter interface; provider routing; AI generation endpoint contract; AI improve endpoint contract; AI failure handling; retry policy; generation audit trigger points (constants owned by F3).
 
 ---
 
@@ -183,15 +183,17 @@ Before sending to the provider, the service estimates token count (characters / 
 8. If validation errors exist → attempt repair pass (F2 repair_spec); max 1 repair attempt
 9. Re-validate after repair
 10. If still invalid after repair → return 422 GENERATION_INVALID_SPEC (see §7)
-11. Create diagrams row (auto-save); return diagram with rendered outputs
-12. Create diagram_versions snapshot (F1 §5.3 trigger 1 — auto-save on generate)
+11. Create diagrams row; return diagram with rendered outputs
+12. Create initial diagram_versions snapshot (F1 §5.3, DEC-020)
 13. Emit DIAGRAM_CREATED and DIAGRAM_AI_GENERATED audit events
 14. Return 200 with diagram data and generation metadata
 ```
 
-### 3.3 Auto-Save on Generate
+### 3.3 Persistence on Generate
 
 A new diagram is immediately persisted to the `diagrams` table on successful generation. The user does not need to click Save. The `spec_json` is the validated (and possibly repaired) spec. The response includes the new `diagram_id` so the client can redirect to `/workspace/:diagramId`.
+
+The initial persisted generated spec is also written to `diagram_versions` as the first snapshot (DEC-020). This snapshot is not considered auto-save noise; it is the baseline history anchor for the diagram.
 
 ### 3.4 Response Body
 
@@ -254,7 +256,7 @@ A new diagram is immediately persisted to the `diagrams` table on successful gen
 13. Emit DIAGRAM_AI_IMPROVE_PROPOSED audit event
 ```
 
-**Note:** The improve flow does NOT auto-save. The updated spec is returned as a proposal. The client shows the diff and the user must explicitly accept. On accept, the client calls `PATCH /api/v1/diagrams/{id}` with the new spec, which triggers a version snapshot (D3).
+**Note:** The improve flow does NOT auto-save. The updated spec is returned as a proposal. The client shows the diff and the user must explicitly accept. On accept, the client calls `PATCH /api/v1/diagrams/{id}` with the new spec and `create_version_snapshot = true`, which creates a version snapshot (D3).
 
 ### 4.3 Spec Diff
 
@@ -366,7 +368,7 @@ In addition to standard F5 error codes, AI generation introduces:
 
 ## 8. Audit Events
 
-Two new audit events are defined here (convention from F3 §3.1):
+F3 §3.2 owns the AI audit event constants used by this flow:
 
 | Event | Trigger | Actor | Entity |
 |-------|---------|-------|--------|

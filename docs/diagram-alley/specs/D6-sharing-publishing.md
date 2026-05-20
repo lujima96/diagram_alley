@@ -29,30 +29,19 @@ Define public share links, embed support, and view-only access for shared diagra
 
 ## Owned Concepts
 
-Share token model; share link creation/revocation; public share endpoint; embed iframe contract; share view UI; share-related permission events.
+Share token model; share link creation/revocation; public share endpoint; embed iframe contract; share view UI; share audit trigger points (constants owned by F3).
 
 ---
 
 ## 1. Share Model
 
-### 1.1 `diagram_shares` Table
+### 1.1 Share Storage
 
-A new table is required for share links. This table is not in F1 — it is defined here and must be added to F1 before F1 is marked `ready`.
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | UUID | PK | — |
-| `diagram_id` | UUID | FK → diagrams.id, NOT NULL | The diagram being shared |
-| `share_token` | TEXT | NOT NULL, UNIQUE | URL-safe random token (32 chars, url-safe base64) |
-| `created_by` | UUID | FK → users.id, NOT NULL | User who created the link |
-| `created_at` | TIMESTAMPTZ | NOT NULL, default now() | — |
-| `revoked_at` | TIMESTAMPTZ | NULLABLE | Set on revocation; NULL = active |
-| `access_count` | INTEGER | NOT NULL, default 0 | Number of times the link was accessed |
-| `last_accessed_at` | TIMESTAMPTZ | NULLABLE | Last access time |
+The `diagram_shares` table is owned by F1 §4.8 (DEC-024). D6 owns the share-link lifecycle and token rules.
 
 **One active share link per diagram** in V1. Creating a new link while one exists revokes the old one first (atomically).
 
-**Share link URL format:** `https://diagram-alley.fly.dev/share/<share_token>` (frontend route `/share/:shareToken` → F4 §2).
+**Share link URL format:** `https://diagram-alley.vercel.app/share/<share_token>` or the configured production frontend domain (frontend route `/share/:shareToken` → F4 §2). The public API remains `GET /api/v1/share/{token}`.
 
 ### 1.2 Share Token Generation
 
@@ -84,7 +73,7 @@ Response:
 {
   "data": {
     "share_token": "abcd1234...",
-    "share_url": "https://diagram-alley.fly.dev/share/abcd1234...",
+    "share_url": "https://diagram-alley.vercel.app/share/abcd1234...",
     "created_at": "2026-05-20T14:32:00Z"
   }
 }
@@ -110,7 +99,7 @@ Returns the current active share link if one exists, or `null`.
 {
   "data": {
     "share_token": "abcd1234...",
-    "share_url": "https://diagram-alley.fly.dev/share/abcd1234...",
+    "share_url": "https://diagram-alley.vercel.app/share/abcd1234...",
     "created_at": "2026-05-20T14:32:00Z",
     "access_count": 7,
     "last_accessed_at": "2026-05-20T16:00:00Z"
@@ -123,7 +112,7 @@ Or:
 { "data": null }
 ```
 
-New endpoint — must be added to F5 §10. See §6.
+Endpoint is listed in F5 §10.
 
 ### 2.4 Public Share Access
 
@@ -212,52 +201,15 @@ The share URL can be embedded in an iframe. The share view accepts an `?embed=1`
 
 No additional iframe sandbox attributes are required from the embedding side — the share view uses only standard web APIs.
 
-Embed URL example: `https://diagram-alley.fly.dev/share/abcd1234...?embed=1&tab=ascii`
+Embed URL example: `https://diagram-alley.vercel.app/share/abcd1234...?embed=1&tab=ascii`
 
 ---
 
 ## 5. Audit Events
 
-| Event | Trigger | Actor | Entity |
-|-------|---------|-------|--------|
-| `SHARE_CREATED` | Share link created | user | diagram_shares |
-| `SHARE_REVOKED` | Share link revoked | user | diagram_shares |
-| `SHARE_ACCESSED` | Public share viewed | system (anonymous) | diagram_shares |
+F3 §3.2 owns the share audit event constants: `SHARE_CREATED`, `SHARE_REVOKED`, and `SHARE_ACCESSED`.
 
-`SHARE_ACCESSED` does not record IP or user identity (anonymous access — no PII logged). It records only `share_token` and timestamp.
-
-These new audit events must be added to F3 §3.2.
-
----
-
-## 6. Reconciliation Notes
-
-### 6.1 `diagram_shares` Table (F1 Drift)
-
-The `diagram_shares` table defined in §1.1 is not in F1 §4. It must be added to F1 §4 before F1 is marked `ready`.
-
-**Action required:** Add `diagram_shares` table to F1 §4 with all columns from §1.1.
-
-### 6.2 New Endpoints in F5
-
-Three new endpoints must be added to F5 §10 (Sharing section):
-
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/api/v1/diagrams/{id}/share` | Get active share link status |
-| POST | `/api/v1/diagrams/{id}/share` | Create share link |
-| DELETE | `/api/v1/diagrams/{id}/share` | Revoke share link |
-| GET | `/api/v1/share/{token}` | Public: get shared diagram (no auth) |
-
-The last entry (`GET /api/v1/share/{token}`) is already in F5 §10. The first three need to be added.
-
-### 6.3 New Audit Events (F3 Drift)
-
-`SHARE_CREATED`, `SHARE_REVOKED`, and `SHARE_ACCESSED` must be added to F3 §3.2.
-
-### 6.4 New Error Code
-
-`SHARE_NOT_FOUND` (HTTP 404) must be added to F5 §9.1.
+`SHARE_ACCESSED` does not record IP or user identity (anonymous access — no PII logged). It records only `share_token` and timestamp in `detail`.
 
 ---
 

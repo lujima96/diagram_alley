@@ -363,12 +363,12 @@ async def export_diagram(id: UUID, background_tasks: BackgroundTasks, ...):
 ```
 
 **When to use BackgroundTasks:**
-- Export generation > 1s (e.g., PNG render via headless browser — deferred to V2)
 - Email sending (always async)
+- Future long-running exports if they exceed the V1 synchronous budget
 
 **Limitations:** FastAPI BackgroundTasks run in-process. If the server restarts mid-task, the task is lost. This is acceptable for V1 (email fails silently, user can retry export). A proper queue (Celery) is V2 if needed.
 
-**Task status polling:** Not implemented in V1 for exports — exports are synchronous (ASCII, Mermaid, JSON are fast enough). PNG/SVG export via headless render is deferred to V2.
+**Task status polling:** Not implemented in V1 for exports. V1 exports, including SVG and PNG (DEC-019), are synchronous. PNG is generated from the deterministic SVG export path rather than from a queued headless-browser screenshot workflow.
 
 ---
 

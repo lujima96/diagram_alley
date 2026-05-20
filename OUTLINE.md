@@ -1199,7 +1199,7 @@ Let users bring existing diagrams into Diagram Alley before paid launch.
 
 ### Engineering Risk: Mermaid Import
 
-Mermaid's syntax has grown organically and is irregular across diagram types (flowchart, ER, sequence, etc.). Parsing Mermaid into a structured Diagram Alley spec is a non-trivial parsing problem — not a simple string transformation. This is a meaningful engineering investment and should be scoped carefully in `D3-import-convert-and-reverse-sync.md` before implementation begins. The risk is that partial or incorrect parsing silently corrupts the imported diagram.
+Mermaid's syntax has grown organically and is irregular across diagram types (flowchart, ER, sequence, etc.). Parsing Mermaid into a structured Diagram Alley spec is a non-trivial parsing problem — not a simple string transformation. This is a meaningful engineering investment and is scoped in `docs/diagram-alley/specs/D5-import.md`. The risk is that partial or incorrect parsing silently corrupts the imported diagram.
 
 Recommended V1 approach: support Mermaid flowchart and ER diagram import at best-effort, with clear warnings for unsupported constructs. Do not promise full-fidelity Mermaid import at launch.
 
@@ -2589,7 +2589,7 @@ The visual renderer should use the same structured spec, not separate drawing da
 
 The first visual renderer can be simple visually, but it should still be the primary grid-based editing surface.
 
-**Design note:** The visual grid editor is the most architecturally complex piece of the product. It needs its own dedicated spec (`F4-ui-surface-and-workspace-architecture.md` or a dedicated `F4b-grid-editor-design.md`) before Phase 3 implementation begins. Key questions that spec must answer: how grid coordinates map to ASCII layout positions, what library (if any) drives the canvas, how drag operations update the structured spec, and how layout metadata flows back to the ASCII renderer. This work cannot be deferred to implementation time.
+**Design note:** The visual grid editor is the most architecturally complex piece of the product. It is now owned by `docs/diagram-alley/specs/F4-ui-surface-workspace.md`, with editor interactions in `docs/diagram-alley/specs/D2-diagram-editor.md`. Key questions that spec must answer: how grid coordinates map to text layout positions, what library drives the canvas, how drag operations update the structured spec, and how layout metadata flows back to the renderer.
 
 The visual renderer should support:
 
@@ -2889,12 +2889,12 @@ Let developers and technical writers validate the workflow before paying.
 Trial should include:
 
 * Core editor access
-* Limited saved diagrams
-* Limited hosted AI credits if hosted AI is offered
+* Unlimited saved diagrams during the 14-day trial
+* No hosted AI credits in V1; AI requires BYOK or local model setup
 * Local provider and BYOK setup where practical
-* Export access sufficient to prove value
+* Full export access
 
-**Open decision:** The specific limits (number of saved diagrams, number of hosted AI credits, trial duration in days) must be defined before the billing integration is built. These numbers affect the Stripe product/price configuration, the usage tracking data model, and the onboarding flow. Resolve this in `F3-security-auth-provider-credentials-and-billing.md`.
+**Resolved decision:** Trial limits are locked by DEC-010: 14 days, unlimited saved diagrams, no hosted AI credits, full editor/export access during trial.
 
 ### 22.2 Pro Subscription
 
@@ -3130,16 +3130,21 @@ Required planning artifacts:
 1. `README.md` for Diagram Alley planning docs
 2. `SPEC-INDEX.md`
 3. `decisions-log.md`
-4. `F0-tech-stack-and-deployment.md`
-5. `F1-diagram-spec-and-data-model.md` — must define spec versioning strategy and exact JSON/YAML schema
-6. `F2-rendering-validation-and-repair.md` — must define which node kinds get distinct rendering in V1
-7. `F3-security-auth-provider-credentials-and-billing.md` — must define Stripe setup and free trial limits
-8. `F4-ui-surface-and-workspace-architecture.md` — must design the visual grid editor before Phase 3
-9. `F5-api-integrations-and-background-jobs.md`
-10. `D1-create-edit-export-diagram.md`
-11. `D2-ai-generate-and-modify-diagram.md`
-12. `D3-import-convert-and-reverse-sync.md` — must scope Mermaid import risk and ASCII reverse sync boundaries
-13. `D4-github-repository-workflows.md` — stretch goal; write this only after core product is complete
+4. `specs/F0-tech-stack.md`
+5. `specs/F1-diagram-spec-and-data-model.md` — defines spec versioning strategy and exact JSON schema
+6. `specs/F2-rendering-validation-repair.md` — defines validation, text rendering, visual export rendering, and node-kind rendering
+7. `specs/F3-security-auth-billing.md` — defines auth, Stripe setup, free trial limits, permissions, and audit events
+8. `specs/F4-ui-surface-workspace.md` — designs the visual grid editor and workspace surface
+9. `specs/F5-api-standards.md`
+10. `specs/D1-ai-generation.md`
+11. `specs/D2-diagram-editor.md`
+12. `specs/D3-version-history.md`
+13. `specs/D4-export.md`
+14. `specs/D5-import.md` — scopes Mermaid import risk
+15. `specs/D6-sharing-publishing.md`
+16. `specs/D7-billing-subscription.md`
+17. `specs/A1-admin-console.md`
+18. `specs/D8-github-integration.md` — stretch goal; write this only after core product is complete
 
 Remaining open decisions to resolve in spec files:
 

@@ -30,7 +30,7 @@ Define the import flow for external diagram formats: Mermaid flowchart and ER (b
 
 ## Owned Concepts
 
-Import endpoint contract; format detection logic; Mermaid-to-spec converter (flowchart, ER); JSON/YAML spec import; import preview step; import warnings; corruption prevention contract; `DIAGRAM_IMPORTED` audit event trigger.
+Import endpoint contract; format detection logic; Mermaid-to-spec converter (flowchart, ER); JSON/YAML spec import; import preview step; import warnings; corruption prevention contract; `DIAGRAM_IMPORTED` trigger point (constant owned by F3).
 
 ---
 
@@ -87,7 +87,7 @@ Import endpoint contract; format detection logic; Mermaid-to-spec converter (flo
 8. If ERRORs remain → return 422 SPEC_VALIDATION_FAILED with detail
 9. Apply title (§5)
 10. If preview_only=true → return preview response (no save)
-11. Create diagrams row (auto-save like AI generation D1 §3.3)
+11. Create diagrams row (persisted import)
 12. Render ASCII and Mermaid synchronously
 13. Emit DIAGRAM_IMPORTED audit event (F3 §3.2)
 14. Return diagram with warnings

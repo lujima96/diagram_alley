@@ -41,18 +41,19 @@ A new `diagram_versions` row is created when (F1 §5.3):
 | Trigger | Who Creates | `change_summary` |
 |---------|-------------|-----------------|
 | User clicks Save (`Ctrl+S` or Save button) | User action (D2 §5.2) | `"Manual save"` |
+| Successful new AI generation | D1 §3.3 generation flow | `"Initial AI generation"` |
 | User accepts an AI improve proposal | D1 §4.2 accept flow | `"AI modification: <first 80 chars of change_request>"` |
-| User restores a previous version | This spec §4 | `"Restored from version <short_id>"` |
+| User restores a previous version | This spec §4 | `"Before restore to <timestamp>"` and `"Restored from version <short_id>"` |
 
 **No snapshot on:**
-- Auto-save (D2 §5.3)
+- Live auto-save (D2 §5.3)
 - ASCII label sync (D2 §7.2)
 - Title-only PATCH
 - Render calls
 
 ### 1.1 Minimum Interval Guard
 
-To prevent accidental duplicate snapshots (double-click Save), a new snapshot is not created if the previous snapshot for this diagram was created less than 5 seconds ago. The PATCH still persists (auto-save behavior), but no version row is written. The 5-second guard applies only to explicit-Save triggers; AI modification and restore always create a snapshot regardless of timing.
+To prevent accidental duplicate snapshots (double-click Save), a new snapshot is not created if the previous snapshot for this diagram was created less than 5 seconds ago. The PATCH still persists through live auto-save behavior, but no version row is written. The 5-second guard applies only to explicit-Save triggers; AI modification and restore always create a snapshot regardless of timing.
 
 ---
 
@@ -153,7 +154,7 @@ Restores the diagram to the state captured in version `{vid}`.
 
 ### 4.3 Restore Does Not Delete History
 
-Restoring a version does not remove any existing version rows. The history is always append-only. After restore, the new snapshot (created in step 9) becomes the latest version.
+Restoring a version does not remove any existing version rows. The history is always append-only. After restore, the post-restore snapshot (created in step 10) becomes the latest version.
 
 ---
 
@@ -236,7 +237,7 @@ None. All D3 decisions are locked.
 
 - `GET /api/v1/diagrams/{id}/versions` returns versions in descending order by `created_at`.
 - Clicking Save creates a new version row; a second click within 5 seconds does not create a duplicate.
-- `POST /api/v1/diagrams/{id}/versions/{vid}/restore` updates `diagrams.spec_json` and creates a new version row.
+- `POST /api/v1/diagrams/{id}/versions/{vid}/restore` updates `diagrams.spec_json` and creates pre-restore and restored version rows.
 - After restore, `ascii_is_detached` is reset to `false`.
 - A version snapshot at spec_version `"1.0"` is migrated before restore if the current spec version has advanced.
 - Pruning removes the oldest version when the 101st version is created, leaving exactly 100.

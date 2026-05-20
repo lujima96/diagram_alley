@@ -30,7 +30,7 @@ Define authentication, session management, BYOK credential storage, permission c
 
 ## Owned Concepts
 
-Auth flow; JWT token model; BYOK encryption; permission key convention; audit event convention; Stripe setup; trial enforcement; `subscriptions` state machine (consumption — owned by F1).
+Auth flow; JWT token model; BYOK encryption; permission key convention; audit event convention and constants; Stripe setup; trial enforcement; `subscriptions` state machine consumption (table and states owned by F1).
 
 ---
 
@@ -87,7 +87,8 @@ All API routes except the public list below require a valid access token. See F5
 - `POST /auth/refresh`
 - `POST /auth/forgot-password`
 - `POST /auth/reset-password`
-- `GET /share/{share_token}` (view-only shared diagrams — D6)
+- `POST /auth/verify`
+- `GET /api/v1/share/{token}` (view-only shared diagram API — D6)
 
 ---
 
@@ -154,7 +155,7 @@ V1 is single-user with no team roles. Two roles exist:
 
 All audit events are past-tense or noun-verb constants, SCREAMING_SNAKE_CASE.
 
-Audit events are stored in a lightweight `audit_log` table (see §3.3) — no external logging service in V1.
+Audit events are stored in the lightweight `audit_log` table owned by F1 §4.10 — no external logging service in V1.
 
 ### 3.2 V1 Audit Events
 
@@ -186,20 +187,9 @@ Audit events are stored in a lightweight `audit_log` table (see §3.3) — no ex
 | `SUBSCRIPTION_CANCELED` | Canceled | user/stripe | subscriptions |
 | `SUBSCRIPTION_EXPIRED` | Trial ended | stripe | subscriptions |
 
-### 3.3 `audit_log` Table
+### 3.3 Audit Log Storage
 
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | UUID | PK |
-| `user_id` | UUID | Actor (nullable for system events) |
-| `event` | TEXT | Event constant (e.g. `DIAGRAM_CREATED`) |
-| `entity_type` | TEXT | Table name (e.g. `diagrams`) |
-| `entity_id` | UUID | Row ID |
-| `detail` | JSONB | Event-specific context |
-| `ip_address` | TEXT | Request IP (nullable) |
-| `created_at` | TIMESTAMPTZ | Event time |
-
-Audit log rows are append-only. No update or delete operations on this table.
+F1 §4.10 owns the `audit_log` table shape. F3 owns the event constants above and the rule that audit log rows are append-only. No update or delete operations are exposed in V1.
 
 ---
 
@@ -243,20 +233,20 @@ Users can set `store_credentials = false` on a `model_providers` row. When this 
 
 On user registration, the backend:
 1. Creates a Stripe Customer with the user's email
-2. Creates a `subscriptions` row with `plan = 'trial'`, `status = 'trialing'`, `trial_ends_at = now() + 14 days`, `stripe_customer_id = <id>`
+2. Creates a `subscriptions` row with `plan = 'trial'`, `status = 'trialing'`, `trial_ends_at = now() + 14 days`, `access_ends_at = trial_ends_at`, `stripe_customer_id = <id>`
 3. Emits `SUBSCRIPTION_TRIAL_STARTED` audit event
 
-On trial expiry (Stripe webhook `customer.subscription.deleted` or a daily cron check against `trial_ends_at`):
+On trial expiry (daily job check against `trial_ends_at`):
 1. Update `subscriptions.status = 'canceled'`
 2. Emit `SUBSCRIPTION_EXPIRED` audit event
-3. User loses access to AI generation features (not the editor — they keep access to manually editing/exporting existing diagrams)
+3. User loses access to AI generation, AI modification, spec editing, and new diagram creation (DEC-022)
 
 **Trial access rules:**
 - Full editor access: yes
 - AI generation: yes (requires BYOK/Ollama — no hosted AI, DEC-010)
 - Unlimited saved diagrams: yes
 - All export formats: yes
-- After trial expires: AI generation disabled, saved diagrams remain accessible read-only, upgrade prompt shown
+- After trial expires: AI generation and spec editing disabled; saved diagrams remain viewable, exportable, and shareable; upgrade prompt shown (DEC-022)
 
 ### 5.3 Upgrade to Pro
 
@@ -275,7 +265,8 @@ All Stripe webhooks arrive at `POST /webhooks/stripe`. The backend:
    - `checkout.session.completed` → upgrade flow
    - `invoice.payment_succeeded` → extend `current_period_end`
    - `invoice.payment_failed` → set `status = 'past_due'`
-   - `customer.subscription.deleted` → set `status = 'canceled'`
+   - `customer.subscription.updated` with `cancel_at_period_end=true` → keep `status = 'active'`, set `cancel_at_period_end = true`, set `access_ends_at = current_period_end`
+   - `customer.subscription.deleted` → set `status = 'canceled'`, set `canceled_at = now()`
 
 Webhook endpoint is **not** auth-protected (Stripe calls it externally). It is signature-verified only.
 
@@ -288,18 +279,26 @@ def require_active_subscription(user: User, db: Session) -> None:
     sub = db.query(Subscription).filter_by(user_id=user.id).first()
     if not sub or sub.status not in ('trialing', 'active'):
         raise SubscriptionRequiredError("Active subscription or trial required")
+    if sub.access_ends_at and sub.access_ends_at <= now():
+        raise SubscriptionRequiredError("Active subscription or trial required")
 ```
 
 Gated features in V1:
 - AI diagram generation (`diagram.ai.generate`)
 - AI diagram modification (`diagram.ai.modify`)
 
-Non-gated features (always available to authenticated users):
-- Manual editor
+Available to authenticated users with `status IN ('trialing', 'active')`:
+- Manual editor and spec updates
+- New diagram creation
+- Version snapshot creation
+
+Available after trial expiry/cancellation (read-only access):
+- Existing diagram viewing
 - All export formats
-- Version history (read)
-- Project management
+- Share link management
+- Version history read
 - Provider configuration
+- Billing upgrade flow
 
 ---
 

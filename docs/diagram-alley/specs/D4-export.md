@@ -30,7 +30,7 @@ Define all export formats, the export endpoint contract, the export state machin
 
 ## Owned Concepts
 
-Export format list; export endpoint contract; export state machine; metadata embedding; file naming convention; export modal UI contract; DIAGRAM_EXPORTED audit event trigger.
+Export format list; export endpoint contract; export state machine; metadata embedding; file naming convention; export modal UI contract; `DIAGRAM_EXPORTED` trigger point (constant owned by F3).
 
 ---
 
@@ -41,17 +41,17 @@ V1 supports the following export formats. Format availability by diagram type is
 | Format | `format` value | Extension | Availability |
 |--------|---------------|-----------|--------------|
 | ASCII text | `ascii` | `.txt` | All types |
-| Markdown (ASCII in fenced block) | `markdown` | `.md` | All types |
+| Markdown (text output in fenced block) | `markdown` | `.md` | All types |
 | Mermaid | `mermaid` | `.mmd` | architecture, database, flowchart, network only |
 | JSON spec | `json` | `.json` | All types |
 | YAML spec | `yaml` | `.yaml` | All types |
 | SVG | `svg` | `.svg` | All types (visual render) |
-| PNG | `png` | `.png` | Deferred to V2 (headless browser render not in V1) |
+| PNG | `png` | `.png` | All types (generated from SVG export path) |
 | PDF | `pdf` | `.pdf` | Deferred to V2 |
 
 **Mermaid availability:** `ui_wireframe` and `file_structure` do not have a meaningful Mermaid equivalent. Requesting `mermaid` for these types returns `400 EXPORT_FORMAT_UNSUPPORTED`.
 
-**PNG/PDF deferral:** These require a headless browser (Puppeteer/Playwright) which adds significant infrastructure. SVG is the V1 visual export. PNG/PDF are listed as planned V2 exports.
+**PNG support:** PNG is V1 (DEC-019). It is generated from the deterministic SVG export path, not from a queued screenshot-only browser workflow. PDF remains deferred to V2.
 
 ---
 
@@ -67,9 +67,9 @@ ready → idle        (user downloads or dismisses)
 error → idle        (user dismisses or retries)
 ```
 
-For synchronous exports (ASCII, Markdown, Mermaid, JSON, YAML, SVG), the state transitions from `idle → exporting → ready` in a single API call (<1s typical). The frontend shows a brief spinner on the export button.
+For synchronous exports (ASCII, Markdown, Mermaid, JSON, YAML, SVG, PNG), the state transitions from `idle → exporting → ready` in a single API call (<1s typical for text/SVG; PNG may take longer but remains synchronous in V1). The frontend shows a brief spinner on the export button.
 
-PNG and PDF (V2) will use the background task pattern (F5 §11) since render takes seconds.
+PDF (V2) will use the background task pattern (F5 §11) if render takes seconds.
 
 ---
 
@@ -85,7 +85,8 @@ PNG and PDF (V2) will use the background task pattern (F5 §11) since render tak
   "options": {
     "include_title": true,
     "include_metadata": false,
-    "ascii_width": null
+    "ascii_width": null,
+    "text_mode": "ascii"
   }
 }
 ```
@@ -96,6 +97,7 @@ PNG and PDF (V2) will use the background task pattern (F5 §11) since render tak
 | `options.include_title` | No | `true` | Prepend diagram title to output |
 | `options.include_metadata` | No | `false` | Append metadata block (see §4) |
 | `options.ascii_width` | No | `null` | Max width for ASCII output in characters; null = no limit |
+| `options.text_mode` | No | `ascii` | `ascii \| utf8`; strict ASCII output stays printable ASCII only (DEC-023) |
 
 ### 3.2 Service Steps
 
@@ -104,12 +106,13 @@ PNG and PDF (V2) will use the background task pattern (F5 §11) since render tak
 2. Validate format value; check diagram_type compatibility
 3. Validate current spec_json (F2 validate_spec); fail if errors present
 4. Select renderer:
-   ascii     → F2 render_ascii
-   markdown  → F2 render_ascii; wrap in markdown fenced block
+   ascii     → F2 render_text(mode=options.text_mode)
+   markdown  → F2 render_text(mode=options.text_mode); wrap in markdown fenced block
    mermaid   → F2 render_mermaid
    json      → serialize spec_json with 2-space indent
    yaml      → re-serialize spec_json as YAML
    svg       → F2 visual renderer → SVG string
+   png       → F2 render_svg → SVG-to-PNG conversion → base64 PNG
 5. Apply options (title prepend, metadata append, width constraint)
 6. Emit DIAGRAM_EXPORTED audit event (F3 §3.2) with detail.format
 7. Return export content
@@ -125,12 +128,13 @@ Export content is returned inline (not as a file download — the client handles
     "format": "ascii",
     "content": "...the export content as a string...",
     "filename": "three-tier-web-app.txt",
-    "content_type": "text/plain"
+    "content_type": "text/plain",
+    "content_encoding": "utf-8"
   }
 }
 ```
 
-SVG content is a full SVG string. The `content_type` is `image/svg+xml`.
+SVG content is a full SVG string with `content_type = "image/svg+xml"` and `content_encoding = "utf-8"`. PNG content is base64-encoded PNG bytes with `content_type = "image/png"` and `content_encoding = "base64"`.
 
 The frontend triggers a browser download using the `filename` from the response.
 
@@ -159,7 +163,7 @@ If the current `spec_json` has validation errors, the export is blocked and retu
 }
 ```
 
-New error code `EXPORT_FORMAT_UNSUPPORTED` must be added to F5 §9.1 error code table.
+Error code `EXPORT_FORMAT_UNSUPPORTED` is defined in F5 §9.1.
 
 ---
 
@@ -201,6 +205,8 @@ Source: diagram-alley
 ```
 
 **SVG:** Appended as an SVG `<desc>` element.
+
+**PNG:** Metadata is written to PNG text chunks when the conversion library supports it. If unsupported, export still succeeds and returns a non-blocking warning.
 
 ---
 
@@ -250,28 +256,17 @@ For text formats (ASCII, Markdown, Mermaid, JSON, YAML): copies the export conte
 
 For SVG: copies the SVG string.
 
+PNG is download-only in V1; copy-to-clipboard is not supported for PNG.
+
 ### 6.3 Quick Export from Preview Panel
 
 The Preview panel (F4 §5.4) has per-tab copy/download buttons:
 - **ASCII tab:** [Copy] copies `ascii_cache`; [Download] triggers export with `format=ascii`
 - **Mermaid tab:** [Copy] copies `mermaid_cache`; [Download] triggers export with `format=mermaid`
 - **JSON/YAML tab:** [Copy] copies spec JSON or YAML re-serialization; [Download] triggers export with `format=json` or `format=yaml`
-- **Visual tab:** [Export SVG] triggers export with `format=svg`
+- **Visual tab:** [Export SVG] triggers export with `format=svg`; [Export PNG] triggers export with `format=png`
 
 These quick-export paths bypass the modal and use the default options (`include_title=true`, `include_metadata=false`).
-
----
-
-## 7. Reconciliation Notes (F5 Drift)
-
-### 7.1 New Error Code
-
-`EXPORT_FORMAT_UNSUPPORTED` (HTTP 400) must be added to F5 §9.1. Added to F5 here as a tracked reconciliation item.
-
-**Action required:** Add to F5 §9.1:
-```
-| 400 | `EXPORT_FORMAT_UNSUPPORTED` | Requested format is not supported for this diagram type |
-```
 
 ---
 
@@ -290,5 +285,6 @@ None. All D4 decisions are locked.
 - Filename for "My DB Schema (v2)!" is `my-db-schema-v2.json` (special characters stripped).
 - `DIAGRAM_EXPORTED` audit event is written with `detail.format` after every successful export.
 - SVG export returns a complete, valid SVG string that renders the diagram visually.
+- PNG export returns base64-encoded PNG bytes generated from the SVG export path.
 - JSON export with `include_metadata=true` includes a `_export_meta` key alongside the spec fields.
 - Copy button in the Preview panel copies ASCII cache without an API call.

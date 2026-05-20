@@ -33,7 +33,7 @@ All foundation specs must reach `ready` status before dependent domain specs are
 | ID | File | Purpose | Status | Depends On |
 |----|------|---------|--------|-----------|
 | F0 | `specs/F0-tech-stack.md` | FastAPI, Vite+React, Postgres, deployment targets, env model, secret management, future constraints | **Draft 0.1** | — |
-| F1 | `specs/F1-diagram-spec-and-data-model.md` | Diagram spec schema, `spec_version` migration strategy, all database tables (`users`, `projects`, `diagrams`, `diagram_versions`, `templates`, `model_providers`, `user_settings`, `subscriptions`), lifecycle rules, state machines | **Draft 0.1** | F0 |
+| F1 | `specs/F1-diagram-spec-and-data-model.md` | Diagram spec schema, `spec_version` migration strategy, all database tables (`users`, `projects`, `diagrams`, `diagram_versions`, `templates`, `model_providers`, `user_settings`, `diagram_shares`, `subscriptions`, `audit_log`), lifecycle rules, state machines | **Draft 0.1** | F0 |
 | F2 | `specs/F2-rendering-validation-repair.md` | Deterministic renderer contract, validation rules per diagram type, repair heuristics, V1 node kind rendering list, ASCII style rules, Mermaid renderer contract, visual renderer contract | **Draft 0.1** | F1 |
 | F3 | `specs/F3-security-auth-billing.md` | Auth provider, session model, BYOK credential storage, Stripe setup, free trial limits (resolved DEC-010), permission key convention, audit event convention, provider credential opt-out | **Draft 0.1** | F0, F1 |
 | F4 | `specs/F4-ui-surface-workspace.md` | Desktop-first surface map, React Flow grid editor architecture, grid coordinate↔ASCII mapping, navigation pattern, workspace layout, responsive rules, component conventions | **Draft 0.1** | F0 |
@@ -161,14 +161,18 @@ Quick lookup for "who owns this concept." If a concept is not listed here, add i
 | `templates` table | F1 |
 | `model_providers` table | F1 |
 | `user_settings` table | F1 |
+| `diagram_shares` table | F1 |
 | `subscriptions` table | F1 |
+| `audit_log` table | F1 |
 | Diagram spec schema | F1 |
 | `spec_version` field and migration | F1 |
 | Diagram type enum | F1 |
 | Node, edge, group models | F1 |
 | ASCII Renderer | F2 |
+| UTF-8 Text Output mode | F2 |
 | Mermaid Renderer | F2 |
 | Visual Renderer | F2 |
+| SVG/PNG visual export renderer | F2 |
 | Validation rules | F2 |
 | Repair pass | F2 |
 | Node kind list and rendering | F2 |
@@ -178,6 +182,7 @@ Quick lookup for "who owns this concept." If a concept is not listed here, add i
 | BYOK credential storage | F3 |
 | Permission key convention | F3 |
 | Audit event convention | F3 |
+| Audit event constants | F3 |
 | Stripe integration | F3 |
 | Free trial limits | F3 |
 | Workspace layout | F4 |
@@ -206,7 +211,6 @@ Quick lookup for "who owns this concept." If a concept is not listed here, add i
 | Mermaid converter | D5 |
 | Import corruption prevention | D5 |
 | Public share links | D6 |
-| `diagram_shares` table | D6 |
 | Share token model | D6 |
 | Embed support | D6 |
 | Billing and subscription tiers | D7 |

@@ -128,11 +128,9 @@ When a decision is **not yet defined**, do not invent an answer. Stop and presen
 
 ## Open Questions
 
-All Phase 0 open questions are resolved — see `decisions-log.md` DEC-010 through DEC-014.
+All Phase 0 and audit reconciliation questions are resolved — see `decisions-log.md` DEC-010 through DEC-025.
 
-One item remains open inside F1 and must be resolved before F1 reaches `ready`:
-
-- **[OPEN — F1]** Exact JSON schema structure (field names, nesting, required vs. optional fields per diagram type) and the `spec_version` migration function contract. Blocks: F1 `ready` and any domain spec that finalizes data shapes.
+F1 schema and migration-contract questions are resolved by DEC-018. No open questions currently block F1 from moving toward `ready`.
 
 ---
 

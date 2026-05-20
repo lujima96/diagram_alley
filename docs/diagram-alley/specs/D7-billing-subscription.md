@@ -43,8 +43,9 @@ From F1 §4.9 and F3 §5.2:
 | `trial` | `trialing` | Active 14-day trial |
 | `trial` | `canceled` | Trial expired, no payment |
 | `pro` | `active` | Paid Pro subscription |
+| `pro` | `active` + `cancel_at_period_end=true` | Canceled in Stripe portal, access continues until `access_ends_at` |
 | `pro` | `past_due` | Payment failed; Stripe retrying |
-| `pro` | `canceled` | User canceled or payment exhausted |
+| `pro` | `canceled` | Access ended after cancellation or payment retries exhausted |
 | `pro` | `incomplete` | Checkout started but not completed |
 
 AI generation is gated on `status IN ('trialing', 'active')` (F3 §5.5).
@@ -157,6 +158,8 @@ Returns the current subscription state for the billing settings page.
     "trial_ends_at": "2026-06-03T10:00:00Z",
     "current_period_start": null,
     "current_period_end": null,
+    "cancel_at_period_end": false,
+    "access_ends_at": "2026-06-03T10:00:00Z",
     "canceled_at": null,
     "days_remaining": 14
   }
@@ -199,10 +202,11 @@ Frontend redirects to `portal_url`. Stripe hosts the portal page.
 
 Cancellation is handled via the Stripe Billing Portal (§5). The user navigates to the portal, cancels the subscription, and Stripe fires:
 
-- `customer.subscription.deleted` → webhook updates `subscriptions.status = 'canceled'`, sets `canceled_at = now()`
+- `customer.subscription.updated` with `cancel_at_period_end=true` → webhook keeps `subscriptions.status = 'active'`, sets `cancel_at_period_end = true`, and sets `access_ends_at = current_period_end`
+- `customer.subscription.deleted` when access actually ends → webhook updates `subscriptions.status = 'canceled'`, sets `canceled_at = now()`
 - Emit `SUBSCRIPTION_CANCELED` audit event (F3 §3.2)
 
-After cancellation, the user retains access until `current_period_end` (Stripe's standard behavior). The frontend shows: "Your Pro subscription will end on <date>. After that, you'll lose access to AI generation."
+After cancel-at-period-end, the user retains active access until `access_ends_at` (Stripe's standard behavior). The frontend shows: "Your Pro subscription will end on <date>. After that, you'll lose editing and AI access."
 
 Diagram data is never deleted on cancellation.
 
@@ -265,6 +269,13 @@ A user with `status = 'canceled'` can resubscribe:
 +------------------------------------------------------------------+
 ```
 
+If `cancel_at_period_end = true`, replace the renewal line with:
+
+```
+| Ends: June 20, 2026                                              |
+| Your Pro access remains active until this date.                  |
+```
+
 ### 9.3 Expired / Canceled State
 
 ```
@@ -274,7 +285,7 @@ A user with `status = 'canceled'` can resubscribe:
 | Plan: Free Trial                                                 |
 | Status: Expired                                                  |
 |                                                                  |
-| Your trial has ended. Upgrade to continue using AI generation.  |
+| Your trial has ended. Upgrade to continue editing and using AI. |
 | Your diagrams are safe and will remain accessible.              |
 |                                                                  |
 | [Upgrade to Pro — $X/month]                                     |
@@ -298,18 +309,6 @@ A user with `status = 'canceled'` can resubscribe:
 
 ---
 
-## 10. Reconciliation Notes
-
-### 10.1 New Error Code
-
-`ALREADY_SUBSCRIBED` (HTTP 400) must be added to F5 §9.1 — returned when `POST /billing/checkout-session` is called by an already-active Pro user.
-
-### 10.2 Diagram Edit Gate
-
-The new subscription check in `PATCH /api/v1/diagrams/{id}` (spec updates blocked for expired users) is not currently in D2. This is an additive constraint on D2 §2.4 — expired users receive `403 SUBSCRIPTION_REQUIRED` for spec PATCH operations. D2 should be read as incorporating this constraint.
-
----
-
 ## Open Questions
 
 None. All D7 decisions are locked.
@@ -321,6 +320,7 @@ None. All D7 decisions are locked.
 - `POST /api/v1/billing/checkout-session` returns a Stripe Checkout URL for a trialing user.
 - `POST /api/v1/billing/checkout-session` returns `400 ALREADY_SUBSCRIBED` for an active Pro user.
 - A `checkout.session.completed` webhook with a valid signature updates `subscriptions.status` to `active`.
+- A `customer.subscription.updated` webhook with `cancel_at_period_end=true` keeps `status='active'` and sets `access_ends_at = current_period_end`.
 - A `customer.subscription.deleted` webhook updates `subscriptions.status` to `canceled`.
 - `GET /api/v1/billing/subscription` returns `days_remaining = 14` for a newly created trial user.
 - `PATCH /api/v1/diagrams/{id}` with spec changes by a `status='canceled'` user returns `403 SUBSCRIPTION_REQUIRED`.

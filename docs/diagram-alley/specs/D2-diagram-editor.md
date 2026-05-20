@@ -46,7 +46,7 @@ Create diagram flow; editor interaction contract; node/edge CRUD operations; ins
 | Quick Create (dashboard) | `/workspace/new?type=<type>` | Blank spec for pre-selected type |
 | From Template | `/workspace/new?template=<template_id>` | Template spec cloned |
 | Open Existing | `/workspace/:diagramId` | Saved spec loaded from API |
-| After AI generation (D1) | `/workspace/:diagramId` | AI-generated spec auto-saved |
+| After AI generation (D1) | `/workspace/:diagramId` | AI-generated spec persisted with an initial version snapshot |
 
 ### 1.2 New Blank Diagram
 
@@ -121,17 +121,19 @@ Partial update. All fields are optional.
 {
   "title": "string",
   "spec_json": { "...": "full spec or null" },
-  "project_id": "uuid | null"
+  "project_id": "uuid | null",
+  "create_version_snapshot": false,
+  "change_summary": "string | null"
 }
 ```
 
 When `spec_json` is provided:
-1. Check subscription gate: if the user's `subscription.status = 'canceled'`, return `403 SUBSCRIPTION_REQUIRED`. Title and `project_id` updates in the same request are still permitted; only `spec_json` is blocked. (D7 §2.3)
+1. Check subscription gate: if the user's subscription is not `trialing` or `active`, or `access_ends_at` has passed, return `403 SUBSCRIPTION_REQUIRED`. Title and `project_id` updates in the same request are still permitted; only `spec_json` is blocked. (D7 §2.3, DEC-022)
 2. Validate the new spec (F2 `validate_spec`).
 3. If validation errors exist, return `400 SPEC_VALIDATION_FAILED` with error detail.
 4. If valid, write `spec_json`, clear `ascii_cache` and `mermaid_cache` (set to NULL), update `updated_at`.
 5. Re-render ASCII and Mermaid synchronously; return fresh caches in response.
-6. Version snapshot is **not** automatically created on every PATCH (see §5.3 for snapshot triggers).
+6. If `create_version_snapshot = true`, create a `diagram_versions` row with `change_summary` or the default summary for the triggering flow. Otherwise, no version snapshot is created.
 
 Returns the updated diagram object.
 
@@ -255,38 +257,48 @@ React Flow's built-in zoom (scroll wheel, pinch) and pan (drag on empty canvas).
 
 ---
 
-## 5. Unsaved Changes and Auto-Save
+## 5. Live Persistence and Version Snapshots
 
-### 5.1 Unsaved Changes Flag
+### 5.1 Change State Flags
 
-`diagramStore.isDirty` is `true` whenever the in-memory `spec_json` differs from the last-persisted state. The workspace header shows a "Unsaved" badge when dirty.
+The workspace tracks two separate states (DEC-021):
 
-### 5.2 Manual Save
+- `has_unpersisted_changes`: the in-memory `spec_json` differs from the last successful PATCH/POST response.
+- `has_unversioned_changes`: the live persisted `spec_json` differs from the latest `diagram_versions` snapshot.
+
+The workspace header shows "Saving..." while `has_unpersisted_changes` is true and a persistence request is in flight. The Save button is enabled while `has_unversioned_changes` is true.
+
+### 5.2 Manual Save / Snapshot
 
 The workspace header has a `[Save]` button. Clicking it:
-1. Calls `PATCH /api/v1/diagrams/{id}` with the current spec immediately (bypasses debounce).
-2. Creates a version snapshot (D3 trigger 1 — explicit save).
-3. Clears `isDirty`.
+1. Flushes any pending live-persistence PATCH immediately.
+2. Calls `PATCH /api/v1/diagrams/{id}` with `create_version_snapshot = true` and `change_summary = "Manual save"` (or `POST /api/v1/diagrams` for a brand-new diagram).
+3. Creates a version snapshot (D3 trigger 1 — explicit save).
+4. Clears `has_unpersisted_changes` and `has_unversioned_changes`.
 
 Keyboard shortcut: `Ctrl+S` / `Cmd+S`.
 
-For a brand-new diagram (not yet persisted), Save calls `POST /api/v1/diagrams` instead.
+For a brand-new diagram (not yet persisted), Save calls `POST /api/v1/diagrams` and creates the initial manual-save snapshot.
 
-### 5.3 Auto-Save
+### 5.3 Live Auto-Save
+
+Live auto-save persists the current spec without creating a version snapshot (DEC-021).
 
 Auto-save fires:
-- After 30 seconds of inactivity following a spec change (`diagramStore.isDirty = true`).
-- On browser `beforeunload` if `isDirty`.
+- 300ms after interactive editor changes (drag, add/delete node, inspector edit), using the existing PATCH debounce.
+- After 30 seconds of inactivity as a fallback if a previous debounce did not complete.
+- On browser `beforeunload` if `has_unpersisted_changes`.
 
-Auto-save calls `PATCH /api/v1/diagrams/{id}` but does **not** create a version snapshot. Snapshots are only created on:
+Auto-save calls `PATCH /api/v1/diagrams/{id}` with `create_version_snapshot = false`. Snapshots are only created on:
 1. Explicit Save (§5.2)
-2. AI modification accepted (D1 §4.2)
-3. Version restore (D3)
+2. Initial AI generation (D1 §3.3)
+3. AI modification accepted (D1 §4.2)
+4. Version restore (D3)
 
 ### 5.4 Navigation Away Guard
 
-If `isDirty` and the user navigates to a different route, the frontend shows a confirmation dialog:
-> "You have unsaved changes. Save now or discard?"
+If `has_unpersisted_changes` and the user navigates to a different route, the frontend shows a confirmation dialog:
+> "Your latest changes are still saving. Save now or discard?"
 > [Save] [Discard] [Cancel]
 
 ---
@@ -376,7 +388,7 @@ When structural ASCII changes are detected (§7.2) or the user directly download
 3. The `[Reset to spec]` action: re-renders ASCII from the current spec and clears `ascii_is_detached`.
 4. The `[Keep detached]` action: dismisses the banner for this session but the flag remains in the database.
 
-**Note:** `ascii_is_detached` column is in the `diagrams` table (F1 §4.3 — this column must be added; see reconciliation note below).
+**Note:** `ascii_is_detached` column is in the `diagrams` table (F1 §4.3).
 
 ### 7.4 Sync-ASCII Endpoint
 
@@ -416,22 +428,6 @@ When structural ASCII changes are detected (§7.2) or the user directly download
 ## 8. Diagram Title Editing
 
 The diagram title is editable in the workspace header (inline click-to-edit). Saving the title calls `PATCH /api/v1/diagrams/{id}` with `{ "title": "new title" }`. Title changes do not create version snapshots and do not affect `spec_json`.
-
----
-
-## 9. Spec Reconciliation Notes (F1 / F2 Drift)
-
-### 9.1 `ascii_is_detached` Column
-
-F2 §7.3 (detached export state) requires `diagrams.ascii_is_detached BOOLEAN NOT NULL DEFAULT false`. This column is **not** currently in the F1 §4.3 table definition. F1 must be updated to add it before either spec is marked `ready`.
-
-**Action required:** Update F1 §4.3 to add `ascii_is_detached BOOLEAN NOT NULL DEFAULT false`.
-
-### 9.2 `sync-ascii` Endpoint Ownership
-
-`POST /api/v1/diagrams/{id}/sync-ascii` is a new endpoint not listed in F5 §10. It must be added to F5's endpoint index before F5 is marked `ready`.
-
-**Action required:** Add `POST /api/v1/diagrams/{id}/sync-ascii | Sync ASCII label changes back to spec` to the Diagrams section of F5 §10.
 
 ---
 

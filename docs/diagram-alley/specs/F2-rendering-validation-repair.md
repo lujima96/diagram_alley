@@ -30,7 +30,7 @@ Define the deterministic rendering contract for all output formats, the validati
 
 ## Owned Concepts
 
-ASCII Renderer, Mermaid Renderer, Visual Renderer; validation rules per diagram type; repair pass; reverse sync scope; detached export state; node kind rendering table.
+ASCII/Text Renderer, Mermaid Renderer, Visual Renderer; validation rules per diagram type; repair pass; reverse sync scope; detached export state; node kind rendering table.
 
 ---
 
@@ -46,7 +46,7 @@ Diagram Spec (JSON)
     → (Repair Pass if invalid)
     → Re-validation
     → Renderer
-    → Output (ASCII | Mermaid | SVG)
+    → Output (ASCII text | UTF-8 text | Mermaid | SVG | PNG)
 ```
 
 A spec with unresolved validation errors is never rendered. The renderer is never called with an invalid spec.
@@ -189,13 +189,15 @@ The UI displays repairs as a non-blocking warning banner.
 
 ---
 
-## 4. ASCII Renderer
+## 4. ASCII/Text Renderer
 
 ### 4.1 Contract
 
 - **Input:** A validated Diagram Spec (JSON) + optional layout metadata (grid positions from the Visual Grid Editor).
-- **Output:** A plain-text string using only printable ASCII characters (+ `\n`).
-- **Determinism:** Same spec + same positions → identical output, always.
+- **Output:** A deterministic plain-text string in either strict ASCII mode or UTF-8 text mode (DEC-023).
+- **Strict ASCII mode:** Uses printable ASCII characters only (+ `\n`).
+- **UTF-8 text mode:** May use Unicode tree/box glyphs for readability. UTF-8 output must not be labeled ASCII.
+- **Determinism:** Same spec + same positions + same text mode → identical output, always.
 - **Width:** Box widths are calculated from content (label length + fixed padding of 2 chars each side). No hard max width in V1 — the consumer (UI, export) controls truncation or scrolling.
 - **Direction:** `top_down` renders nodes in rows; `left_right` renders nodes in columns.
 
@@ -273,7 +275,8 @@ Column alignment: name and type are left-aligned, annotation (PK, FK) is right-a
 - **Top-down edges:** Vertical `|` runs with `v` arrowhead, edge label centered on the line.
 - **Left-right edges:** Horizontal `-` runs with `>` arrowhead, edge label above the line.
 - **Cross edges** (connecting non-adjacent columns): routed with `+` junctions at turns.
-- **Dashed edges:** Use `·` instead of `-` or `|` (ASCII-safe approximation).
+- **Dashed edges in strict ASCII mode:** Use `.` instead of `-` or `|`.
+- **Dashed edges in UTF-8 text mode:** May use `·` for a clearer dotted line.
 
 ### 4.6 File Structure Rendering
 
@@ -286,7 +289,18 @@ project/
     └── main.py
 ```
 
-Uses Unicode box-drawing for tree lines (`├──`, `│`, `└──`). This is an accepted exception — the file structure renderer outputs UTF-8 tree characters because the alternatives (ASCII-only) are significantly less readable.
+UTF-8 text mode uses Unicode box-drawing for tree lines (`├──`, `│`, `└──`) because it is significantly more readable.
+
+Strict ASCII mode uses this fallback:
+
+```
+project/
+|-- frontend/
+|   |-- src/
+|   |   `-- App.tsx
+`-- backend/
+    `-- main.py
+```
 
 ### 4.7 Layout Metadata
 
@@ -361,11 +375,13 @@ Relationship type mapping:
 
 ### 6.1 Contract
 
-The visual renderer is powered by **React Flow** (DEC-013). It reads the Diagram Spec and the same layout metadata used by the ASCII renderer.
+The browser visual renderer is powered by **React Flow** (DEC-013). It reads the Diagram Spec and the same layout metadata used by the ASCII/Text Renderer.
 
 - **Input:** Diagram Spec (JSON) + layout positions → React Flow `nodes[]` and `edges[]` arrays.
 - **Output:** An interactive SVG canvas rendered in the browser.
 - **Determinism:** Same spec + same positions → same initial render. User drag operations update positions in the spec (round-trip).
+
+For export, the visual export renderer serializes the same validated spec and layout metadata into a standalone SVG string. PNG export is generated from that deterministic SVG output (DEC-019); it is not a screenshot-only workflow.
 
 ### 6.2 Grid Coordinate → React Flow Position Mapping
 
@@ -420,7 +436,7 @@ Each `node.kind` maps to a custom React Flow node component. The component rende
 When a diagram's ASCII output has been edited in ways beyond label changes:
 
 - The `diagrams.ascii_cache` column stores the edited ASCII as-is.
-- A `is_ascii_detached: true` flag is stored alongside the cache (or as a separate boolean column — add `ascii_is_detached BOOLEAN NOT NULL DEFAULT false` to `diagrams` table).
+- The `diagrams.ascii_is_detached` column (F1 §4.3) is set to `true`.
 - The UI shows a persistent warning banner: *"This ASCII has been manually edited and is no longer synced with the diagram spec. Edits beyond label changes are not reflected in the spec. Re-render from spec to discard manual changes."*
 - The user can: (a) re-render from spec (loses ASCII edits), or (b) keep the detached ASCII for export only.
 - Exporting a detached diagram shows the same warning in the export UI.
@@ -432,11 +448,20 @@ When a diagram's ASCII output has been edited in ways beyond label changes:
 The render service (`app/services/render_service.py`) exposes these functions:
 
 ```python
+def render_text(spec: dict, mode: str = "ascii") -> str:
+    """Validates spec, renders strict ASCII or UTF-8 text. Raises ValidationError if spec is invalid."""
+
 def render_ascii(spec: dict) -> str:
-    """Validates spec, renders ASCII. Raises ValidationError if spec is invalid."""
+    """Compatibility wrapper for render_text(spec, mode="ascii")."""
 
 def render_mermaid(spec: dict) -> str:
     """Validates spec, renders Mermaid. Raises UnsupportedDiagramTypeError for unsupported types."""
+
+def render_svg(spec: dict) -> str:
+    """Validates spec, renders standalone SVG for export."""
+
+def render_png(spec: dict) -> bytes:
+    """Validates spec, renders PNG bytes from the standalone SVG output."""
 
 def validate_spec(spec: dict) -> ValidationResult:
     """Returns ValidationResult with errors, warnings, repair_suggestions."""
@@ -455,7 +480,9 @@ None. All F2 decisions are locked in `decisions-log.md`.
 
 ## Acceptance Criteria
 
-- The same architecture spec input produces identical ASCII output on every call (determinism).
+- The same architecture spec input produces identical text output on every call for the same text mode (determinism).
+- Strict ASCII mode emits only printable ASCII characters plus newlines.
+- UTF-8 text mode can emit file-tree glyphs for file structure diagrams.
 - A spec with a missing node ID passes through the repair pass, receives a generated ID, and renders successfully.
 - An edge referencing a non-existent node is removed by the repair pass; the diagram renders without that edge.
 - A `database` kind node renders with `((  ))` cylinder border characters in ASCII.
@@ -466,3 +493,5 @@ None. All F2 decisions are locked in `decisions-log.md`.
 - Editing a node's border in ASCII output triggers detached export state without updating the spec.
 - Architecture → Mermaid renders a valid Mermaid `graph TD` string accepted by the Mermaid parser.
 - Database → Mermaid renders a valid `erDiagram` string.
+- SVG export returns a standalone SVG string from the validated spec.
+- PNG export returns valid PNG bytes generated from the SVG export path.

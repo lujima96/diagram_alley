@@ -14,15 +14,15 @@ Terms are listed alphabetically. Add new terms here when they are first introduc
 
 ## ASCII Output
 
-The plain-text rendering of a diagram, using ASCII box-drawing characters and arrows. Produced deterministically by the ASCII Renderer from the Diagram Spec. Must be reproducible from the same spec every time with no variation. The primary export format for V1.
+The strict-ASCII text rendering of a diagram, using printable ASCII characters only. Produced deterministically by the ASCII Renderer from the Diagram Spec. Must be reproducible from the same spec every time with no variation. The primary text export format for V1.
 
-See also: [Detached Export](#detached-export), [ASCII Renderer](#ascii-renderer).
+See also: [Text Output](#text-output), [Detached Export](#detached-export), [ASCII Renderer](#ascii-renderer).
 
 ---
 
 ## ASCII Renderer
 
-The component responsible for converting a validated Diagram Spec into ASCII Output. The renderer is deterministic — given the same spec and layout metadata, it always produces the same output. The LLM is never the final layout engine. Owner spec: `F2-rendering-validation-repair.md`.
+The component responsible for converting a validated Diagram Spec into strict ASCII Output or UTF-8 Text Output. The renderer is deterministic — given the same spec, layout metadata, and text mode, it always produces the same output. The LLM is never the final layout engine. Owner spec: `F2-rendering-validation-repair.md`.
 
 ---
 
@@ -99,7 +99,7 @@ An optional container in an architecture diagram that holds one or more Nodes. U
 
 ## Layout Engine
 
-The part of the ASCII Renderer responsible for positioning nodes and edges on a grid and calculating spacing, box widths, and arrow routes. The layout engine is deterministic. It uses grid position metadata from the Visual Grid Editor where available. Owner spec: `F2-rendering-validation-repair.md`.
+The part of the ASCII/Text Renderer responsible for positioning nodes and edges on a grid and calculating spacing, box widths, and arrow routes. The layout engine is deterministic. It uses grid position metadata from the Visual Grid Editor where available. Owner spec: `F2-rendering-validation-repair.md`.
 
 ---
 
@@ -123,7 +123,13 @@ A discrete element within an architecture or network diagram. Nodes have an ID, 
 
 ## Node Kind
 
-The semantic type of an architecture or network Node. Node kinds determine the icon, rendering style (in V1 some kinds collapse to generic), and optional validation rules. The full list of V1 node kinds and which ones get distinct rendering is defined in `F2-rendering-validation-repair.md`. Owner spec: `F2-rendering-validation-repair.md`.
+The semantic type of an architecture or network Node. Node kinds determine the icon, rendering style, and optional validation rules. All named architecture node kinds get distinct rendering in V1 (DEC-012). The full list of V1 node kinds and rendering treatments is defined in `F2-rendering-validation-repair.md`. Owner spec: `F2-rendering-validation-repair.md`.
+
+---
+
+## Text Output
+
+A deterministic plain-text rendering of a diagram. Text Output can be strict ASCII or UTF-8. UTF-8 text mode may use Unicode box-drawing or tree characters when they materially improve readability; strict ASCII mode must not. Owner spec: `F2-rendering-validation-repair.md`.
 
 ---
 
@@ -153,7 +159,7 @@ An automated step that attempts to fix a Diagram Spec that has failed validation
 
 ## Renderer
 
-Any component that converts a validated Diagram Spec into a specific output format. V1 renderers: ASCII Renderer, Mermaid Renderer, Visual Renderer (SVG/grid). Owner spec: `F2-rendering-validation-repair.md`.
+Any component that converts a validated Diagram Spec into a specific output format. V1 renderers: ASCII/Text Renderer, Mermaid Renderer, Visual Renderer (SVG/grid), SVG export renderer, and PNG export conversion. Owner spec: `F2-rendering-validation-repair.md`.
 
 ---
 
@@ -195,7 +201,7 @@ A snapshot of a Diagram Spec at a point in time. Versions are created when a dia
 
 ## Visual Grid Editor
 
-The primary editing surface in the workspace. A canvas that renders nodes and edges on a deterministic grid, allows drag-and-drop repositioning, and updates the Diagram Spec on every edit. The visual grid editor is backed by layout metadata that also informs the ASCII Renderer. The grid editor architecture must be specced in `F4-ui-surface-workspace.md` before any domain UI implementation. Owner spec: `F4-ui-surface-workspace.md`, `D2-diagram-editor.md`.
+The primary editing surface in the workspace. A canvas that renders nodes and edges on a deterministic grid, allows drag-and-drop repositioning, and updates the Diagram Spec on every edit. The visual grid editor is backed by layout metadata that also informs the ASCII/Text Renderer. The grid editor architecture must be specced in `F4-ui-surface-workspace.md` before any domain UI implementation. Owner spec: `F4-ui-surface-workspace.md`, `D2-diagram-editor.md`.
 
 ---
 
