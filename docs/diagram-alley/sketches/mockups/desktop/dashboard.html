@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Diagram Alley Mockup</title>
+<link rel="stylesheet" href="../_shared.css">
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">DA</div>
+      Diagram Alley
+    </div>
+    <button class="sidebar-new-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New Diagram
+    </button>
+    <a href="dashboard.html" class="nav-item active">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a href="library.html" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Library
+    </a>
+    <a href="templates.html" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      Templates
+    </a>
+    <a href="#" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      Projects
+    </a>
+    <div class="sidebar-footer">
+      <a href="settings-providers.html" class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M8.46 15.54a5 5 0 0 1 0-7.07"/></svg>
+        Providers
+      </a>
+      <a href="billing.html" class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Billing
+      </a>
+      <div class="nav-item" style="margin-top: auto;">
+        <div class="avatar">PR</div>
+        <div class="flex-1 overflow-hidden">
+          <div class="truncate" style="font-size:13px; font-weight:600;">Priya R.</div>
+          <div class="truncate" style="font-size:11px; color: var(--text-tertiary);">Pro · 12 days left</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <div class="main-content">
+    <div class="header-bar">
+      <div class="header-title">Dashboard</div>
+      <div class="header-actions">
+        <div class="provider-status">
+          <div class="status-dot connected"></div>
+          GPT-4o (BYOK)
+        </div>
+        <div class="trial-chip">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          12 days left
+        </div>
+        <div class="avatar">PR</div>
+      </div>
+    </div>
+
+    <div class="page-scroll">
+      <div class="page-content">
+
+        <!-- Quick start -->
+        <div class="mb-4">
+          <div class="section-header">
+            <div class="section-title">Start a diagram</div>
+          </div>
+          <div class="grid-5" style="grid-template-columns: repeat(5, 1fr);">
+            <button class="card card-sm" style="border:none; cursor:pointer; text-align:left;">
+              <div class="card-body" style="padding: var(--sp-3) var(--sp-4); display:flex; align-items:center; gap:var(--sp-2);">
+                <span style="font-size:18px;">🏗️</span>
+                <span class="subhead">Architecture</span>
+              </div>
+            </button>
+            <button class="card card-sm" style="border:none; cursor:pointer; text-align:left;">
+              <div class="card-body" style="padding: var(--sp-3) var(--sp-4); display:flex; align-items:center; gap:var(--sp-2);">
+                <span style="font-size:18px;">🗄️</span>
+                <span class="subhead">Database Schema</span>
+              </div>
+            </button>
+            <button class="card card-sm" style="border:none; cursor:pointer; text-align:left;">
+              <div class="card-body" style="padding: var(--sp-3) var(--sp-4); display:flex; align-items:center; gap:var(--sp-2);">
+                <span style="font-size:18px;">🔀</span>
+                <span class="subhead">Flowchart</span>
+              </div>
+            </button>
+            <button class="card card-sm" style="border:none; cursor:pointer; text-align:left;">
+              <div class="card-body" style="padding: var(--sp-3) var(--sp-4); display:flex; align-items:center; gap:var(--sp-2);">
+                <span style="font-size:18px;">🖼️</span>
+                <span class="subhead">UI Wireframe</span>
+              </div>
+            </button>
+            <button class="card card-sm" style="border:none; cursor:pointer; text-align:left;">
+              <div class="card-body" style="padding: var(--sp-3) var(--sp-4); display:flex; align-items:center; gap:var(--sp-2);">
+                <span style="font-size:18px;">🌐</span>
+                <span class="subhead">Network</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Recent diagrams -->
+        <div class="mb-4">
+          <div class="section-header">
+            <div class="section-title">Recent diagrams</div>
+            <a href="library.html" class="btn btn-ghost btn-sm">View all</a>
+          </div>
+          <div class="grid-3">
+
+            <div class="diagram-card">
+              <div class="diagram-card-thumb">
+                <pre>+-------------------+
+| Inventory API     |
+| service           |
++--------+----------+
+         |
+         v
++-------------------+
+| Postgres DB       |
+| database          |
++-------------------+</pre>
+              </div>
+              <div class="diagram-card-body">
+                <div class="diagram-card-title">Inventory API Architecture</div>
+                <div class="diagram-card-meta">Architecture · 2 hours ago</div>
+                <div class="mt-2 flex gap-1">
+                  <span class="badge badge-blue">architecture</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="diagram-card">
+              <div class="diagram-card-thumb">
+                <pre>+--------------------+
+| orders             |
++--------------------+
+| id      PK         |
+| user_id FK         |
+| total   DECIMAL    |
++--------------------+
+       |
+       v
++--------------------+
+| order_items        |
++--------------------+</pre>
+              </div>
+              <div class="diagram-card-body">
+                <div class="diagram-card-title">Orders Schema v3</div>
+                <div class="diagram-card-meta">Database Schema · Yesterday</div>
+                <div class="mt-2 flex gap-1">
+                  <span class="badge badge-gray">database</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="diagram-card">
+              <div class="diagram-card-thumb">
+                <pre>+----------------------------+
+| Header: Auth Dashboard     |
++----------+-----------------+
+| Sidebar  | Main            |
+|          | +------+------+ |
+| - Users  | | Active| Pending|
+| - Roles  | +------+------+ |
+| - Audit  |                 |
++----------+-----------------+</pre>
+              </div>
+              <div class="diagram-card-body">
+                <div class="diagram-card-title">Admin Dashboard Wireframe</div>
+                <div class="diagram-card-meta">UI Wireframe · 3 days ago</div>
+                <div class="mt-2 flex gap-1">
+                  <span class="badge badge-gray">wireframe</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Projects -->
+        <div class="mb-4">
+          <div class="section-header">
+            <div class="section-title">Projects</div>
+            <button class="btn btn-ghost btn-sm">New project</button>
+          </div>
+          <div class="grid-2">
+            <div class="card card-sm">
+              <div class="card-body" style="padding: var(--sp-4); display:flex; align-items:center; gap: var(--sp-3);">
+                <div style="width:36px; height:36px; border-radius:var(--r-s); background: var(--accent-muted); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">📦</div>
+                <div class="flex-1 overflow-hidden">
+                  <div class="body-strong truncate">Inventory Management System</div>
+                  <div class="footnote text-secondary">4 diagrams · Updated 2 hours ago</div>
+                </div>
+              </div>
+            </div>
+            <div class="card card-sm">
+              <div class="card-body" style="padding: var(--sp-4); display:flex; align-items:center; gap: var(--sp-3);">
+                <div style="width:36px; height:36px; border-radius:var(--r-s); background: #F0F0F5; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">🔐</div>
+                <div class="flex-1 overflow-hidden">
+                  <div class="body-strong truncate">Auth Service Redesign</div>
+                  <div class="footnote text-secondary">2 diagrams · Updated yesterday</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<div class="mockup-note">dashboard · /dashboard</div>
+</body>
+</html>

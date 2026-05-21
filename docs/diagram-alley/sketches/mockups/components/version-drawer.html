@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Version Drawer — Component</title>
+<link rel="stylesheet" href="../_shared.css">
+<style>
+  body { padding: var(--sp-8); background: var(--bg-base); display:flex; gap:var(--sp-8); flex-wrap:wrap; align-items:flex-start; }
+  .component-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-tertiary); margin-bottom: var(--sp-3); }
+  .drawer-frame { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--r-l); overflow: hidden; width: 320px; }
+  .drawer-header { padding: var(--sp-4) var(--sp-5); border-bottom: 1px solid var(--border-subtle); display:flex; align-items:center; justify-content:space-between; }
+  .drawer-title { font-size: 15px; font-weight: 700; color: var(--text-primary); font-family: var(--font-display); }
+  .version-list { display:flex; flex-direction:column; max-height:480px; overflow-y:auto; }
+</style>
+</head>
+<body>
+
+<!-- Default: list with one selected -->
+<div>
+  <div class="component-label">Version Drawer — Entry selected</div>
+  <div class="drawer-frame">
+    <div class="drawer-header">
+      <div class="drawer-title">Version history</div>
+      <button class="btn btn-ghost btn-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="version-list">
+
+      <!-- Version 4: current -->
+      <div class="version-item" style="background:var(--bg-base);">
+        <div class="version-dot" style="background:var(--accent);"></div>
+        <div style="flex:1; min-width:0;">
+          <div style="display:flex; align-items:center; gap:var(--sp-2);">
+            <div style="font-size:13px; font-weight:600; color:var(--text-primary);">AI update — added Redis layer</div>
+            <span class="badge badge-blue" style="font-size:10px;">Current</span>
+          </div>
+          <div style="font-size:11px; color:var(--text-tertiary); margin-top:2px;">Today, 2:14 PM · AI modification</div>
+        </div>
+      </div>
+
+      <!-- Version 3: selected with preview -->
+      <div class="version-item" style="background:var(--accent-muted); border-left:2px solid var(--accent);">
+        <div class="version-dot" style="background:var(--accent);"></div>
+        <div style="flex:1; min-width:0;">
+          <div style="font-size:13px; font-weight:600; color:var(--text-primary);">Added DB schema tables</div>
+          <div style="font-size:11px; color:var(--text-tertiary); margin-top:2px;">Today, 1:47 PM · Manual save</div>
+          <!-- Expanded preview -->
+          <div style="margin-top:var(--sp-3); background:var(--bg-code); border-radius:var(--r-s); padding:var(--sp-3); font-family:var(--font-mono); font-size:10px; line-height:1.6; color:var(--text-code); overflow-x:auto;">
+<pre>+--------------------+
+| React Frontend     |
++--------+-----------+
+         |
+         v
++--------------------+
+| Inventory API      |
++------+-------------+
+       |
+       v
++--------------------+
+| Postgres DB        |
+| orders / products  |
++--------------------+</pre>
+          </div>
+          <div style="margin-top:var(--sp-3); display:flex; gap:var(--sp-2);">
+            <button class="btn btn-primary btn-sm flex-1">Restore this version</button>
+            <button class="btn btn-ghost btn-sm">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Version 2 -->
+      <div class="version-item">
+        <div class="version-dot"></div>
+        <div style="flex:1; min-width:0;">
+          <div style="font-size:13px; font-weight:600; color:var(--text-primary);">Initial manual save</div>
+          <div style="font-size:11px; color:var(--text-tertiary); margin-top:2px;">Today, 1:20 PM · Manual save</div>
+        </div>
+      </div>
+
+      <!-- Version 1: initial generation -->
+      <div class="version-item">
+        <div class="version-dot"></div>
+        <div style="flex:1; min-width:0;">
+          <div style="font-size:13px; font-weight:600; color:var(--text-primary);">Initial AI generation</div>
+          <div style="font-size:11px; color:var(--text-tertiary); margin-top:2px;">Today, 12:58 PM · Generated</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Restoring state -->
+<div>
+  <div class="component-label">Version Drawer — Restoring</div>
+  <div class="drawer-frame">
+    <div class="drawer-header">
+      <div class="drawer-title">Version history</div>
+      <button class="btn btn-ghost btn-icon" disabled style="opacity:0.4;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div style="padding:var(--sp-8); display:flex; flex-direction:column; align-items:center; gap:var(--sp-4); text-align:center;">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5" style="opacity:0.6;"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      <div style="font-size:14px; font-weight:600; color:var(--text-primary);">Restoring version…</div>
+      <div style="font-size:12px; color:var(--text-secondary);">Saving a snapshot of the current state first.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Empty state (new diagram, no saves yet) -->
+<div>
+  <div class="component-label">Version Drawer — No versions yet</div>
+  <div class="drawer-frame">
+    <div class="drawer-header">
+      <div class="drawer-title">Version history</div>
+      <button class="btn btn-ghost btn-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div style="padding:var(--sp-8); display:flex; flex-direction:column; align-items:center; gap:var(--sp-3); text-align:center;">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <div style="font-size:14px; font-weight:600; color:var(--text-primary);">No saved versions yet</div>
+      <div style="font-size:12px; color:var(--text-secondary); line-height:1.5;">Save this diagram to create your first version snapshot. Auto-save keeps changes safe between saves.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Compact list (no selection open) -->
+<div>
+  <div class="component-label">Version Drawer — List only (no selection)</div>
+  <div class="drawer-frame">
+    <div class="drawer-header">
+      <div class="drawer-title">Version history</div>
+      <button class="btn btn-ghost btn-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="version-list">
+      <div class="version-item">
+        <div class="version-dot" style="background:var(--accent);"></div>
+        <div style="flex:1; min-width:0;">
+          <div style="display:flex; align-items:center; gap:var(--sp-2);">
+            <div style="font-size:13px; font-weight:600; color:var(--text-primary);">AI update — added Redis layer</div>
+            <span class="badge badge-blue" style="font-size:10px;">Current</span>
+          </div>
+          <div style="font-size:11px; color:var(--text-tertiary); margin-top:2px;">Today, 2:14 PM · AI modification</div>
+        </div>
+      </div>
+      <div class="version-item">
+        <div class="version-dot"></div>
+        <div style="flex:1; min-width:0;">
+          <div style="font-size:13px; font-weight:600; color:var(--text-primary);">Added DB schema tables</div>
+          <div style="font-size:11px; color:var(--text-tertiary); margin-top:2px;">Today, 1:47 PM · Manual save</div>
+        </div>
+      </div>
+      <div class="version-item">
+        <div class="version-dot"></div>
+        <div style="flex:1; min-width:0;">
+          <div style="font-size:13px; font-weight:600; color:var(--text-primary);">Initial manual save</div>
+          <div style="font-size:11px; color:var(--text-tertiary); margin-top:2px;">Today, 1:20 PM · Manual save</div>
+        </div>
+      </div>
+      <div class="version-item">
+        <div class="version-dot"></div>
+        <div style="flex:1; min-width:0;">
+          <div style="font-size:13px; font-weight:600; color:var(--text-primary);">Initial AI generation</div>
+          <div style="font-size:11px; color:var(--text-tertiary); margin-top:2px;">Today, 12:58 PM · Generated</div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:var(--sp-3) var(--sp-4); border-top:1px solid var(--border-subtle);">
+      <div style="font-size:11px; color:var(--text-tertiary); text-align:center;">Click any version to preview and restore</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

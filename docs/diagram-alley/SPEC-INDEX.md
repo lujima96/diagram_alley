@@ -63,9 +63,9 @@ Write in the order listed. Each spec depends on the foundation specs shown.
 
 | File | Purpose | Status |
 |------|---------|--------|
-| `sketches/personas.md` | Full persona entries (expands Phase 0 stub) | Planned |
-| `sketches/surfaces/desktop.md` | Desktop route list, device assumptions, nav pattern, offline behavior | Planned |
-| `sketches/surfaces/mobile.md` | Mobile: read-only / share viewing only (V1) | Planned |
+| `sketches/personas.md` | Full persona entries (expands Phase 0 stub) | **Done** |
+| `sketches/surfaces/desktop.md` | Desktop route list, device assumptions, nav pattern, offline behavior | **Done** |
+| `sketches/surfaces/mobile.md` | Mobile: read-only / share viewing only (V1) | **Done** |
 
 ---
 
@@ -73,12 +73,12 @@ Write in the order listed. Each spec depends on the foundation specs shown.
 
 | File | Purpose | Status |
 |------|---------|--------|
-| `sketches/flows/ai-generation.md` | End-to-end AI generation flow with realistic cast and data | Planned |
-| `sketches/flows/manual-edit.md` | Manual create and edit flow | Planned |
-| `sketches/flows/ascii-export-and-reverse-sync.md` | ASCII export, label-change sync, detached export warning | Planned |
-| `sketches/flows/version-history.md` | Save, restore, branch from version | Planned |
-| `sketches/flows/sharing.md` | Public link creation and view-only access | Planned |
-| `sketches/flows/billing-upgrade.md` | Trial start, limit hit, upgrade, diagram unlock | Planned |
+| `sketches/flows/ai-generation.md` | End-to-end AI generation flow with realistic cast and data | **Done** |
+| `sketches/flows/manual-edit.md` | Manual create and edit flow | **Done** |
+| `sketches/flows/ascii-export-and-reverse-sync.md` | ASCII export, label-change sync, detached export warning | **Done** |
+| `sketches/flows/version-history.md` | Save, restore, branch from version | **Done** |
+| `sketches/flows/sharing.md` | Public link creation and view-only access | **Done** |
+| `sketches/flows/billing-upgrade.md` | Trial start, limit hit, upgrade, diagram unlock | **Done** |
 
 ---
 
@@ -86,9 +86,9 @@ Write in the order listed. Each spec depends on the foundation specs shown.
 
 | File | Purpose | Status |
 |------|---------|--------|
-| `sketches/stories/solo-developer.md` | Developer persona user story set | Planned |
-| `sketches/stories/technical-writer.md` | Technical writer persona user story set | Planned |
-| `sketches/stories/engineering-lead.md` | Engineering lead persona user story set | Planned |
+| `sketches/stories/solo-developer.md` | Developer persona user story set | **Done** |
+| `sketches/stories/technical-writer.md` | Technical writer persona user story set | **Done** |
+| `sketches/stories/engineering-lead.md` | Engineering lead persona user story set | **Done** |
 
 ---
 
@@ -96,12 +96,29 @@ Write in the order listed. Each spec depends on the foundation specs shown.
 
 | File | Purpose | Status |
 |------|---------|--------|
-| `sketches/mockups/index.html` | Browser index for all mockup screens | Planned |
-| `sketches/mockups/_route-map.json` | Machine-readable route registry | Planned |
-| `sketches/mockups/_shared.css` | Shared styles across mockup files | Planned |
-| `sketches/mockups/desktop/` | Desktop screen files (landing, dashboard, editor, version history, export, billing, settings) | Planned |
-| `sketches/mockups/mobile/` | Mobile screen files (share view, read-only) | Planned |
-| `sketches/mockups/components/` | Reusable component files (toolbar, AI prompt panel, ASCII panel, version drawer, export modal) | Planned |
+| `sketches/mockups/index.html` | Browser index for all mockup screens | **Done** |
+| `sketches/mockups/_route-map.json` | Machine-readable route registry | **Done** |
+| `sketches/mockups/_shared.css` | Shared design system tokens + component classes | **Done** |
+| `sketches/mockups/design-system.md` | Design language reference (Apple-vibe aesthetic, tokens, conventions) | **Done** |
+| `sketches/mockups/desktop/landing.html` | Public landing page | **Done** |
+| `sketches/mockups/desktop/login.html` | Login screen | **Done** |
+| `sketches/mockups/desktop/register.html` | Registration + trial start | **Done** |
+| `sketches/mockups/desktop/dashboard.html` | Post-login dashboard | **Done** |
+| `sketches/mockups/desktop/editor.html` | Workspace — new/empty diagram | **Done** |
+| `sketches/mockups/desktop/editor-saved.html` | Workspace — saved diagram with nodes | **Done** |
+| `sketches/mockups/desktop/library.html` | Diagram library | **Done** |
+| `sketches/mockups/desktop/templates.html` | Template browser | **Done** |
+| `sketches/mockups/desktop/billing.html` | Billing + subscription settings | **Done** |
+| `sketches/mockups/desktop/settings-providers.html` | AI provider settings | **Done** |
+| `sketches/mockups/desktop/version-history.html` | Version history drawer (open state) | **Done** |
+| `sketches/mockups/desktop/export-modal.html` | Export modal (open state) | **Done** |
+| `sketches/mockups/desktop/trial-expired.html` | Trial expired overlay state | **Done** |
+| `sketches/mockups/mobile/share-view.html` | Mobile read-only share view | **Done** |
+| `sketches/mockups/components/toolbar.html` | Toolbar — 6 states (clean, unsaved, saving, title-edit, new, expired) | **Done** |
+| `sketches/mockups/components/ai-prompt-panel.html` | AI prompt panel — 4 states | **Done** |
+| `sketches/mockups/components/ascii-panel.html` | ASCII panel — 4 states (read-only, edit, detached, repair) | **Done** |
+| `sketches/mockups/components/version-drawer.html` | Version drawer — 4 states (selected, restoring, empty, list) | **Done** |
+| `sketches/mockups/components/export-modal.html` | Export modal — 3 states (ASCII, PNG, copy success) | **Done** |
 
 ---
 

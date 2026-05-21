@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASCII Panel — Component</title>
+<link rel="stylesheet" href="../_shared.css">
+<style>
+  body { padding: var(--sp-8); background: var(--bg-base); display:flex; gap:var(--sp-6); flex-wrap:wrap; align-items:flex-start; }
+  .component-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-tertiary); margin-bottom: var(--sp-3); }
+  .panel-frame { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--r-l); overflow: hidden; width: 280px; }
+</style>
+</head>
+<body>
+
+<!-- Default: read-only, ASCII tab -->
+<div>
+  <div class="component-label">ASCII Panel — Read-only (default)</div>
+  <div class="panel-frame">
+    <div class="tabs" style="padding:0 var(--sp-3);">
+      <div class="tab active">ASCII</div>
+      <div class="tab">Visual</div>
+      <div class="tab">Mermaid</div>
+      <div class="tab">JSON</div>
+    </div>
+    <div style="padding:var(--sp-3); flex:1;">
+      <div class="code-block">
+        <pre>+--------------------+
+| React Frontend     |
+| frontend           |
++--------+-----------+
+         |
+         | HTTP
+         v
++--------------------+
+| Inventory API      |
+| service            |
++------+------+------+
+       |             |
+       | cache       | SQL
+       v             v
++----------+  +----------+
+| Redis    |  | Postgres |
+| Cache    |  | DB       |
+| cache    |  | database |
++----------+  +----------+</pre>
+      </div>
+    </div>
+    <div style="padding:var(--sp-3); border-top:1px solid var(--border-subtle); display:flex; flex-direction:column; gap:var(--sp-2);">
+      <button class="btn btn-secondary w-full btn-sm">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy ASCII
+      </button>
+      <button class="btn btn-ghost w-full btn-sm">Edit ASCII</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit mode -->
+<div>
+  <div class="component-label">ASCII Panel — Edit mode active</div>
+  <div class="panel-frame">
+    <div style="background:var(--warning-muted); border-bottom:1px solid rgba(255,159,10,0.2); padding:var(--sp-2) var(--sp-3); display:flex; align-items:center; gap:var(--sp-2);">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" style="flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span style="font-size:11px; color:var(--warning-text);">Label changes sync back · Other edits create a detached export</span>
+    </div>
+    <div class="tabs" style="padding:0 var(--sp-3);">
+      <div class="tab active">ASCII</div>
+      <div class="tab">Visual</div>
+      <div class="tab">Mermaid</div>
+      <div class="tab">JSON</div>
+    </div>
+    <div style="padding:var(--sp-3);">
+      <textarea style="width:100%; min-height:180px; font-family:var(--font-mono); font-size:12px; line-height:1.6; background:var(--bg-code); color:var(--text-code); border:1.5px solid var(--accent); border-radius:var(--r-s); padding:var(--sp-3); resize:none; outline:none;" spellcheck="false">+--------------------+
+| React Frontend     |
+| frontend           |
++--------+-----------+
+         |
+         | HTTP
+         v
++--------------------+
+| Inventory API      |
+| service            |</textarea>
+    </div>
+    <div style="padding:var(--sp-3); border-top:1px solid var(--border-subtle); display:flex; gap:var(--sp-2);">
+      <button class="btn btn-primary flex-1 btn-sm">Apply</button>
+      <button class="btn btn-ghost btn-sm">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Detached export state -->
+<div>
+  <div class="component-label">ASCII Panel — Detached export warning</div>
+  <div class="panel-frame">
+    <div style="background:var(--warning-muted); padding:var(--sp-3); border-bottom:1px solid rgba(255,159,10,0.2);">
+      <div style="display:flex; align-items:flex-start; gap:var(--sp-2);">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" style="flex-shrink:0; margin-top:1px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <div>
+          <div style="font-size:12px; font-weight:600; color:var(--warning-text);">Detached export</div>
+          <div style="font-size:11px; color:var(--warning-text); margin-top:2px; line-height:1.4;">Structural changes can't be synced back to the spec. This ASCII won't update if you edit the diagram.</div>
+          <button class="btn btn-ghost btn-sm" style="margin-top:var(--sp-2); color:var(--warning-text); font-size:11px; padding:2px var(--sp-2);">Reset to spec output</button>
+        </div>
+      </div>
+    </div>
+    <div class="tabs" style="padding:0 var(--sp-3);">
+      <div class="tab active">
+        ASCII
+        <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--warning); margin-left:4px; vertical-align:middle;"></span>
+      </div>
+      <div class="tab">Visual</div>
+    </div>
+    <div style="padding:var(--sp-3);">
+      <div class="code-block">
+        <pre>+-------------------+
+| Load Balancer     |
+| gateway           |
++--------+----------+
+         |
+         v
++--------------------+
+| Inventory API      |
+| service            |</pre>
+      </div>
+    </div>
+    <div style="padding:var(--sp-3); border-top:1px solid var(--border-subtle); display:flex; gap:var(--sp-2);">
+      <button class="btn btn-secondary flex-1 btn-sm">Download detached</button>
+      <button class="btn btn-ghost btn-sm">Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- Repair notice state -->
+<div>
+  <div class="component-label">ASCII Panel — With repair notice</div>
+  <div class="panel-frame">
+    <div style="background:var(--warning-muted); padding:var(--sp-2) var(--sp-3); border-bottom:1px solid rgba(255,159,10,0.2); display:flex; align-items:center; gap:var(--sp-2);">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" style="flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+      <span style="font-size:11px; color:var(--warning-text); flex:1;">1 repair made: edge "api→ghost_node" removed — node not found.</span>
+      <button class="btn btn-ghost btn-sm" style="font-size:11px; color:var(--warning-text); padding:1px 6px;">Details</button>
+    </div>
+    <div class="tabs" style="padding:0 var(--sp-3);">
+      <div class="tab active">ASCII</div>
+      <div class="tab">Visual</div>
+    </div>
+    <div style="padding:var(--sp-3);">
+      <div class="code-block"><pre>+--------------------+
+| React Frontend     |
++--------+-----------+
+         |
+         v
++--------------------+
+| Inventory API      |
++--------------------+</pre></div>
+    </div>
+    <div style="padding:var(--sp-3); border-top:1px solid var(--border-subtle); display:flex; gap:var(--sp-2);">
+      <button class="btn btn-secondary flex-1 btn-sm">Copy ASCII</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

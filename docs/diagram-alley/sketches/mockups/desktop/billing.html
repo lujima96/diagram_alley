@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Billing — Diagram Alley Mockup</title>
+<link rel="stylesheet" href="../_shared.css">
+<style>
+  .plan-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--r-l); padding: var(--sp-6); box-shadow: var(--shadow-xs); }
+  .plan-card.current { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), var(--shadow-s); }
+  .plan-name { font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: var(--sp-1); }
+  .plan-price { font-size: 32px; font-weight: 800; color: var(--text-primary); font-family: var(--font-display); }
+  .plan-price span { font-size: 14px; font-weight: 400; color: var(--text-secondary); }
+  .plan-desc { font-size: 13px; color: var(--text-secondary); margin: var(--sp-3) 0 var(--sp-4); }
+  .plan-feature { display: flex; align-items: center; gap: var(--sp-2); font-size: 13px; color: var(--text-primary); padding: 3px 0; }
+  .plan-feature svg { flex-shrink: 0; color: var(--success); }
+  .settings-nav { display:flex; flex-direction:column; gap:2px; margin-bottom: var(--sp-6); }
+  .settings-nav-item { display:flex; align-items:center; gap:var(--sp-2); padding: var(--sp-2) var(--sp-3); border-radius: var(--r-s); font-size:13px; font-weight:500; color:var(--text-secondary); cursor:pointer; text-decoration:none; }
+  .settings-nav-item:hover { background:rgba(0,0,0,0.04); color:var(--text-primary); text-decoration:none; }
+  .settings-nav-item.active { background:var(--accent-muted); color:var(--accent-text); }
+  .usage-row { display:flex; align-items:center; justify-content:space-between; padding: var(--sp-3) 0; border-bottom: 1px solid var(--border-subtle); }
+  .usage-bar { height: 6px; border-radius: var(--r-full); background: var(--bg-base); overflow: hidden; margin-top: 6px; }
+  .usage-bar-fill { height: 100%; border-radius: var(--r-full); background: var(--accent); }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <nav class="sidebar">
+    <div class="sidebar-logo"><div class="logo-mark">DA</div>Diagram Alley</div>
+    <button class="sidebar-new-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Diagram</button>
+    <a href="dashboard.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a href="library.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Library</a>
+    <div class="sidebar-footer"><div class="nav-item"><div class="avatar">PR</div><div class="flex-1 overflow-hidden"><div class="truncate subhead">Priya R.</div><div class="truncate" style="font-size:11px; color: var(--text-tertiary);">Trial · 12 days left</div></div></div></div>
+  </nav>
+
+  <div class="main-content">
+    <div class="header-bar">
+      <div class="header-title">Settings</div>
+    </div>
+    <div class="page-scroll">
+      <div class="page-content" style="display:grid; grid-template-columns:200px 1fr; gap:var(--sp-8); align-items:start;">
+
+        <!-- Settings nav -->
+        <div>
+          <div class="settings-nav">
+            <a href="#" class="settings-nav-item">Account</a>
+            <a href="billing.html" class="settings-nav-item active">Billing</a>
+            <a href="settings-providers.html" class="settings-nav-item">Providers</a>
+          </div>
+        </div>
+
+        <!-- Billing content -->
+        <div>
+          <div class="section-header mb-4">
+            <div class="section-title">Billing &amp; Plan</div>
+          </div>
+
+          <!-- Trial notice -->
+          <div class="notice notice-warning mb-4" style="border-radius:var(--r-m);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0; margin-top:1px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <div>
+              <div style="font-weight:600; margin-bottom:2px;">Free trial — 12 days remaining</div>
+              <div style="font-size:12px;">Your trial ends June 1, 2026. Upgrade to Pro to keep editing after it ends.</div>
+            </div>
+          </div>
+
+          <!-- Plan cards -->
+          <div class="grid-2 mb-6">
+            <div class="plan-card current">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:var(--sp-3);">
+                <div class="plan-name">Free Trial</div>
+                <span class="badge badge-blue">Current</span>
+              </div>
+              <div class="plan-price">$0 <span>/ 14 days</span></div>
+              <div class="plan-desc">Full access during the trial. No credit card required.</div>
+              <div class="plan-feature"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Unlimited diagrams</div>
+              <div class="plan-feature"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>All export formats</div>
+              <div class="plan-feature"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>BYOK / local model</div>
+              <div class="plan-feature" style="color:var(--text-tertiary);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-tertiary)"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>No hosted AI credits</div>
+            </div>
+            <div class="plan-card">
+              <div class="plan-name">Pro</div>
+              <div class="plan-price">$12 <span>/ month</span></div>
+              <div class="plan-desc">Full access for individual developers and technical writers.</div>
+              <div class="plan-feature"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Everything in trial</div>
+              <div class="plan-feature"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Unlimited version history</div>
+              <div class="plan-feature"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Share links</div>
+              <div class="plan-feature"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Priority support</div>
+              <div style="margin-top:var(--sp-4);">
+                <button class="btn btn-primary w-full">Upgrade to Pro</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Usage summary -->
+          <div class="card mb-6">
+            <div class="card-body">
+              <div style="font-size:15px; font-weight:700; margin-bottom:var(--sp-4);">Usage this trial</div>
+              <div class="usage-row">
+                <div>
+                  <div style="font-size:13px; font-weight:500;">Saved diagrams</div>
+                  <div style="font-size:11px; color:var(--text-tertiary);">Unlimited during trial</div>
+                </div>
+                <div style="font-size:15px; font-weight:700;">7</div>
+              </div>
+              <div class="usage-row" style="border-bottom:none;">
+                <div>
+                  <div style="font-size:13px; font-weight:500;">Projects</div>
+                </div>
+                <div style="font-size:15px; font-weight:700;">2</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="font-size:12px; color:var(--text-tertiary);">Questions? <a href="#" style="color:var(--accent);">Contact support</a></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<div class="mockup-note">billing · /settings/billing</div>
+</body>
+</html>

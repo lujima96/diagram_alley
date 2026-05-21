@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Templates — Diagram Alley Mockup</title>
+<link rel="stylesheet" href="../_shared.css">
+<style>
+  .template-card { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--r-m); box-shadow: var(--shadow-xs); overflow: hidden; cursor: pointer; transition: box-shadow var(--normal) var(--ease), border-color var(--normal) var(--ease), transform var(--normal) var(--ease); }
+  .template-card:hover { box-shadow: var(--shadow-m); border-color: var(--border); transform: translateY(-1px); }
+  .template-thumb { height: 100px; background: var(--bg-base); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: center; padding: var(--sp-2); overflow: hidden; }
+  .template-thumb pre { font-family: var(--font-mono); font-size: 8px; line-height: 1.3; color: var(--text-secondary); white-space: pre; }
+  .template-body { padding: var(--sp-3) var(--sp-4); }
+  .template-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  .template-meta { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
+  .tab-bar { display:flex; gap:var(--sp-1); padding: var(--sp-4) 0 var(--sp-5); overflow-x: auto; }
+  .tab-pill { padding: 6px var(--sp-4); border-radius: var(--r-full); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--bg-surface); color: var(--text-secondary); white-space: nowrap; transition: all var(--fast) var(--ease); }
+  .tab-pill:hover { border-color: var(--border-strong); color: var(--text-primary); }
+  .tab-pill.active { background: var(--accent-muted); border-color: transparent; color: var(--accent-text); }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <nav class="sidebar">
+    <div class="sidebar-logo"><div class="logo-mark">DA</div>Diagram Alley</div>
+    <button class="sidebar-new-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Diagram</button>
+    <a href="dashboard.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a href="library.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Library</a>
+    <a href="templates.html" class="nav-item active"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>Templates</a>
+    <div class="sidebar-footer"><div class="nav-item"><div class="avatar">PR</div><div class="flex-1 overflow-hidden"><div class="truncate subhead">Priya R.</div></div></div></div>
+  </nav>
+
+  <div class="main-content">
+    <div class="header-bar">
+      <div class="header-title">Templates</div>
+    </div>
+    <div class="page-scroll">
+      <div class="page-content">
+
+        <div class="tab-bar">
+          <div class="tab-pill active">All</div>
+          <div class="tab-pill">Architecture</div>
+          <div class="tab-pill">Database Schema</div>
+          <div class="tab-pill">UI Wireframe</div>
+          <div class="tab-pill">Flowchart</div>
+          <div class="tab-pill">Network</div>
+          <div class="tab-pill">My Templates</div>
+        </div>
+
+        <div class="section-header mb-4">
+          <div class="section-title">Architecture</div>
+        </div>
+        <div class="grid-4" style="margin-bottom:var(--sp-8);">
+          <div class="template-card">
+            <div class="template-thumb"><pre>+----------+
+| React    |
+| Frontend |
++----+-----+
+     | HTTP
+     v
++----------+
+| FastAPI  |
++----+-----+
+     |
+     v
++----------+
+| Postgres |
++----------+</pre></div>
+            <div class="template-body">
+              <div class="template-title">FastAPI + React + Postgres</div>
+              <div class="template-meta">Architecture · System template</div>
+            </div>
+          </div>
+          <div class="template-card">
+            <div class="template-thumb"><pre>+-------+  +-------+
+| Svc A |  | Svc B |
++---+---+  +---+---+
+    |          |
+    v          v
++---+----------+--+
+| Message Queue   |
++-----------------+
+         |
+         v
+    +--------+
+    | Worker |
+    +--------+</pre></div>
+            <div class="template-body">
+              <div class="template-title">Microservices + Queue</div>
+              <div class="template-meta">Architecture · System template</div>
+            </div>
+          </div>
+          <div class="template-card">
+            <div class="template-thumb"><pre>+----------+
+| Auth     |
+| Service  |
++----+-----+
+     |
++----+-----+  +-------+
+| JWT      |  | Redis |
+| Store    +->| Cache |
++----------+  +-------+</pre></div>
+            <div class="template-body">
+              <div class="template-title">Auth Service with JWT + Redis</div>
+              <div class="template-meta">Architecture · System template</div>
+            </div>
+          </div>
+          <div class="template-card">
+            <div class="template-thumb"><pre>+-------+  +-------+
+| Pipe  |  | Trans |
+| line  |->| form  |
++-------+  +---+---+
+               |
+               v
+          +--------+
+          | Load   |
+          | Target |
+          +--------+</pre></div>
+            <div class="template-body">
+              <div class="template-title">ETL Pipeline</div>
+              <div class="template-meta">Architecture · System template</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-header mb-4">
+          <div class="section-title">Database Schema</div>
+        </div>
+        <div class="grid-4" style="margin-bottom:var(--sp-8);">
+          <div class="template-card">
+            <div class="template-thumb"><pre>+----------+
+| users    |
++----------+
+| id    PK |
+| email    |
++----+-----+
+     |
+     v
++----------+
+| posts    |
++----------+
+| id    PK |
+| user_id  |
++----------+</pre></div>
+            <div class="template-body">
+              <div class="template-title">Blog Schema</div>
+              <div class="template-meta">Database · System template</div>
+            </div>
+          </div>
+          <div class="template-card">
+            <div class="template-thumb"><pre>+----------+
+| orders   |
++----------+
+| id    PK |
+| user_id  |
+| total    |
++----+-----+
+     |
+     v
++----------+
+|order_item|
++----------+</pre></div>
+            <div class="template-body">
+              <div class="template-title">Orders / Inventory Schema</div>
+              <div class="template-meta">Database · System template</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-header mb-4">
+          <div class="section-title">My Templates</div>
+        </div>
+        <div style="background: var(--bg-surface); border: 1px dashed var(--border); border-radius: var(--r-m); padding: var(--sp-8); text-align: center; color: var(--text-tertiary); font-size:13px;">
+          No custom templates yet. Save any diagram as a template from the workspace.
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<div class="mockup-note">templates · /templates</div>
+</body>
+</html>

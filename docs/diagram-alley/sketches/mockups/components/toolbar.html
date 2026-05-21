@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toolbar — Component</title>
+<link rel="stylesheet" href="../_shared.css">
+<style>
+  body { padding: var(--sp-8); background: var(--bg-base); display:flex; flex-direction:column; gap:var(--sp-8); }
+  .component-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-tertiary); margin-bottom: var(--sp-3); }
+  .toolbar-frame { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--r-l); overflow: hidden; }
+</style>
+</head>
+<body>
+
+<!-- Default: saved diagram, clean state -->
+<div>
+  <div class="component-label">Toolbar — Saved diagram (clean)</div>
+  <div class="toolbar-frame">
+    <div class="header-bar" style="border-bottom:none; border-radius:inherit;">
+      <div style="display:flex; align-items:center; gap:var(--sp-2); flex:1; min-width:0;">
+        <!-- Diagram title (editable) -->
+        <div style="font-size:14px; font-weight:600; color:var(--text-primary); padding:4px var(--sp-2); border-radius:var(--r-xs); cursor:text; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:280px;" title="Click to rename">
+          Inventory API Architecture
+        </div>
+        <span class="badge badge-blue" style="flex-shrink:0;">Architecture</span>
+        <span class="badge badge-green" style="flex-shrink:0;">Saved</span>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-ghost btn-sm btn-icon" title="Version history">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </button>
+        <button class="btn btn-ghost btn-sm" title="Share diagram">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Share
+        </button>
+        <button class="btn btn-secondary btn-sm">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export
+        </button>
+        <button class="btn btn-primary btn-sm" disabled style="opacity:0.4; cursor:not-allowed;">
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Unsaved changes -->
+<div>
+  <div class="component-label">Toolbar — Unsaved changes</div>
+  <div class="toolbar-frame">
+    <div class="header-bar" style="border-bottom:none; border-radius:inherit;">
+      <div style="display:flex; align-items:center; gap:var(--sp-2); flex:1; min-width:0;">
+        <div style="font-size:14px; font-weight:600; color:var(--text-primary); padding:4px var(--sp-2); border-radius:var(--r-xs); cursor:text; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:280px;">
+          Inventory API Architecture
+        </div>
+        <span class="badge badge-blue" style="flex-shrink:0;">Architecture</span>
+        <span style="display:inline-flex; align-items:center; gap:4px; font-size:11px; color:var(--text-tertiary); flex-shrink:0;">
+          <span style="width:6px; height:6px; border-radius:50%; background:var(--warning); display:inline-block;"></span>
+          Unsaved changes
+        </span>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-ghost btn-sm btn-icon" title="Version history">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </button>
+        <button class="btn btn-ghost btn-sm">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Share
+        </button>
+        <button class="btn btn-secondary btn-sm">Export</button>
+        <button class="btn btn-primary btn-sm">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Saving state -->
+<div>
+  <div class="component-label">Toolbar — Saving in progress</div>
+  <div class="toolbar-frame">
+    <div class="header-bar" style="border-bottom:none; border-radius:inherit;">
+      <div style="display:flex; align-items:center; gap:var(--sp-2); flex:1; min-width:0;">
+        <div style="font-size:14px; font-weight:600; color:var(--text-primary); padding:4px var(--sp-2); border-radius:var(--r-xs); cursor:text; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:280px;">
+          Inventory API Architecture
+        </div>
+        <span class="badge badge-blue" style="flex-shrink:0;">Architecture</span>
+        <span style="display:inline-flex; align-items:center; gap:4px; font-size:11px; color:var(--text-secondary); flex-shrink:0;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.5;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+          Saving…
+        </span>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-ghost btn-sm btn-icon" disabled style="opacity:0.4;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </button>
+        <button class="btn btn-ghost btn-sm" disabled style="opacity:0.4;">Share</button>
+        <button class="btn btn-secondary btn-sm" disabled style="opacity:0.4;">Export</button>
+        <button class="btn btn-primary btn-sm" disabled style="opacity:0.4;">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Title editing state -->
+<div>
+  <div class="component-label">Toolbar — Title edit active</div>
+  <div class="toolbar-frame">
+    <div class="header-bar" style="border-bottom:none; border-radius:inherit;">
+      <div style="display:flex; align-items:center; gap:var(--sp-2); flex:1; min-width:0;">
+        <input
+          type="text"
+          value="Inventory API Architecture"
+          style="font-size:14px; font-weight:600; color:var(--text-primary); padding:4px var(--sp-2); border-radius:var(--r-xs); border:1.5px solid var(--accent); background:var(--bg-base); outline:none; max-width:280px; width:280px;"
+        />
+        <span style="font-size:11px; color:var(--text-tertiary);">Press Enter to confirm · Esc to cancel</span>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-ghost btn-sm btn-icon" disabled style="opacity:0.3;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </button>
+        <button class="btn btn-ghost btn-sm" disabled style="opacity:0.3;">Share</button>
+        <button class="btn btn-secondary btn-sm" disabled style="opacity:0.3;">Export</button>
+        <button class="btn btn-primary btn-sm" disabled style="opacity:0.3;">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- New/unsaved diagram -->
+<div>
+  <div class="component-label">Toolbar — New diagram (never saved)</div>
+  <div class="toolbar-frame">
+    <div class="header-bar" style="border-bottom:none; border-radius:inherit;">
+      <div style="display:flex; align-items:center; gap:var(--sp-2); flex:1; min-width:0;">
+        <div style="font-size:14px; font-weight:600; color:var(--text-tertiary); padding:4px var(--sp-2); border-radius:var(--r-xs); cursor:text; font-style:italic;">
+          Untitled diagram
+        </div>
+        <span class="badge" style="background:var(--bg-base); color:var(--text-tertiary); border:1px solid var(--border); flex-shrink:0;">New</span>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-ghost btn-sm btn-icon" disabled style="opacity:0.3;" title="No version history yet">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </button>
+        <button class="btn btn-ghost btn-sm" disabled style="opacity:0.3;">Share</button>
+        <button class="btn btn-secondary btn-sm" disabled style="opacity:0.3;">Export</button>
+        <button class="btn btn-primary btn-sm">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Trial expired state -->
+<div>
+  <div class="component-label">Toolbar — Trial expired</div>
+  <div class="toolbar-frame">
+    <div class="header-bar" style="border-bottom:none; border-radius:inherit;">
+      <div style="display:flex; align-items:center; gap:var(--sp-2); flex:1; min-width:0;">
+        <div style="font-size:14px; font-weight:600; color:var(--text-secondary); padding:4px var(--sp-2); border-radius:var(--r-xs);">
+          Inventory API Architecture
+        </div>
+        <span class="badge badge-yellow" style="flex-shrink:0;">Trial expired</span>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-ghost btn-sm">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Share
+        </button>
+        <button class="btn btn-secondary btn-sm">Export</button>
+        <button class="btn btn-primary btn-sm">Upgrade to Pro</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

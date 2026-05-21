@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Share View (Mobile) — Diagram Alley Mockup</title>
+<link rel="stylesheet" href="../_shared.css">
+<style>
+  body { background: var(--bg-base); max-width: 390px; margin: 0 auto; }
+  .mobile-header { height: 52px; display:flex; align-items:center; padding: 0 var(--sp-4); background: rgba(245,245,247,0.92); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-subtle); position: sticky; top:0; z-index:10; }
+  .mobile-logo { display:flex; align-items:center; gap:var(--sp-2); font-size:14px; font-weight:700; color:var(--text-primary); font-family:var(--font-display); }
+  .mobile-tabs { display:flex; border-bottom: 1px solid var(--border); background: var(--bg-surface); overflow-x: auto; }
+  .mobile-tabs::-webkit-scrollbar { display: none; }
+  .mobile-tab { padding: var(--sp-3) var(--sp-4); font-size: 13px; font-weight: 500; color: var(--text-secondary); border-bottom: 2px solid transparent; white-space: nowrap; flex-shrink: 0; }
+  .mobile-tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  .ascii-container { padding: var(--sp-4); overflow-x: auto; background: var(--bg-code); }
+  .ascii-container pre { font-family: var(--font-mono); font-size: 11px; line-height: 1.6; color: var(--text-code); white-space: pre; }
+  .mobile-action-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 390px; display:flex; gap:var(--sp-3); padding: var(--sp-3) var(--sp-4) var(--sp-5); background: rgba(245,245,247,0.95); backdrop-filter: blur(16px); border-top: 1px solid var(--border-subtle); }
+  .diagram-meta { padding: var(--sp-4); background: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); }
+  .diagram-meta-title { font-size: 17px; font-weight: 700; color: var(--text-primary); }
+  .diagram-meta-sub { font-size: 12px; color: var(--text-tertiary); margin-top: 3px; }
+  .scroll-hint { font-size: 11px; color: var(--text-tertiary); text-align:center; padding: var(--sp-2) var(--sp-4); display:flex; align-items:center; justify-content:center; gap:var(--sp-1); }
+</style>
+</head>
+<body>
+
+<div class="mobile-header">
+  <div class="mobile-logo">
+    <div class="logo-mark" style="width:24px; height:24px; font-size:11px; font-weight:800;">DA</div>
+    Diagram Alley
+  </div>
+</div>
+
+<div class="diagram-meta">
+  <div class="diagram-meta-title">Platform Architecture v2</div>
+  <div class="diagram-meta-sub">Shared by Rafael · Architecture · Read-only</div>
+</div>
+
+<div class="mobile-tabs">
+  <div class="mobile-tab active">ASCII</div>
+  <div class="mobile-tab">Visual</div>
+  <div class="mobile-tab">Mermaid</div>
+</div>
+
+<div class="scroll-hint">
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+  Scroll horizontally to see full diagram
+</div>
+
+<div class="ascii-container">
+  <pre>+--------------------+
+| React Frontend     |
+| frontend           |
++--------+-----------+
+         |
+         | HTTP
+         v
++--------------------+
+| Platform API       |
+| service            |
++------+------+------+
+       |             |
+       | cache       | SQL
+       v             v
++----------+  +-------------------+
+| Redis    |  | Postgres DB       |
+| Cache    |  | database          |
+| cache    |  +-------------------+
++----------+</pre>
+</div>
+
+<div style="height:80px;"></div><!-- spacer for fixed action bar -->
+
+<div class="mobile-action-bar">
+  <button class="btn btn-primary flex-1">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+    Copy ASCII
+  </button>
+  <button class="btn btn-secondary flex-1" style="font-size:12px;">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+    View on desktop
+  </button>
+</div>
+
+<div class="mockup-note">share-view · /share/:token (mobile)</div>
+</body>
+</html>

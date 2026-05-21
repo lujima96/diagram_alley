@@ -1,0 +1,50 @@
+{
+  "version": "1.0",
+  "description": "Machine-readable registry of all Phase 6 mockup files. Matches F4 route map.",
+  "groups": [
+    {
+      "label": "Desktop — Public",
+      "screens": [
+        { "id": "landing",        "file": "desktop/landing.html",           "route": "/",                        "auth": false },
+        { "id": "login",          "file": "desktop/login.html",             "route": "/login",                   "auth": false },
+        { "id": "register",       "file": "desktop/register.html",          "route": "/register",                "auth": false }
+      ]
+    },
+    {
+      "label": "Desktop — Authenticated",
+      "screens": [
+        { "id": "dashboard",      "file": "desktop/dashboard.html",         "route": "/dashboard",               "auth": true },
+        { "id": "editor-new",     "file": "desktop/editor.html",            "route": "/workspace/new",           "auth": true },
+        { "id": "editor-saved",   "file": "desktop/editor-saved.html",      "route": "/workspace/:diagramId",    "auth": true },
+        { "id": "library",        "file": "desktop/library.html",           "route": "/library",                 "auth": true },
+        { "id": "templates",      "file": "desktop/templates.html",         "route": "/templates",               "auth": true },
+        { "id": "billing",        "file": "desktop/billing.html",           "route": "/settings/billing",        "auth": true },
+        { "id": "settings-providers", "file": "desktop/settings-providers.html", "route": "/settings/providers", "auth": true }
+      ]
+    },
+    {
+      "label": "Desktop — Overlays and States",
+      "screens": [
+        { "id": "version-history","file": "desktop/version-history.html",   "route": "/workspace/:id (history drawer open)", "auth": true },
+        { "id": "export-modal",   "file": "desktop/export-modal.html",      "route": "/workspace/:id (export modal open)",   "auth": true },
+        { "id": "trial-expired",  "file": "desktop/trial-expired.html",     "route": "/workspace/:id (trial expired state)", "auth": true }
+      ]
+    },
+    {
+      "label": "Mobile",
+      "screens": [
+        { "id": "share-view",     "file": "mobile/share-view.html",         "route": "/share/:shareToken",       "auth": false }
+      ]
+    },
+    {
+      "label": "Components",
+      "screens": [
+        { "id": "toolbar",         "file": "components/toolbar.html",        "route": "n/a — component",         "auth": false },
+        { "id": "ai-prompt-panel", "file": "components/ai-prompt-panel.html","route": "n/a — component",         "auth": false },
+        { "id": "ascii-panel",     "file": "components/ascii-panel.html",    "route": "n/a — component",         "auth": false },
+        { "id": "version-drawer",  "file": "components/version-drawer.html", "route": "n/a — component",         "auth": false },
+        { "id": "export-modal-c",  "file": "components/export-modal.html",   "route": "n/a — component",         "auth": false }
+      ]
+    }
+  ]
+}

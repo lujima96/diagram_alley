@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Prompt Panel — Component</title>
+<link rel="stylesheet" href="../_shared.css">
+<style>
+  body { padding: var(--sp-8); background: var(--bg-base); display:flex; gap:var(--sp-6); flex-wrap:wrap; }
+  .component-frame { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--r-l); overflow: hidden; width: 260px; }
+  .component-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-tertiary); margin-bottom: var(--sp-3); }
+  .prompt-section { padding: var(--sp-4); border-bottom: 1px solid var(--border-subtle); }
+  .prompt-section-title { font-size: 11px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: var(--sp-2); }
+  .select-sm { font-size: 12px; padding: 5px var(--sp-2); border-radius: var(--r-s); border: 1px solid var(--border); background: var(--bg-surface); color: var(--text-primary); cursor: pointer; width: 100%; }
+</style>
+</head>
+<body>
+
+<div>
+  <div class="component-label">AI Prompt Panel — Default (new diagram)</div>
+  <div class="component-frame">
+    <div class="prompt-section">
+      <div class="prompt-section-title">Diagram type</div>
+      <select class="select-sm">
+        <option>🏗️ Architecture</option>
+        <option>🗄️ Database Schema</option>
+        <option>🔀 Flowchart</option>
+        <option>🖼️ UI Wireframe</option>
+        <option>🌐 Network</option>
+        <option>📁 File Structure</option>
+      </select>
+    </div>
+    <div class="prompt-section">
+      <div class="prompt-section-title">AI provider</div>
+      <select class="select-sm">
+        <option>GPT-4o (BYOK)</option>
+        <option>Ollama · llama3.1</option>
+        <option>+ Add provider…</option>
+      </select>
+    </div>
+    <div class="prompt-section" style="display:flex; flex-direction:column; gap:var(--sp-2); border-bottom:none;">
+      <div class="prompt-section-title">Prompt</div>
+      <textarea class="textarea" style="min-height:100px; resize:none; font-size:13px;" placeholder="Describe your system…&#10;&#10;e.g. FastAPI + React + Postgres with Redis cache."></textarea>
+      <div class="footnote text-secondary">Examples</div>
+      <div style="display:flex; flex-direction:column; gap:3px;">
+        <button class="btn btn-ghost btn-sm" style="justify-content:flex-start; font-weight:400; color:var(--text-secondary); font-size:12px;">React + FastAPI + Postgres</button>
+        <button class="btn btn-ghost btn-sm" style="justify-content:flex-start; font-weight:400; color:var(--text-secondary); font-size:12px;">Microservices + message queue</button>
+      </div>
+    </div>
+    <div style="padding:var(--sp-3) var(--sp-4); border-top:1px solid var(--border-subtle); display:flex; gap:var(--sp-2);">
+      <button class="btn btn-primary w-full">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Generate
+      </button>
+    </div>
+  </div>
+</div>
+
+<div>
+  <div class="component-label">AI Prompt Panel — Modify mode (saved diagram)</div>
+  <div class="component-frame">
+    <div class="prompt-section">
+      <div class="prompt-section-title">Diagram type</div>
+      <select class="select-sm"><option>🏗️ Architecture</option></select>
+    </div>
+    <div class="prompt-section">
+      <div class="prompt-section-title">AI provider</div>
+      <select class="select-sm"><option>GPT-4o (BYOK)</option></select>
+    </div>
+    <div class="prompt-section" style="display:flex; flex-direction:column; gap:var(--sp-2); border-bottom:none;">
+      <div class="prompt-section-title">Modify with AI</div>
+      <textarea class="textarea" style="min-height:80px; resize:none; font-size:13px;" placeholder="Describe a change…&#10;&#10;e.g. Add Redis between API and Postgres"></textarea>
+      <div style="background:var(--accent-muted); border-radius:var(--r-s); padding:var(--sp-2) var(--sp-3);">
+        <div style="font-size:11px; color:var(--accent-text); font-weight:500;">The AI will suggest changes. You'll review before they're applied.</div>
+      </div>
+    </div>
+    <div style="padding:var(--sp-3) var(--sp-4); border-top:1px solid var(--border-subtle); display:flex; gap:var(--sp-2);">
+      <button class="btn btn-primary w-full">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Improve
+      </button>
+      <button class="btn btn-secondary">Regenerate</button>
+    </div>
+  </div>
+</div>
+
+<div>
+  <div class="component-label">AI Prompt Panel — Generating state</div>
+  <div class="component-frame">
+    <div class="prompt-section">
+      <div class="prompt-section-title">Diagram type</div>
+      <select class="select-sm" disabled><option>🏗️ Architecture</option></select>
+    </div>
+    <div class="prompt-section" style="display:flex; flex-direction:column; gap:var(--sp-2); border-bottom:none;">
+      <div class="prompt-section-title">Prompt</div>
+      <textarea class="textarea" style="min-height:80px; resize:none; font-size:13px;" disabled>FastAPI backend, React frontend, Postgres database, Redis cache. Frontend talks to API over HTTP.</textarea>
+    </div>
+    <div style="padding:var(--sp-3) var(--sp-4); border-top:1px solid var(--border-subtle); display:flex; flex-direction:column; align-items:center; gap:var(--sp-2);">
+      <div style="display:flex; align-items:center; gap:var(--sp-2); font-size:13px; color:var(--text-secondary);">
+        <div style="width:16px; height:16px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:none; opacity:0.8;">◌</div>
+        Generating diagram…
+      </div>
+      <button class="btn btn-ghost btn-sm w-full" style="color:var(--error);">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div>
+  <div class="component-label">AI Prompt Panel — No provider configured</div>
+  <div class="component-frame">
+    <div style="padding:var(--sp-6); display:flex; flex-direction:column; align-items:center; gap:var(--sp-3); text-align:center;">
+      <div style="font-size:28px;">🔌</div>
+      <div style="font-size:14px; font-weight:600; color:var(--text-primary);">No AI provider configured</div>
+      <div style="font-size:12px; color:var(--text-secondary);">Connect your own API key or a local Ollama instance to use AI generation.</div>
+      <a href="../desktop/settings-providers.html" class="btn btn-primary w-full">Set up provider</a>
+      <div style="font-size:11px; color:var(--text-tertiary);">Or start with a blank diagram below ↓</div>
+    </div>
+    <div style="padding:var(--sp-3) var(--sp-4); border-top:1px solid var(--border-subtle);">
+      <button class="btn btn-secondary w-full">Start blank diagram</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

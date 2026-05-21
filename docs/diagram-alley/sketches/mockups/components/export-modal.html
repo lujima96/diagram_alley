@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Export Modal — Component</title>
+<link rel="stylesheet" href="../_shared.css">
+<style>
+  body { padding: var(--sp-8); background: var(--bg-base); display:flex; gap:var(--sp-8); flex-wrap:wrap; align-items:flex-start; }
+  .component-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-tertiary); margin-bottom: var(--sp-3); }
+
+  /* Inline modal frame (no backdrop — standalone component view) */
+  .modal-frame { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--r-xl); overflow: hidden; width: 640px; box-shadow: var(--shadow-l); }
+  .modal-frame .modal-header { padding: var(--sp-4) var(--sp-5); border-bottom: 1px solid var(--border-subtle); display:flex; align-items:center; justify-content:space-between; }
+  .modal-frame .modal-title { font-size: 15px; font-weight: 700; color: var(--text-primary); font-family: var(--font-display); }
+
+  .format-option { display:flex; align-items:center; gap:var(--sp-3); padding: var(--sp-3) var(--sp-4); border-radius: var(--r-s); cursor:pointer; border: 1.5px solid transparent; transition: background 120ms ease; }
+  .format-option:hover { background: var(--bg-base); }
+  .format-option.selected { background: var(--accent-muted); border-color: var(--accent); }
+  .format-icon { width:36px; height:36px; border-radius:var(--r-xs); background:var(--bg-base); border:1px solid var(--border-subtle); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:10px; font-weight:700; color:var(--text-secondary); flex-shrink:0; }
+  .format-option.selected .format-icon { background:rgba(0,113,227,0.1); border-color:transparent; color:var(--accent-text); }
+
+  .mode-toggle { display:flex; background:var(--bg-base); border:1px solid var(--border); border-radius:var(--r-s); padding:2px; }
+  .mode-btn { flex:1; padding:5px var(--sp-3); border-radius:5px; font-size:12px; font-weight:500; text-align:center; cursor:pointer; color:var(--text-secondary); }
+  .mode-btn.active { background:var(--bg-surface); color:var(--text-primary); font-weight:600; box-shadow:var(--shadow-xs); }
+</style>
+</head>
+<body>
+
+<!-- ASCII selected, Strict mode -->
+<div>
+  <div class="component-label">Export Modal — ASCII (.txt) selected, Strict mode</div>
+  <div class="modal-frame">
+    <div class="modal-header">
+      <div class="modal-title">Export diagram</div>
+      <button class="btn btn-ghost btn-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div style="display:grid; grid-template-columns:240px 1fr; min-height:400px;">
+
+      <!-- Format list -->
+      <div style="padding:var(--sp-3); border-right:1px solid var(--border-subtle); display:flex; flex-direction:column; gap:2px; overflow-y:auto;">
+        <div style="font-size:10px; font-weight:700; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.5px; padding:var(--sp-2) var(--sp-2) var(--sp-1);">Format</div>
+
+        <div class="format-option selected">
+          <div class="format-icon">TXT</div>
+          <div>
+            <div style="font-size:12px; font-weight:600; color:var(--accent-text);">ASCII (.txt)</div>
+            <div style="font-size:11px; color:var(--text-secondary);">Copy-paste for README, PRs</div>
+          </div>
+        </div>
+        <div class="format-option">
+          <div class="format-icon">MD</div>
+          <div>
+            <div style="font-size:12px; font-weight:600;">Markdown (.md)</div>
+            <div style="font-size:11px; color:var(--text-secondary);">Fenced code block</div>
+          </div>
+        </div>
+        <div class="format-option">
+          <div class="format-icon">MMD</div>
+          <div>
+            <div style="font-size:12px; font-weight:600;">Mermaid (.mmd)</div>
+            <div style="font-size:11px; color:var(--text-secondary);">Docs with Mermaid support</div>
+          </div>
+        </div>
+        <div class="format-option">
+          <div class="format-icon">SVG</div>
+          <div>
+            <div style="font-size:12px; font-weight:600;">SVG (.svg)</div>
+            <div style="font-size:11px; color:var(--text-secondary);">Vector, scalable</div>
+          </div>
+        </div>
+        <div class="format-option">
+          <div class="format-icon">PNG</div>
+          <div>
+            <div style="font-size:12px; font-weight:600;">PNG (.png)</div>
+            <div style="font-size:11px; color:var(--text-secondary);">Wikis, slide decks</div>
+          </div>
+        </div>
+        <div class="format-option">
+          <div class="format-icon">JSON</div>
+          <div>
+            <div style="font-size:12px; font-weight:600;">JSON spec (.json)</div>
+            <div style="font-size:11px; color:var(--text-secondary);">Version-control ready</div>
+          </div>
+        </div>
+        <div class="format-option">
+          <div class="format-icon">YAML</div>
+          <div>
+            <div style="font-size:12px; font-weight:600;">YAML spec (.yaml)</div>
+            <div style="font-size:11px; color:var(--text-secondary);">Human-readable spec</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right pane: options + preview -->
+      <div style="display:flex; flex-direction:column;">
+
+        <!-- Text mode toggle (shown for ASCII/MD formats only) -->
+        <div style="padding:var(--sp-4) var(--sp-5); border-bottom:1px solid var(--border-subtle);">
+          <div style="font-size:10px; font-weight:700; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:var(--sp-2);">Text output mode</div>
+          <div class="mode-toggle">
+            <div class="mode-btn active">Strict ASCII</div>
+            <div class="mode-btn">UTF-8 Text</div>
+          </div>
+          <div style="font-size:11px; color:var(--text-tertiary); margin-top:var(--sp-2);">Strict uses only printable ASCII (+-|). UTF-8 uses Unicode box-drawing characters.</div>
+        </div>
+
+        <!-- Preview -->
+        <div style="flex:1; padding:var(--sp-4) var(--sp-5); overflow:auto;">
+          <div style="font-size:10px; font-weight:700; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:var(--sp-3);">Preview</div>
+          <div class="code-block">
+            <pre>+--------------------+
+| React Frontend     |
+| frontend           |
++--------+-----------+
+         |
+         | HTTP
+         v
++--------------------+
+| Inventory API      |
+| service            |
++------+------+------+
+       |             |
+       | cache       | SQL
+       v             v
++----------+  +----------+
+| Redis    |  | Postgres |
+| Cache    |  | DB       |
++----------+  +----------+</pre>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div style="padding:var(--sp-4) var(--sp-5); border-top:1px solid var(--border-subtle); display:flex; flex-direction:column; gap:var(--sp-2);">
+          <div style="display:flex; gap:var(--sp-2);">
+            <button class="btn btn-primary flex-1">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy ASCII
+            </button>
+            <button class="btn btn-secondary">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download
+            </button>
+          </div>
+          <div style="font-size:11px; color:var(--text-tertiary); text-align:center;">Exports include spec version metadata</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PNG selected (no text mode toggle) -->
+<div>
+  <div class="component-label">Export Modal — PNG (.png) selected</div>
+  <div class="modal-frame">
+    <div class="modal-header">
+      <div class="modal-title">Export diagram</div>
+      <button class="btn btn-ghost btn-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div style="display:grid; grid-template-columns:240px 1fr; min-height:400px;">
+      <div style="padding:var(--sp-3); border-right:1px solid var(--border-subtle); display:flex; flex-direction:column; gap:2px; overflow-y:auto;">
+        <div style="font-size:10px; font-weight:700; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.5px; padding:var(--sp-2) var(--sp-2) var(--sp-1);">Format</div>
+        <div class="format-option"><div class="format-icon">TXT</div><div><div style="font-size:12px; font-weight:600;">ASCII (.txt)</div></div></div>
+        <div class="format-option"><div class="format-icon">MD</div><div><div style="font-size:12px; font-weight:600;">Markdown (.md)</div></div></div>
+        <div class="format-option"><div class="format-icon">MMD</div><div><div style="font-size:12px; font-weight:600;">Mermaid (.mmd)</div></div></div>
+        <div class="format-option"><div class="format-icon">SVG</div><div><div style="font-size:12px; font-weight:600;">SVG (.svg)</div></div></div>
+        <div class="format-option selected"><div class="format-icon">PNG</div><div><div style="font-size:12px; font-weight:600; color:var(--accent-text);">PNG (.png)</div><div style="font-size:11px; color:var(--text-secondary);">Wikis, slide decks</div></div></div>
+        <div class="format-option"><div class="format-icon">JSON</div><div><div style="font-size:12px; font-weight:600;">JSON spec (.json)</div></div></div>
+        <div class="format-option"><div class="format-icon">YAML</div><div><div style="font-size:12px; font-weight:600;">YAML spec (.yaml)</div></div></div>
+      </div>
+
+      <div style="display:flex; flex-direction:column;">
+        <!-- PNG options (no text mode toggle) -->
+        <div style="padding:var(--sp-4) var(--sp-5); border-bottom:1px solid var(--border-subtle);">
+          <div style="font-size:10px; font-weight:700; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:var(--sp-3);">Options</div>
+          <div style="display:flex; flex-direction:column; gap:var(--sp-3);">
+            <div>
+              <div style="font-size:12px; font-weight:500; color:var(--text-primary); margin-bottom:var(--sp-1);">Scale</div>
+              <div class="mode-toggle">
+                <div class="mode-btn active">1×</div>
+                <div class="mode-btn">2×</div>
+                <div class="mode-btn">3×</div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:12px; font-weight:500; color:var(--text-primary); margin-bottom:var(--sp-1);">Background</div>
+              <div class="mode-toggle">
+                <div class="mode-btn active">White</div>
+                <div class="mode-btn">Transparent</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:1; padding:var(--sp-4) var(--sp-5); overflow:auto; display:flex; align-items:center; justify-content:center;">
+          <!-- PNG preview placeholder -->
+          <div style="background:var(--bg-base); border:1px dashed var(--border); border-radius:var(--r-s); padding:var(--sp-6); text-align:center; color:var(--text-tertiary);">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="margin:0 auto var(--sp-2); display:block; opacity:0.4;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <div style="font-size:12px;">Visual preview</div>
+            <div style="font-size:11px; margin-top:2px;">PNG render of the canvas</div>
+          </div>
+        </div>
+
+        <div style="padding:var(--sp-4) var(--sp-5); border-top:1px solid var(--border-subtle); display:flex; gap:var(--sp-2);">
+          <button class="btn btn-primary flex-1">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download PNG
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Copied confirmation state -->
+<div>
+  <div class="component-label">Export Modal — Copy success flash</div>
+  <div class="modal-frame" style="width:360px;">
+    <div class="modal-header">
+      <div class="modal-title">Export diagram</div>
+      <button class="btn btn-ghost btn-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div style="padding:var(--sp-6); display:flex; flex-direction:column; align-items:center; gap:var(--sp-3); text-align:center;">
+      <div style="width:48px; height:48px; border-radius:50%; background:var(--success-muted); display:flex; align-items:center; justify-content:center;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div style="font-size:15px; font-weight:700; color:var(--text-primary);">Copied to clipboard</div>
+      <div style="font-size:12px; color:var(--text-secondary);">ASCII art is ready to paste into your README or PR.</div>
+      <button class="btn btn-ghost btn-sm w-full">Close</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Version History — Diagram Alley Mockup</title>
+<link rel="stylesheet" href="../_shared.css">
+<style>
+  .select-sm { font-size: 12px; padding: 4px var(--sp-2); border-radius: var(--r-s); border: 1px solid var(--border); background: var(--bg-surface); color: var(--text-primary); cursor: pointer; width: 100%; }
+  .canvas-node { position: absolute; background: var(--bg-surface); border: 1.5px solid var(--border); border-radius: var(--r-s); padding: var(--sp-2) var(--sp-4); font-size: 12px; text-align: center; box-shadow: var(--shadow-s); min-width: 140px; }
+  .canvas-node .node-label { font-weight: 600; font-size: 12px; color: var(--text-primary); }
+  .canvas-node .node-kind { font-size: 10px; color: var(--text-tertiary); margin-top: 1px; }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <nav class="sidebar">
+    <div class="sidebar-logo"><div class="logo-mark">DA</div>Diagram Alley</div>
+    <button class="sidebar-new-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Diagram</button>
+    <a href="dashboard.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a href="library.html" class="nav-item"><svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Library</a>
+    <div class="sidebar-footer"><div class="nav-item"><div class="avatar">PR</div><div class="flex-1 overflow-hidden"><div class="truncate subhead">Priya R.</div></div></div></div>
+  </nav>
+
+  <div class="main-content">
+    <div class="header-bar">
+      <div class="header-title"><input type="text" value="Platform Architecture v2"></div>
+      <div class="header-actions">
+        <button class="btn btn-primary btn-sm" style="background:var(--accent-muted); color:var(--accent-text);">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          History
+        </button>
+        <button class="btn btn-ghost btn-sm">Share</button>
+        <button class="btn btn-secondary btn-sm">Export</button>
+        <button class="btn btn-primary btn-sm">Save</button>
+      </div>
+    </div>
+
+    <!-- Workspace with version drawer open -->
+    <div style="flex:1; display:flex; overflow:hidden; position:relative;">
+
+      <!-- Prompt panel (narrow, dimmed) -->
+      <div style="width:260px; flex-shrink:0; border-right:1px solid var(--border-subtle); background:var(--bg-surface); opacity:0.5; pointer-events:none;">
+        <div style="padding:var(--sp-4);">
+          <div style="font-size:11px; font-weight:600; color:var(--text-tertiary); text-transform:uppercase; margin-bottom:var(--sp-2);">Modify with AI</div>
+          <textarea class="textarea" style="height:80px; resize:none; font-size:13px;" placeholder="Describe a change…"></textarea>
+          <div style="margin-top:var(--sp-2); display:flex; gap:var(--sp-2);">
+            <button class="btn btn-primary w-full" style="opacity:0.5;" disabled>Improve</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Canvas (visible but overlaid by drawer) -->
+      <div style="flex:1; background:var(--bg-canvas); position:relative; overflow:hidden;">
+        <div class="workspace-canvas-grid"></div>
+        <div class="canvas-node" style="left:50%; top:40px; transform:translateX(-50%);"><div class="node-label">React Frontend</div><div class="node-kind">frontend</div></div>
+        <div class="canvas-node" style="left:50%; top:150px; transform:translateX(-50%);"><div class="node-label">Platform API</div><div class="node-kind">service</div></div>
+        <div class="canvas-node" style="left:22%; top:260px; transform:translateX(-50%);"><div class="node-label">Redis Cache</div><div class="node-kind">cache</div></div>
+        <div class="canvas-node" style="left:78%; top:260px; transform:translateX(-50%);"><div class="node-label">Postgres DB</div><div class="node-kind">database</div></div>
+        <!-- overlay -->
+        <div style="position:absolute; inset:0; background:rgba(250,250,250,0.6);"></div>
+      </div>
+
+      <!-- Version History Drawer -->
+      <div class="drawer">
+        <div class="panel-header" style="padding:var(--sp-4) var(--sp-5);">
+          <div style="font-size:15px; font-weight:700; color:var(--text-primary);">Version History</div>
+          <button class="btn btn-ghost btn-sm btn-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        <div style="flex:1; overflow-y:auto;">
+          <!-- Version 4 — current -->
+          <div class="version-item active">
+            <div class="version-dot current"></div>
+            <div style="flex:1; min-width:0;">
+              <div style="display:flex; justify-content:space-between; align-items:baseline;">
+                <div style="font-size:13px; font-weight:600; color:var(--accent-text);">Current version</div>
+                <span class="badge badge-blue" style="font-size:10px;">Current</span>
+              </div>
+              <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">AI: Added monitoring services</div>
+              <div style="font-size:11px; color:var(--text-tertiary); margin-top:2px; font-family:var(--font-mono);">Yesterday at 14:32</div>
+            </div>
+          </div>
+
+          <!-- Version 3 — selected for preview -->
+          <div class="version-item" style="background:rgba(0,113,227,0.04); border-left:2px solid var(--accent);">
+            <div class="version-dot"></div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:13px; font-weight:600; color:var(--text-primary);">Updated node labels for sprint 4</div>
+              <div style="font-size:11px; color:var(--text-tertiary); margin-top:2px; font-family:var(--font-mono);">3 days ago at 10:14</div>
+              <div style="margin-top:var(--sp-2); background:var(--bg-code); border-radius:var(--r-s); padding:var(--sp-2); overflow:hidden;">
+                <pre style="font-family:var(--font-mono); font-size:9px; color:var(--text-code); line-height:1.4; white-space:pre;">+----------------+
+| React Frontend |
++-------+--------+
+        |
+        v
++----------------+
+| Platform API   |
++-------+--------+
+        |
+        v
++----------------+
+| Postgres DB    |
++----------------+</pre>
+              </div>
+              <button class="btn btn-primary btn-sm w-full" style="margin-top:var(--sp-2);">Restore this version</button>
+            </div>
+          </div>
+
+          <!-- Version 2 -->
+          <div class="version-item">
+            <div class="version-dot"></div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:13px; font-weight:600; color:var(--text-primary);">Added Redis and CDN nodes</div>
+              <div style="font-size:11px; color:var(--text-tertiary); margin-top:2px; font-family:var(--font-mono);">5 days ago at 16:05</div>
+            </div>
+          </div>
+
+          <!-- Version 1 -->
+          <div class="version-item" style="border-bottom:none;">
+            <div class="version-dot"></div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:13px; font-weight:600; color:var(--text-primary);">Initial generation</div>
+              <div style="font-size:11px; color:var(--text-tertiary); margin-top:2px; font-family:var(--font-mono);">7 days ago at 09:42</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="mockup-note">version-history · /workspace/:id (drawer open)</div>
+</body>
+</html>

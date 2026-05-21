@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Export Modal — Diagram Alley Mockup</title>
+<link rel="stylesheet" href="../_shared.css">
+<style>
+  .canvas-node { position: absolute; background: var(--bg-surface); border: 1.5px solid var(--border); border-radius: var(--r-s); padding: var(--sp-2) var(--sp-4); font-size: 12px; text-align: center; box-shadow: var(--shadow-s); min-width: 140px; }
+  .canvas-node .node-label { font-weight: 600; font-size: 12px; color: var(--text-primary); }
+  .canvas-node .node-kind { font-size: 10px; color: var(--text-tertiary); margin-top: 1px; }
+  .format-option { display:flex; align-items:center; gap:var(--sp-3); padding: var(--sp-3) var(--sp-4); border-radius: var(--r-s); cursor:pointer; transition: background var(--fast) var(--ease); border: 1.5px solid transparent; }
+  .format-option:hover { background: var(--bg-base); }
+  .format-option.selected { background: var(--accent-muted); border-color: var(--accent); }
+  .format-icon { width:36px; height:36px; border-radius:var(--r-xs); background:var(--bg-base); border:1px solid var(--border-subtle); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; font-family:var(--font-mono); font-size:10px; font-weight:700; color:var(--text-secondary); }
+  .format-option.selected .format-icon { background:rgba(0,113,227,0.1); border-color:transparent; color:var(--accent-text); }
+  .mode-toggle { display:flex; background:var(--bg-base); border:1px solid var(--border); border-radius:var(--r-s); padding:2px; }
+  .mode-btn { flex:1; padding:5px var(--sp-3); border-radius:5px; font-size:12px; font-weight:500; text-align:center; cursor:pointer; color:var(--text-secondary); transition: all var(--fast) var(--ease); }
+  .mode-btn.active { background:var(--bg-surface); color:var(--text-primary); font-weight:600; box-shadow:var(--shadow-xs); }
+</style>
+</head>
+<body>
+<div class="app-shell" style="filter:brightness(0.96);">
+  <nav class="sidebar" style="opacity:0.5; pointer-events:none;">
+    <div class="sidebar-logo"><div class="logo-mark">DA</div>Diagram Alley</div>
+  </nav>
+  <div class="main-content" style="opacity:0.5; pointer-events:none;">
+    <div class="header-bar">
+      <div class="header-title">Inventory API Architecture</div>
+    </div>
+    <div style="flex:1; background:var(--bg-canvas); position:relative;">
+      <div class="workspace-canvas-grid"></div>
+      <div class="canvas-node" style="left:50%; top:80px; transform:translateX(-50%);"><div class="node-label">Inventory API</div><div class="node-kind">service</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-backdrop">
+  <div class="modal" style="width:680px; max-width:none;">
+    <div class="modal-header">
+      <div class="modal-title">Export diagram</div>
+      <button class="btn btn-ghost btn-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; min-height:420px;">
+
+      <!-- Left: format list -->
+      <div style="padding:var(--sp-4); border-right:1px solid var(--border-subtle); display:flex; flex-direction:column; gap:2px;">
+        <div style="font-size:11px; font-weight:600; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.5px; padding: var(--sp-2) var(--sp-4) var(--sp-3);">Format</div>
+
+        <div class="format-option selected">
+          <div class="format-icon">TXT</div>
+          <div>
+            <div style="font-size:13px; font-weight:600; color:var(--accent-text);">ASCII (.txt)</div>
+            <div style="font-size:11px; color:var(--text-secondary);">Copy-paste ready for README, PR</div>
+          </div>
+        </div>
+        <div class="format-option">
+          <div class="format-icon">MD</div>
+          <div>
+            <div style="font-size:13px; font-weight:600;">Markdown (.md)</div>
+            <div style="font-size:11px; color:var(--text-secondary);">Fenced code block with title</div>
+          </div>
+        </div>
+        <div class="format-option">
+          <div class="format-icon">MMD</div>
+          <div>
+            <div style="font-size:13px; font-weight:600;">Mermaid (.mmd)</div>
+            <div style="font-size:11px; color:var(--text-secondary);">For docs sites with Mermaid support</div>
+          </div>
+        </div>
+        <div class="format-option">
+          <div class="format-icon">SVG</div>
+          <div>
+            <div style="font-size:13px; font-weight:600;">SVG (.svg)</div>
+            <div style="font-size:11px; color:var(--text-secondary);">Vector, scalable for design tools</div>
+          </div>
+        </div>
+        <div class="format-option">
+          <div class="format-icon">PNG</div>
+          <div>
+            <div style="font-size:13px; font-weight:600;">PNG (.png)</div>
+            <div style="font-size:11px; color:var(--text-secondary);">For wikis, slide decks, docs embeds</div>
+          </div>
+        </div>
+        <div class="format-option">
+          <div class="format-icon">JSON</div>
+          <div>
+            <div style="font-size:13px; font-weight:600;">JSON spec (.json)</div>
+            <div style="font-size:11px; color:var(--text-secondary);">Full source spec, version-control ready</div>
+          </div>
+        </div>
+        <div class="format-option">
+          <div class="format-icon">YAML</div>
+          <div>
+            <div style="font-size:13px; font-weight:600;">YAML spec (.yaml)</div>
+            <div style="font-size:11px; color:var(--text-secondary);">Human-readable spec format</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: preview + options -->
+      <div style="display:flex; flex-direction:column;">
+        <div style="padding:var(--sp-4) var(--sp-5); border-bottom:1px solid var(--border-subtle);">
+          <div style="font-size:11px; font-weight:600; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:var(--sp-3);">Text output mode</div>
+          <div class="mode-toggle">
+            <div class="mode-btn active">Strict ASCII</div>
+            <div class="mode-btn">UTF-8 Text</div>
+          </div>
+        </div>
+
+        <div style="flex:1; padding:var(--sp-4) var(--sp-5); overflow:auto;">
+          <div style="font-size:11px; font-weight:600; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:var(--sp-3);">Preview</div>
+          <div class="code-block">
+            <pre>+--------------------+
+| React Frontend     |
+| frontend           |
++--------+-----------+
+         |
+         | HTTP
+         v
++--------------------+
+| Inventory API      |
+| service            |
++------+------+------+
+       |             |
+       | cache       | SQL
+       v             v
++----------+  +----------+
+| Redis    |  | Postgres |
+| Cache    |  | DB       |
+| cache    |  | database |
++----------+  +----------+</pre>
+          </div>
+        </div>
+
+        <div style="padding:var(--sp-4) var(--sp-5); border-top:1px solid var(--border-subtle); display:flex; flex-direction:column; gap:var(--sp-2);">
+          <div style="display:flex; gap:var(--sp-2);">
+            <button class="btn btn-primary flex-1">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy ASCII
+            </button>
+            <button class="btn btn-secondary">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download
+            </button>
+          </div>
+          <div style="font-size:11px; color:var(--text-tertiary); text-align:center;">Exports include source spec version metadata</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mockup-note">export-modal · /workspace/:id (export open)</div>
+</body>
+</html>
