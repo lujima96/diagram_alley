@@ -63,12 +63,12 @@ During the first 13 days, Priya has full access. She creates 7 diagrams across 3
 
 ### 4. Trial Expiry
 
-On day 14 at midnight (UTC), the Stripe trial period ends. Stripe sends a `customer.subscription.trial_will_end` event 3 days before (already shown in banner). On expiry, Stripe fires `customer.subscription.updated` with `status = 'canceled'` (since Priya has no payment method, the trial ends without converting to paid).
+On day 14 at midnight (UTC), the Diagram Alley trial expires. No Stripe subscription exists during the free trial (D7 §2.1), so this is handled by Diagram Alley's subscription lifecycle rather than a Stripe subscription event.
 
-The backend Stripe webhook handler (D7, F3):
+The backend scheduled expiry job or request-time subscription check (D7, F3):
 
-1. Receives `customer.subscription.updated`.
-2. Updates `subscriptions` row: `status = 'canceled'`, `access_ends_at = now()` (per DEC-025 — the `cancel_at_period_end` model; access ends at period end).
+1. Finds trial rows where `trial_ends_at <= now()` and `status = 'trialing'`.
+2. Updates the `subscriptions` row: `plan = 'trial'`, `status = 'canceled'`, `access_ends_at = now()`.
 3. The feature gate (F3) now evaluates `subscription.status == 'canceled'` for Priya's requests.
 
 ### 5. Priya Opens the App After Expiry

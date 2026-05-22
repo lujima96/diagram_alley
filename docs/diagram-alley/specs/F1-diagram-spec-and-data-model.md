@@ -308,6 +308,8 @@ generic
 | `created_at` | TIMESTAMPTZ | NOT NULL, default now() | Account creation time |
 | `updated_at` | TIMESTAMPTZ | NOT NULL, default now() | Last profile update |
 
+**Display fallback (DEC-029):** When `name` is null or blank, UI and API display helpers use the lowercased email prefix before `@` as the display name. Avatar initials are derived from `name` when present, otherwise from the email prefix.
+
 **Soft delete:** Users are not hard-deleted. Set `is_active = false` and clear PII on account deletion request (GDPR compliance path).
 
 ---
@@ -326,6 +328,7 @@ generic
 | `updated_at` | TIMESTAMPTZ | NOT NULL, default now() | — |
 
 **Index:** `(user_id, is_archived)` for dashboard queries.
+**Archive UX (DEC-027):** Archived projects are hidden from default project lists, appear in an Archived filter/view, and can be restored by setting `is_archived = false`. V1 does not expose project hard delete as a standalone user action.
 
 ---
 
@@ -505,6 +508,18 @@ archived (is_archived = true, hidden from library but not deleted)
     ↓
 deleted (hard delete, performed only by user via account deletion flow)
 ```
+
+Project lifecycle:
+
+```
+active (visible in default project lists)
+    ↓
+archived (is_archived = true, hidden by default, visible in Archived filter/view)
+    ↓
+active (restored by setting is_archived = false)
+```
+
+Projects have no standalone hard-delete transition in V1 (DEC-027).
 
 A diagram in `created` state only exists in the browser — it has not been persisted. The API creates a persisted diagram on first explicit save, successful AI generation, or import.
 

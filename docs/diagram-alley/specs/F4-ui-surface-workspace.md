@@ -161,6 +161,10 @@ Empty state (new user): large centered prompt with quick-create options and a "S
 
 List view toggle available. Pagination: 24 per page.
 
+Archived projects (DEC-027) are hidden by default. The page includes an Archived filter/view where users can review archived projects and restore them. V1 does not expose standalone project hard delete.
+
+Diagrams can move between projects in V1 (DEC-028). Diagram cards and row menus expose a "Move to project" action that opens a project picker.
+
 ### 4.3 Templates (`/templates`)
 
 ```
@@ -210,7 +214,7 @@ Contents:
 - Prompt textarea (resizable, auto-expand, max 10 rows)
 - Model provider selector (dropdown; shows configured providers)
 - `[Generate]` button (primary, disabled when no provider configured)
-- `[Improve existing]` button (secondary, only shown when a diagram is loaded)
+- `[Improve]` button (secondary, only shown when a diagram is loaded)
 - "No provider configured" → link to `/settings/providers`
 
 States:
@@ -336,6 +340,8 @@ Each custom node component renders:
 - The kind annotation line (lighter weight)
 - A selection handle ring when selected
 - React Flow `Handle` components for edge connections (top, bottom, left, right)
+
+For `file_structure` diagrams (DEC-030), the visual editor renders file/folder entries as tree rows with indentation, folder/file affordances, and editable labels. For `ui_wireframe` diagrams (DEC-030), the visual editor renders components as nested boxes with type labels and editable text/properties. Both diagram types remain visually editable in V1.
 
 ### 6.5 Groups in React Flow
 

@@ -202,6 +202,21 @@
         </a>
       </div>
     </div>
+
+    <div class="route-row">
+      <div class="route-meta">
+        <div class="route-path">*</div>
+        <div class="route-name">Not Found</div>
+        <div class="route-spec">F4</div>
+      </div>
+      <div class="surface-chips">
+        <a class="surface-chip" href="desktop/not-found.html">
+          <div class="surface-label">Desktop</div>
+          <div class="surface-title">404</div>
+          <div class="surface-note">Unknown route fallback</div>
+        </a>
+      </div>
+    </div>
   </div>
 
   <!-- ─── Authenticated Routes ──────────────────────── -->
@@ -269,6 +284,16 @@
           <div class="surface-label">Desktop · Overlay</div>
           <div class="surface-title">Export Modal</div>
           <div class="surface-note">Format list, preview, download</div>
+        </a>
+        <a class="surface-chip overlay" href="desktop/editor-improve.html">
+          <div class="surface-label">Desktop · State</div>
+          <div class="surface-title">AI Improve</div>
+          <div class="surface-note">Diff proposal, accept, reject</div>
+        </a>
+        <a class="surface-chip overlay" href="desktop/editor-detached.html">
+          <div class="surface-label">Desktop · State</div>
+          <div class="surface-title">Detached Export</div>
+          <div class="surface-note">ASCII out-of-sync warning</div>
         </a>
         <a class="surface-chip overlay" href="desktop/trial-expired.html">
           <div class="surface-label">Desktop · State</div>
@@ -409,6 +434,71 @@
     </div>
   </div>
 
+  <!-- ─── Admin Routes ──────────────────────────────── -->
+  <div class="section">
+    <div class="section-title">Admin routes <span class="badge-auth" style="vertical-align:middle; margin-left:6px;">superuser required</span></div>
+
+    <div class="route-row">
+      <div class="route-meta">
+        <div class="route-path">/admin</div>
+        <div class="route-name">Admin Dashboard</div>
+        <div class="route-spec">A1 · F3</div>
+      </div>
+      <div class="surface-chips">
+        <a class="surface-chip" href="desktop/admin.html">
+          <div class="surface-label">Desktop</div>
+          <div class="surface-title">Admin Dashboard</div>
+          <div class="surface-note">Stats, recent events, support queue</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="route-row">
+      <div class="route-meta">
+        <div class="route-path">/admin/users</div>
+        <div class="route-name">Admin Users</div>
+        <div class="route-spec">A1 · F3</div>
+      </div>
+      <div class="surface-chips">
+        <a class="surface-chip" href="desktop/admin-users.html">
+          <div class="surface-label">Desktop</div>
+          <div class="surface-title">User Management</div>
+          <div class="surface-note">Search, filters, subscription state</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="route-row">
+      <div class="route-meta">
+        <div class="route-path">/admin/users/:userId</div>
+        <div class="route-name">Admin User Detail</div>
+        <div class="route-spec">A1 · F3 · D7</div>
+      </div>
+      <div class="surface-chips">
+        <a class="surface-chip" href="desktop/admin-user-detail.html">
+          <div class="surface-label">Desktop</div>
+          <div class="surface-title">User Detail</div>
+          <div class="surface-note">Profile, subscription override, events</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="route-row">
+      <div class="route-meta">
+        <div class="route-path">/admin/audit-log</div>
+        <div class="route-name">Admin Audit Log</div>
+        <div class="route-spec">A1 · F3</div>
+      </div>
+      <div class="surface-chips">
+        <a class="surface-chip" href="desktop/admin-audit-log.html">
+          <div class="surface-label">Desktop</div>
+          <div class="surface-title">Audit Log</div>
+          <div class="surface-note">Event filters, actor, entity, metadata</div>
+        </a>
+      </div>
+    </div>
+  </div>
+
   <!-- ─── Components ────────────────────────────────── -->
   <div class="section">
     <div class="section-title">Reusable components <span style="font-size:10px; font-weight:500; color:var(--text-tertiary); margin-left:6px; text-transform:none; letter-spacing:0;">Not tied to a single route — shown in isolation with all states</span></div>
@@ -431,12 +521,22 @@
       <a class="comp-card" href="components/version-drawer.html">
         <div class="comp-id">version-drawer</div>
         <div class="comp-name">Version Drawer</div>
-        <div class="comp-desc">4 states: entry selected, restoring, empty, list only</div>
+        <div class="comp-desc">5 states: entry selected, restore confirm, restoring, empty, list only</div>
       </a>
       <a class="comp-card" href="components/export-modal.html">
         <div class="comp-id">export-modal</div>
         <div class="comp-name">Export Modal</div>
         <div class="comp-desc">3 states: ASCII selected, PNG selected, copy success</div>
+      </a>
+      <a class="comp-card" href="components/inspector-panel.html">
+        <div class="comp-id">inspector-panel</div>
+        <div class="comp-name">Inspector Panel</div>
+        <div class="comp-desc">4 states across Selection, Validation, and Spec Editor tabs</div>
+      </a>
+      <a class="comp-card" href="components/error-states.html">
+        <div class="comp-id">error-states</div>
+        <div class="comp-name">Error States</div>
+        <div class="comp-desc">5 error codes with banners, dialogs, and retry paths</div>
       </a>
     </div>
   </div>

@@ -79,12 +79,14 @@ During `trialing`:
 - AI generation (with configured provider): ✓
 - All other features: ✓
 
-On trial expiry (`status = 'canceled'`):
+On trial expiry (`plan = 'trial'`, `status = 'canceled'`):
 - AI generation: blocked (403 SUBSCRIPTION_REQUIRED on all AI endpoints)
 - Existing saved diagrams: read-only (can view, export, share — not edit spec)
 - Editor: shows a banner "Your trial has expired. Upgrade to continue editing."
 
-**Read-only enforcement for expired users:** The PATCH /api/v1/diagrams/{id} endpoint checks subscription status. If `status = 'canceled'`, spec updates are blocked with `403 SUBSCRIPTION_REQUIRED`. Title updates and archiving are still permitted.
+This state means an expired trial, not a canceled Pro subscription. A canceled Pro subscription remains `plan = 'pro'`, `status = 'active'`, `cancel_at_period_end = true` until access ends (DEC-025).
+
+**Read-only enforcement for expired users:** The frontend may proactively render read-only controls or an upgrade overlay, but the API gate is authoritative. The PATCH /api/v1/diagrams/{id} endpoint checks subscription status. If `status = 'canceled'`, spec updates are blocked with `403 SUBSCRIPTION_REQUIRED`. Title updates and archiving are still permitted.
 
 ---
 
@@ -230,6 +232,8 @@ After all retries exhausted, Stripe fires `customer.subscription.deleted`:
 A user with `status = 'canceled'` can resubscribe:
 - The `POST /api/v1/billing/checkout-session` endpoint works for canceled users (only blocked for `status = 'active'`).
 - On successful checkout, `status` updates to `active` and AI features are immediately re-enabled.
+
+If `plan = 'pro'`, `status = 'active'`, and `cancel_at_period_end = true`, the user still has active access and does not use the checkout-session resubscribe flow. They use Stripe Billing Portal to resume/reactivate renewal before `access_ends_at`. When Stripe sends `customer.subscription.updated` with `cancel_at_period_end=false`, the webhook clears `cancel_at_period_end` and `access_ends_at`.
 
 ---
 

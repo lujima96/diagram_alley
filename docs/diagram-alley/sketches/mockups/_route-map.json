@@ -1,5 +1,5 @@
 {
-  "version": "1.1",
+  "version": "1.3",
   "description": "Machine-readable registry of all Phase 6 mockup files. Organized by route; each route lists all surface variants. Matches F4 route map.",
   "routes": [
     {
@@ -33,6 +33,24 @@
       ]
     },
     {
+      "route": "/verify-email",
+      "name": "Email Verification",
+      "auth": false,
+      "spec": ["F3"],
+      "surfaces": [
+        { "surface": "desktop", "id": "verify-email", "file": "desktop/verify-email.html", "status": "active" }
+      ]
+    },
+    {
+      "route": "/reset-password",
+      "name": "Reset Password",
+      "auth": false,
+      "spec": ["F3"],
+      "surfaces": [
+        { "surface": "desktop", "id": "reset-password", "file": "desktop/reset-password.html", "status": "active", "note": "request link and set password states" }
+      ]
+    },
+    {
       "route": "/share/:token",
       "name": "Shared Diagram View",
       "auth": false,
@@ -40,6 +58,15 @@
       "surfaces": [
         { "surface": "desktop", "id": "share-view-d", "file": "desktop/share-view.html", "status": "active" },
         { "surface": "mobile",  "id": "share-view-m", "file": "mobile/share-view.html",  "status": "active" }
+      ]
+    },
+    {
+      "route": "*",
+      "name": "Not Found",
+      "auth": false,
+      "spec": ["F4"],
+      "surfaces": [
+        { "surface": "desktop", "id": "not-found", "file": "desktop/not-found.html", "status": "active" }
       ]
     },
     {
@@ -71,8 +98,28 @@
         { "surface": "desktop",          "id": "editor-saved",    "file": "desktop/editor-saved.html",    "status": "active" },
         { "surface": "desktop-overlay",  "id": "version-history", "file": "desktop/version-history.html", "status": "active", "note": "history drawer open" },
         { "surface": "desktop-overlay",  "id": "export-modal",    "file": "desktop/export-modal.html",    "status": "active", "note": "export modal open" },
+        { "surface": "desktop-state",    "id": "editor-improve",  "file": "desktop/editor-improve.html",  "status": "active", "note": "AI improve diff proposal" },
+        { "surface": "desktop-state",    "id": "editor-detached", "file": "desktop/editor-detached.html", "status": "active", "note": "detached ASCII warning" },
         { "surface": "desktop-state",    "id": "trial-expired",   "file": "desktop/trial-expired.html",   "status": "active", "note": "trial expired overlay" },
         { "surface": "mobile",           "id": "editor-saved-m",  "file": null,                           "status": "planned", "note": "V2 scope" }
+      ]
+    },
+    {
+      "route": "/projects",
+      "name": "Projects",
+      "auth": true,
+      "spec": ["F4", "F1"],
+      "surfaces": [
+        { "surface": "desktop", "id": "projects", "file": "desktop/projects.html", "status": "active" }
+      ]
+    },
+    {
+      "route": "/projects/:projectId",
+      "name": "Project Detail",
+      "auth": true,
+      "spec": ["F4", "F1"],
+      "surfaces": [
+        { "surface": "desktop", "id": "project-detail", "file": "desktop/project-detail.html", "status": "active" }
       ]
     },
     {
@@ -96,6 +143,15 @@
       ]
     },
     {
+      "route": "/settings/account",
+      "name": "Account Settings",
+      "auth": true,
+      "spec": ["F3"],
+      "surfaces": [
+        { "surface": "desktop", "id": "settings-account", "file": "desktop/settings-account.html", "status": "active" }
+      ]
+    },
+    {
       "route": "/settings/billing",
       "name": "Billing Settings",
       "auth": true,
@@ -114,13 +170,51 @@
         { "surface": "desktop", "id": "settings-providers",   "file": "desktop/settings-providers.html", "status": "active" },
         { "surface": "mobile",  "id": "settings-providers-m", "file": null,                              "status": "planned", "note": "V2 scope" }
       ]
+    },
+    {
+      "route": "/admin",
+      "name": "Admin Dashboard",
+      "auth": true,
+      "spec": ["A1", "F3"],
+      "surfaces": [
+        { "surface": "desktop", "id": "admin", "file": "desktop/admin.html", "status": "active", "note": "superuser required" }
+      ]
+    },
+    {
+      "route": "/admin/users",
+      "name": "Admin Users",
+      "auth": true,
+      "spec": ["A1", "F3"],
+      "surfaces": [
+        { "surface": "desktop", "id": "admin-users", "file": "desktop/admin-users.html", "status": "active", "note": "superuser required" }
+      ]
+    },
+    {
+      "route": "/admin/users/:userId",
+      "name": "Admin User Detail",
+      "auth": true,
+      "spec": ["A1", "F3", "D7"],
+      "surfaces": [
+        { "surface": "desktop", "id": "admin-user-detail", "file": "desktop/admin-user-detail.html", "status": "active", "note": "superuser required" }
+      ]
+    },
+    {
+      "route": "/admin/audit-log",
+      "name": "Admin Audit Log",
+      "auth": true,
+      "spec": ["A1", "F3"],
+      "surfaces": [
+        { "surface": "desktop", "id": "admin-audit-log", "file": "desktop/admin-audit-log.html", "status": "active", "note": "superuser required" }
+      ]
     }
   ],
   "components": [
     { "id": "toolbar",          "file": "components/toolbar.html",         "states": 6  },
     { "id": "ai-prompt-panel",  "file": "components/ai-prompt-panel.html", "states": 4  },
     { "id": "ascii-panel",      "file": "components/ascii-panel.html",     "states": 4  },
-    { "id": "version-drawer",   "file": "components/version-drawer.html",  "states": 4  },
-    { "id": "export-modal",     "file": "components/export-modal.html",    "states": 3  }
+    { "id": "version-drawer",   "file": "components/version-drawer.html",  "states": 5  },
+    { "id": "export-modal",     "file": "components/export-modal.html",    "states": 3  },
+    { "id": "inspector-panel",  "file": "components/inspector-panel.html", "states": 4  },
+    { "id": "error-states",     "file": "components/error-states.html",    "states": 5  }
   ]
 }

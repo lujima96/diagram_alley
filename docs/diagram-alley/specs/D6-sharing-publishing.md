@@ -143,7 +143,7 @@ Response:
 }
 ```
 
-`shared_by_name`: the `users.name` of the diagram owner. Used in the share view header. Returns `null` if the user has no display name.
+`shared_by_name`: the display name of the diagram owner. Uses `users.name` when present; otherwise uses the lowercased email prefix before `@` (DEC-029). Used in the share view header.
 
 `spec_json` is **not** included in the public response — the share view only exposes rendered output, not the raw spec.
 

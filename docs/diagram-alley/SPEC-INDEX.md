@@ -104,13 +104,25 @@ Write in the order listed. Each spec depends on the foundation specs shown.
 | `sketches/mockups/desktop/landing.html` | Public landing page | **Done** |
 | `sketches/mockups/desktop/login.html` | Login screen | **Done** |
 | `sketches/mockups/desktop/register.html` | Registration + trial start | **Done** |
+| `sketches/mockups/desktop/verify-email.html` | Email verification flow | **Done** |
+| `sketches/mockups/desktop/reset-password.html` | Password reset flow | **Done** |
+| `sketches/mockups/desktop/not-found.html` | 404 not found route | **Done** |
 | `sketches/mockups/desktop/dashboard.html` | Post-login dashboard | **Done** |
 | `sketches/mockups/desktop/editor.html` | Workspace — new/empty diagram | **Done** |
 | `sketches/mockups/desktop/editor-saved.html` | Workspace — saved diagram with nodes | **Done** |
+| `sketches/mockups/desktop/editor-improve.html` | Workspace — AI improve proposal state | **Done** |
+| `sketches/mockups/desktop/editor-detached.html` | Workspace — detached ASCII export warning state | **Done** |
+| `sketches/mockups/desktop/projects.html` | Project list | **Done** |
+| `sketches/mockups/desktop/project-detail.html` | Project detail | **Done** |
 | `sketches/mockups/desktop/library.html` | Diagram library | **Done** |
 | `sketches/mockups/desktop/templates.html` | Template browser | **Done** |
 | `sketches/mockups/desktop/billing.html` | Billing + subscription settings | **Done** |
+| `sketches/mockups/desktop/settings-account.html` | Account settings | **Done** |
 | `sketches/mockups/desktop/settings-providers.html` | AI provider settings | **Done** |
+| `sketches/mockups/desktop/admin.html` | Admin dashboard | **Done** |
+| `sketches/mockups/desktop/admin-users.html` | Admin user management | **Done** |
+| `sketches/mockups/desktop/admin-user-detail.html` | Admin user detail and subscription override | **Done** |
+| `sketches/mockups/desktop/admin-audit-log.html` | Admin audit log viewer | **Done** |
 | `sketches/mockups/desktop/version-history.html` | Version history drawer (open state) | **Done** |
 | `sketches/mockups/desktop/export-modal.html` | Export modal (open state) | **Done** |
 | `sketches/mockups/desktop/trial-expired.html` | Trial expired overlay state | **Done** |
@@ -118,8 +130,10 @@ Write in the order listed. Each spec depends on the foundation specs shown.
 | `sketches/mockups/components/toolbar.html` | Toolbar — 6 states (clean, unsaved, saving, title-edit, new, expired) | **Done** |
 | `sketches/mockups/components/ai-prompt-panel.html` | AI prompt panel — 4 states | **Done** |
 | `sketches/mockups/components/ascii-panel.html` | ASCII panel — 4 states (read-only, edit, detached, repair) | **Done** |
-| `sketches/mockups/components/version-drawer.html` | Version drawer — 4 states (selected, restoring, empty, list) | **Done** |
+| `sketches/mockups/components/version-drawer.html` | Version drawer — 5 states (selected, restore confirmation, restoring, empty, list) | **Done** |
 | `sketches/mockups/components/export-modal.html` | Export modal — 3 states (ASCII, PNG, copy success) | **Done** |
+| `sketches/mockups/components/inspector-panel.html` | Inspector panel — 4 states across 3 tabs | **Done** |
+| `sketches/mockups/components/error-states.html` | Error states — 5 error codes | **Done** |
 
 ---
 
@@ -154,7 +168,8 @@ Run audits after Phase 1, after Phase 2, and after Phase 6 mockups.
 
 | File | Purpose | Status |
 |------|---------|--------|
-| Audit report files | Created on demand; named `audit-YYYY-MM-DD.md` | Planned |
+| `audit-2026-05-22.md` | Phase 6 post-mockup audit and reconciliation ledger | **Reconciled** |
+| Future audit report files | Created on demand; named `audit-YYYY-MM-DD.md` | Planned |
 
 ---
 

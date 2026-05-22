@@ -410,6 +410,20 @@ When a user drags a node in React Flow, the new pixel position is converted back
 
 Each `node.kind` maps to a custom React Flow node component. The component renders the label, kind annotation, and the border style defined in §4.3. In V1, these are simple styled `div` elements — no SVG icons required. Icons are a V2 enhancement.
 
+For `file_structure` diagrams (DEC-030), the visual renderer converts each folder/file entry into a tree-row node:
+- Folders render with a folder label row and may contain indented child rows.
+- Files render as leaf rows.
+- Tree depth maps to horizontal indentation; order follows the source `children` arrays.
+- Label edits update the corresponding file/folder entry in `spec_json`.
+
+For `ui_wireframe` diagrams (DEC-030), the visual renderer converts each component into a nested-box node:
+- Container components render as boxes that can contain child component boxes.
+- Leaf components render as labeled boxes with the component type annotation.
+- Nesting follows the source component tree.
+- Label/property edits update the corresponding component entry in `spec_json`.
+
+These renderings are intentionally schematic, not pixel-perfect UI or file explorer clones. They preserve deterministic structure and editability.
+
 ### 6.4 Edge Appearance in React Flow
 
 - Solid edges: `type="smoothstep"` with solid stroke

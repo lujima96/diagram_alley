@@ -115,6 +115,45 @@
   </div>
 </div>
 
+<!-- Restore confirmation dialog -->
+<div>
+  <div class="component-label">Version Drawer — Restore confirmation</div>
+  <div class="drawer-frame" style="position:relative;">
+    <div class="drawer-header">
+      <div class="drawer-title">Version history</div>
+      <button class="btn btn-ghost btn-icon" disabled style="opacity:0.4;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="version-list" style="filter:blur(1px); opacity:0.45;">
+      <div class="version-item" style="background:var(--bg-base);">
+        <div class="version-dot" style="background:var(--accent);"></div>
+        <div style="flex:1; min-width:0;">
+          <div style="font-size:13px; font-weight:600; color:var(--text-primary);">AI update — added Redis layer</div>
+          <div style="font-size:11px; color:var(--text-tertiary); margin-top:2px;">Today, 2:14 PM · Current</div>
+        </div>
+      </div>
+      <div class="version-item" style="background:var(--accent-muted);">
+        <div class="version-dot" style="background:var(--accent);"></div>
+        <div style="flex:1; min-width:0;">
+          <div style="font-size:13px; font-weight:600; color:var(--text-primary);">Added DB schema tables</div>
+          <div style="font-size:11px; color:var(--text-tertiary); margin-top:2px;">Today, 1:47 PM · Manual save</div>
+        </div>
+      </div>
+    </div>
+    <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:var(--sp-5); background:rgba(255,255,255,0.72);">
+      <div style="background:var(--bg-surface); border:1px solid var(--border); border-radius:var(--r-l); box-shadow:var(--shadow-l); padding:var(--sp-5); width:100%;">
+        <div style="font-size:15px; font-weight:700; color:var(--text-primary); margin-bottom:var(--sp-2);">Restore this version?</div>
+        <div style="font-size:12px; color:var(--text-secondary); line-height:1.5; margin-bottom:var(--sp-4);">The current diagram will be saved as a new version before this older version is restored.</div>
+        <div style="display:flex; justify-content:flex-end; gap:var(--sp-2);">
+          <button class="btn btn-secondary btn-sm">Cancel</button>
+          <button class="btn btn-primary btn-sm">Restore</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Empty state (new diagram, no saves yet) -->
 <div>
   <div class="component-label">Version Drawer — No versions yet</div>

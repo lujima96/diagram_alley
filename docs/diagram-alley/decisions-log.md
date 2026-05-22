@@ -17,6 +17,68 @@ This file is the canonical record of all user-approved decisions. It **overrides
 
 ---
 
+## 2026-05-22 — Phase 10 Mockup Audit Reconciliation
+
+### DEC-030: Visual Editor — File Structure and UI Wireframe Rendering
+
+**Decision:** V1 visually renders `file_structure` diagrams as tree rows and `ui_wireframe` diagrams as nested boxes in the React Flow editor. These diagram types are editable in the visual editor; they are not reduced to read-only ASCII/text previews.
+
+**Source:** Phase 10 mockup audit reconciliation, user decision 2026-05-22.
+
+**Rationale:** This keeps all V1 diagram types visually editable and preserves the product promise of a structured visual workspace across supported diagram types.
+
+**Affects:** F2 (visual renderer behavior), F4 (visual editor UI behavior)
+
+---
+
+### DEC-029: Display Name Fallback — Email Prefix
+
+**Decision:** When `users.name` is null or blank, the display name fallback is the lowercased email prefix before `@`. Avatar initials are derived from the display name when present, otherwise from the email prefix.
+
+**Source:** Phase 10 mockup audit reconciliation, user decision 2026-05-22.
+
+**Rationale:** Email prefix fallback is deterministic, avoids signup friction, and keeps identity surfaces readable.
+
+**Affects:** F1 (user display semantics), F3 (account/profile display), D6 (public share display)
+
+---
+
+### DEC-028: Diagrams Can Move Between Projects in V1
+
+**Decision:** Users can move diagrams between their projects in V1. The move uses the existing `PATCH /api/v1/diagrams/{id}` `project_id` field and appears in the UI as a diagram menu action. No dedicated move endpoint is required.
+
+**Source:** Phase 10 mockup audit reconciliation, user decision 2026-05-22.
+
+**Rationale:** The schema and API already support `project_id` updates, and moving diagrams prevents project assignment mistakes from becoming permanent.
+
+**Affects:** D2 (diagram update behavior and UI action), F4 (project/library UI)
+
+---
+
+### DEC-027: Project Archive UX — Restore, No Hard Delete
+
+**Decision:** V1 supports project archive and restore. Archived projects are hidden from default project lists, can be viewed in an Archived filter/view, and can be restored. V1 does not expose project hard delete as a standalone user action.
+
+**Source:** Phase 10 mockup audit reconciliation, user decision 2026-05-22.
+
+**Rationale:** This matches the soft-delete data model, gives users an undo path, and avoids destructive project deletion scope in V1.
+
+**Affects:** F1 (`projects` lifecycle), F4 (`/projects` UI), F5 (project update/archive API)
+
+---
+
+### DEC-026: V1 Templates — System and User-Created Private Templates
+
+**Decision:** V1 supports both built-in system templates and user-created private templates. User-created templates are owned by the creating user through `templates.created_by`; system templates have `created_by = null`. The `templates.is_public` field remains reserved for a future marketplace and is always `false` in V1.
+
+**Source:** Phase 10 mockup audit reconciliation, user-approved follow-up 2026-05-22.
+
+**Rationale:** F5 already defines user template create/delete endpoints, and the mockups include a "My Templates" area. Recording the decision removes ambiguity without introducing marketplace scope.
+
+**Affects:** F1 (`templates` table), F4 (`/templates` UI), F5 (template endpoints), D2 (new diagram from template)
+
+---
+
 ## 2026-05-20 — Audit Reconciliation Decisions
 
 ### DEC-025: Stripe Cancellation — Active Until Access Ends

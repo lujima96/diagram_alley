@@ -287,9 +287,11 @@ Domain specs define the full contract for each endpoint. This table is the canon
 | GET | `/api/v1/projects` | List projects |
 | POST | `/api/v1/projects` | Create project |
 | GET | `/api/v1/projects/{id}` | Get project |
-| PATCH | `/api/v1/projects/{id}` | Update project |
+| PATCH | `/api/v1/projects/{id}` | Update project, including archive restore (`is_archived=false`) |
 | DELETE | `/api/v1/projects/{id}` | Archive project |
 | GET | `/api/v1/projects/{id}/diagrams` | List project's diagrams |
+
+Project hard delete is not exposed in V1 (DEC-027).
 
 ### Templates
 | Method | Path | Description |

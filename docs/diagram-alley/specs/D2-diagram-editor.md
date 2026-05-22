@@ -137,6 +137,8 @@ When `spec_json` is provided:
 
 Returns the updated diagram object.
 
+Updating `project_id` moves the diagram to another project owned by the same user (DEC-028). The service must reject a `project_id` that is missing, archived, or not owned by the current user with `404 PROJECT_NOT_FOUND`.
+
 ### 2.5 `DELETE /api/v1/diagrams/{id}`
 
 Archives the diagram (`is_archived = true`). Returns `204 No Content`.
@@ -327,6 +329,12 @@ Shown when a node or edge is selected in the grid.
 
 **Flowchart specifics:**
 - When a step is selected: editable `kind` (start, end, process, decision, io) and `label`.
+
+**Project assignment (DEC-028):**
+- The diagram action menu includes "Move to project".
+- The move dialog lists active projects owned by the user.
+- Selecting a project sends `PATCH /api/v1/diagrams/{id}` with only `project_id`.
+- Moving a diagram does not create a version snapshot because `spec_json` is unchanged.
 
 **No multi-select editing** in V1 — if multiple nodes are selected, the Selection tab shows "Multiple nodes selected. Deselect to edit."
 
