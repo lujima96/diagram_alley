@@ -43,8 +43,8 @@ The Phase 7 follow-ups are resolved:
 | Detached ASCII state | ASCII reverse-sync flow | F1, F2, D2 | Covered by `diagrams.ascii_is_detached`. No schema change. |
 | Cancel-at-period-end access | Billing flow | F1, D7, A1 | Covered by `subscriptions.cancel_at_period_end` and `access_ends_at`. No schema change. |
 | Share links show live diagram | Sharing flow | F1, D6 | Covered by `diagram_shares` pointing to `diagrams`. No version snapshot link needed in V1. |
-| Import warnings | D5 import flow | D5 | Response-level warning objects are defined. Persistence decision remains explicit follow-up (§4.1). |
-| AI repair warnings | AI generation flow | D1, F2 | Response-level warning objects are defined. Persistence decision remains explicit follow-up (§4.1). |
+| Import warnings | D5 import flow | D5 | Response-level warning objects are defined. Persistence is rejected by DEC-031. No schema change. |
+| AI repair warnings | AI generation flow | D1, F2 | Response-level warning objects are defined. Persistence is rejected by DEC-031. No schema change. |
 
 ---
 
@@ -99,9 +99,7 @@ The Phase 7 follow-ups are resolved:
 - D3 restore creates pre-restore and post-restore snapshots.
 - D3 allows `PATCH /versions/{vid}` to update only `change_summary`.
 
-**Follow-up:**
-
-- Restore response may need both pre-restore and post-restore version IDs (§4.2).
+**Resolution:** Closed by DEC-032. Restore responses return both pre-restore and post-restore version IDs.
 
 ### 3.5 Sharing and Publishing
 
