@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — User Detail — Diagram Alley Mockup</title>
+<link rel="stylesheet" href="../_shared.css">
+<style>
+  .admin-shell { display:grid; grid-template-columns: 200px 1fr; height:100vh; }
+  .admin-sidebar { background: #1D1D1F; color: #F5F5F7; padding: var(--sp-5) var(--sp-4); display:flex; flex-direction:column; gap: var(--sp-1); }
+  .admin-logo { font-size:14px; font-weight:700; font-family:var(--font-display); color:#F5F5F7; margin-bottom: var(--sp-6); display:flex; align-items:center; gap:var(--sp-2); }
+  .admin-logo .logo-mark { background: var(--accent); }
+  .admin-nav-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:rgba(255,255,255,0.3); margin: var(--sp-3) 0 var(--sp-1); }
+  .admin-nav-item { font-size:13px; color:rgba(255,255,255,0.7); padding: var(--sp-2) var(--sp-3); border-radius: var(--r-s); display:flex; align-items:center; gap:var(--sp-2); cursor:pointer; text-decoration:none; }
+  .admin-nav-item:hover { color:#F5F5F7; background:rgba(255,255,255,0.08); }
+  .admin-nav-item.active { color:#F5F5F7; background:rgba(255,255,255,0.12); font-weight:600; }
+  .admin-main { display:flex; flex-direction:column; background: var(--bg-base); overflow:hidden; }
+  .admin-header { background: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); padding: 0 var(--sp-6); height:52px; display:flex; align-items:center; gap: var(--sp-3); flex-shrink:0; }
+  .admin-badge { font-size:11px; font-weight:700; background:#FF3B30; color:#fff; padding: 2px 8px; border-radius:99px; }
+  .detail-grid { display:grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
+  .detail-row { display:flex; justify-content:space-between; align-items:center; padding: var(--sp-3) 0; border-bottom: 1px solid var(--border-subtle); }
+  .detail-row:last-child { border-bottom:none; }
+  .detail-key { font-size:13px; color: var(--text-secondary); }
+  .detail-val { font-size:13px; font-weight:500; color: var(--text-primary); font-family: var(--font-mono); }
+  .data-table { width:100%; border-collapse:collapse; }
+  .data-table th { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--text-tertiary); padding: var(--sp-2) var(--sp-4); text-align:left; border-bottom: 1px solid var(--border-subtle); }
+  .data-table td { font-size:12px; color: var(--text-primary); padding: var(--sp-2) var(--sp-4); border-bottom: 1px solid var(--border-subtle); }
+  .data-table tr:last-child td { border-bottom:none; }
+  .section-card { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--r-l); padding: var(--sp-5); }
+  .section-card-title { font-size:13px; font-weight:700; color: var(--text-primary); margin-bottom: var(--sp-4); }
+</style>
+</head>
+<body style="margin:0; padding:0;">
+<div class="admin-shell">
+
+  <div class="admin-sidebar">
+    <div class="admin-logo">
+      <div class="logo-mark">DA</div>
+      Admin
+    </div>
+    <div class="admin-nav-label">Overview</div>
+    <a href="admin.html" class="admin-nav-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <div class="admin-nav-label">Users</div>
+    <a href="admin-users.html" class="admin-nav-item active">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      All Users
+    </a>
+    <div class="admin-nav-label">Logs</div>
+    <a href="admin-audit-log.html" class="admin-nav-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Audit Log
+    </a>
+    <div style="margin-top:auto;">
+      <a href="dashboard.html" class="admin-nav-item" style="color:rgba(255,255,255,0.4); font-size:12px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 18l-6-6 6-6"/></svg>
+        Back to app
+      </a>
+    </div>
+  </div>
+
+  <div class="admin-main">
+    <div class="admin-header">
+      <a href="admin-users.html" style="color: var(--text-secondary); font-size:13px; text-decoration:none; display:flex; align-items:center; gap:4px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        Users
+      </a>
+      <span style="color: var(--text-tertiary);">/</span>
+      <span style="font-size:15px; font-weight:700; font-family:var(--font-display);">priya.ramesh@techcorp.io</span>
+      <span class="admin-badge">INTERNAL</span>
+    </div>
+
+    <div class="page-scroll">
+      <div style="padding: var(--sp-6); max-width:900px; display:flex; flex-direction:column; gap: var(--sp-4);">
+
+        <!-- Profile + subscription -->
+        <div class="detail-grid">
+
+          <!-- Profile -->
+          <div class="section-card">
+            <div class="section-card-title">Profile</div>
+            <div class="detail-row">
+              <span class="detail-key">User ID</span>
+              <span class="detail-val">usr_7f3a19c</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-key">Email</span>
+              <span class="detail-val" style="font-family:var(--font-ui);">priya.ramesh@techcorp.io</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-key">Display name</span>
+              <span class="detail-val" style="font-family:var(--font-ui);">Priya R.</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-key">Registered</span>
+              <span class="detail-val" style="font-family:var(--font-ui);">May 22, 2026</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-key">Diagrams</span>
+              <span class="detail-val" style="font-family:var(--font-ui);">7</span>
+            </div>
+          </div>
+
+          <!-- Subscription -->
+          <div class="section-card">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: var(--sp-4);">
+              <div class="section-card-title" style="margin-bottom:0;">Subscription</div>
+              <button class="btn btn-secondary btn-sm">Override plan</button>
+            </div>
+            <div class="detail-row">
+              <span class="detail-key">Plan</span>
+              <span class="detail-val" style="font-family:var(--font-ui);"><span class="badge badge-blue">trial</span></span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-key">Status</span>
+              <span class="detail-val" style="font-family:var(--font-ui);"><span class="badge badge-green">trialing</span></span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-key">Trial ends</span>
+              <span class="detail-val" style="font-family:var(--font-ui);">Jun 5, 2026</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-key">Stripe customer</span>
+              <span class="detail-val">cus_Qx7f3a19</span>
+            </div>
+
+            <!-- Override plan form (inline, visible) -->
+            <div style="margin-top: var(--sp-4); padding: var(--sp-4); background: var(--bg-base); border-radius: var(--r-m); border: 1px solid var(--border);">
+              <div style="font-size:12px; font-weight:600; color: var(--text-secondary); margin-bottom: var(--sp-3);">Override subscription</div>
+              <div style="display:flex; gap: var(--sp-2); align-items:center; flex-wrap:wrap;">
+                <select class="select" style="font-size:12px; padding: 4px var(--sp-2); width:auto;">
+                  <option>trial</option>
+                  <option selected>pro</option>
+                </select>
+                <select class="select" style="font-size:12px; padding: 4px var(--sp-2); width:auto;">
+                  <option>active</option>
+                  <option>trialing</option>
+                  <option>canceled</option>
+                </select>
+                <input class="input" type="date" value="2026-12-31" style="font-size:12px; padding: 4px var(--sp-2); width:auto;">
+                <button class="btn btn-primary btn-sm">Apply override</button>
+              </div>
+              <div style="font-size:11px; color: var(--text-tertiary); margin-top: var(--sp-2);">Override is recorded in the audit log and is not billed via Stripe.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent audit events for this user -->
+        <div class="section-card" style="padding:0; overflow:hidden;">
+          <div style="padding: var(--sp-4) var(--sp-5); border-bottom: 1px solid var(--border-subtle); display:flex; align-items:center; justify-content:space-between;">
+            <div class="section-card-title" style="margin-bottom:0;">Recent audit events</div>
+            <a href="admin-audit-log.html" class="btn btn-ghost btn-sm">View full log</a>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Event</th>
+                <th>Actor</th>
+                <th>Details</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="badge badge-blue">diagram.created</span></td>
+                <td>priya.ramesh@…</td>
+                <td>diag_9c1f2b — "Auth Flow"</td>
+                <td>2026-05-22 14:03 UTC</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-blue">diagram.exported</span></td>
+                <td>priya.ramesh@…</td>
+                <td>format: ascii</td>
+                <td>2026-05-22 13:58 UTC</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-green">user.trial_started</span></td>
+                <td>priya.ramesh@…</td>
+                <td>plan: trial, 14 days</td>
+                <td>2026-05-22 10:12 UTC</td>
+              </tr>
+              <tr>
+                <td><span class="badge badge-green">user.registered</span></td>
+                <td>priya.ramesh@…</td>
+                <td>method: email</td>
+                <td>2026-05-22 10:12 UTC</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Danger zone -->
+        <div class="section-card" style="border-color: var(--error-muted);">
+          <div class="section-card-title" style="color: var(--error);">Danger zone</div>
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div>
+              <div style="font-size:13px; font-weight:600;">Delete account</div>
+              <div style="font-size:12px; color: var(--text-secondary);">Permanently deletes all diagrams, versions, and provider credentials. Cannot be undone.</div>
+            </div>
+            <button class="btn btn-destructive btn-sm" style="border: 1px solid var(--error-muted);">Delete account</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+<div class="mockup-note">admin-user-detail · /admin/users/:userId</div>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Account Settings — Diagram Alley Mockup</title>
+<link rel="stylesheet" href="../_shared.css">
+<style>
+  .settings-layout { display:grid; grid-template-columns: 180px 1fr; flex:1; overflow:hidden; }
+  .settings-nav { border-right: 1px solid var(--border-subtle); padding: var(--sp-4) var(--sp-3); display:flex; flex-direction:column; gap: var(--sp-1); background: var(--bg-surface); }
+  .settings-nav-item { font-size:13px; color: var(--text-secondary); padding: var(--sp-2) var(--sp-3); border-radius: var(--r-s); text-decoration:none; display:block; }
+  .settings-nav-item:hover { color: var(--text-primary); background: var(--bg-base); }
+  .settings-nav-item.active { color: var(--accent); background: var(--accent-muted); font-weight:600; }
+  .settings-section { padding: var(--sp-6); max-width:560px; }
+  .settings-section-title { font-size:16px; font-weight:700; color: var(--text-primary); margin-bottom: var(--sp-1); }
+  .settings-section-desc { font-size:13px; color: var(--text-secondary); margin-bottom: var(--sp-6); }
+  .settings-block { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--r-l); padding: var(--sp-5); margin-bottom: var(--sp-5); }
+  .settings-block-title { font-size:14px; font-weight:700; color: var(--text-primary); margin-bottom: var(--sp-4); }
+  .settings-row { display:flex; align-items:center; justify-content:space-between; padding: var(--sp-3) 0; border-bottom: 1px solid var(--border-subtle); gap: var(--sp-4); }
+  .settings-row:last-child { border-bottom:none; padding-bottom:0; }
+  .settings-row-label { font-size:13px; font-weight:600; color: var(--text-primary); }
+  .settings-row-desc { font-size:12px; color: var(--text-secondary); margin-top:2px; }
+  .toggle { width:36px; height:20px; border-radius:10px; background: var(--accent); position:relative; cursor:pointer; flex-shrink:0; }
+  .toggle::after { content:''; position:absolute; right:3px; top:3px; width:14px; height:14px; border-radius:7px; background:#fff; }
+  .toggle.off { background: var(--border); }
+  .toggle.off::after { left:3px; right:auto; }
+  .danger-block { background: var(--bg-surface); border: 1px solid #FFCDD2; border-radius: var(--r-l); padding: var(--sp-5); }
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">DA</div>
+      Diagram Alley
+    </div>
+    <button class="sidebar-new-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New Diagram
+    </button>
+    <a href="dashboard.html" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a href="library.html" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Library
+    </a>
+    <a href="templates.html" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      Templates
+    </a>
+    <a href="projects.html" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      Projects
+    </a>
+    <div class="sidebar-footer">
+      <a href="settings-providers.html" class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>
+        Providers
+      </a>
+      <a href="billing.html" class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Billing
+      </a>
+      <div class="nav-item" style="margin-top:auto;">
+        <div class="avatar">PR</div>
+        <div class="flex-1 overflow-hidden">
+          <div class="truncate subhead">Priya R.</div>
+          <div class="truncate" style="font-size:11px; color:var(--text-tertiary);">Trial · 12 days left</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <div class="header-bar">
+      <div class="header-title">Settings</div>
+    </div>
+
+    <div class="settings-layout" style="flex:1; overflow:hidden;">
+
+      <!-- Settings sub-nav -->
+      <div class="settings-nav">
+        <a href="settings-account.html" class="settings-nav-item active">Account</a>
+        <a href="billing.html" class="settings-nav-item">Billing</a>
+        <a href="settings-providers.html" class="settings-nav-item">Providers</a>
+      </div>
+
+      <!-- Account settings content -->
+      <div class="page-scroll">
+        <div class="settings-section">
+
+          <!-- Profile -->
+          <div class="settings-block">
+            <div class="settings-block-title">Profile</div>
+            <div class="form-group" style="margin-bottom: var(--sp-4);">
+              <label class="footnote" style="font-weight:600; color: var(--text-secondary);">Display name</label>
+              <input class="input" type="text" value="Priya R." style="margin-top: var(--sp-1);">
+            </div>
+            <div class="form-group" style="margin-bottom: var(--sp-4);">
+              <label class="footnote" style="font-weight:600; color: var(--text-secondary);">Email address</label>
+              <input class="input" type="email" value="priya.ramesh@techcorp.io" style="margin-top: var(--sp-1);">
+              <div style="font-size:11px; color: var(--text-tertiary); margin-top: var(--sp-1);">Changing your email requires re-verification.</div>
+            </div>
+            <button class="btn btn-primary btn-sm">Save changes</button>
+          </div>
+
+          <!-- Password -->
+          <div class="settings-block">
+            <div class="settings-block-title">Password</div>
+            <div class="form-group" style="margin-bottom: var(--sp-3);">
+              <label class="footnote" style="font-weight:600; color: var(--text-secondary);">Current password</label>
+              <input class="input" type="password" placeholder="Enter current password" style="margin-top: var(--sp-1);">
+            </div>
+            <div class="form-group" style="margin-bottom: var(--sp-3);">
+              <label class="footnote" style="font-weight:600; color: var(--text-secondary);">New password</label>
+              <input class="input" type="password" placeholder="At least 8 characters" style="margin-top: var(--sp-1);">
+            </div>
+            <div class="form-group" style="margin-bottom: var(--sp-4);">
+              <label class="footnote" style="font-weight:600; color: var(--text-secondary);">Confirm new password</label>
+              <input class="input" type="password" placeholder="Repeat new password" style="margin-top: var(--sp-1);">
+            </div>
+            <button class="btn btn-secondary btn-sm">Update password</button>
+          </div>
+
+          <!-- Privacy / provider credentials -->
+          <div class="settings-block">
+            <div class="settings-block-title">Privacy</div>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Store AI provider credentials</div>
+                <div class="settings-row-desc">When enabled, API keys are encrypted and stored server-side. When disabled, you must enter credentials each session.</div>
+              </div>
+              <div class="toggle" title="Enabled"></div>
+            </div>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Default spec format</div>
+                <div class="settings-row-desc">Preferred format when exporting or copying diagram specs.</div>
+              </div>
+              <select class="select" style="font-size:13px; padding: 4px var(--sp-3); width:auto;">
+                <option selected>JSON</option>
+                <option>YAML</option>
+              </select>
+            </div>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Default export format</div>
+                <div class="settings-row-desc">Pre-selected format in the Export modal.</div>
+              </div>
+              <select class="select" style="font-size:13px; padding: 4px var(--sp-3); width:auto;">
+                <option selected>ASCII (.txt)</option>
+                <option>Markdown (.md)</option>
+                <option>Mermaid (.mmd)</option>
+                <option>SVG</option>
+                <option>PNG</option>
+              </select>
+            </div>
+            <div style="margin-top: var(--sp-4);">
+              <button class="btn btn-secondary btn-sm">Save preferences</button>
+            </div>
+          </div>
+
+          <!-- Data export -->
+          <div class="settings-block">
+            <div class="settings-block-title">Your data</div>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Export all data</div>
+                <div class="settings-row-desc">Download a ZIP of all your diagram specs, versions, and account data.</div>
+              </div>
+              <button class="btn btn-secondary btn-sm">Request export</button>
+            </div>
+          </div>
+
+          <!-- Danger zone -->
+          <div class="danger-block">
+            <div class="settings-block-title" style="color: #D32F2F;">Danger zone</div>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Delete account</div>
+                <div class="settings-row-desc">Permanently deletes your account, all diagrams, versions, and provider credentials. This cannot be undone. Your subscription will be canceled immediately.</div>
+              </div>
+              <button class="btn btn-destructive btn-sm" style="border: 1px solid #FFCDD2; flex-shrink:0;">Delete account</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="mockup-note">settings-account · /settings/account</div>
+</body>
+</html>

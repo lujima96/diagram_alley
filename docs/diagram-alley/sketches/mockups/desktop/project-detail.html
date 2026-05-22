@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Detail — Diagram Alley Mockup</title>
+<link rel="stylesheet" href="../_shared.css">
+</head>
+<body>
+<div class="app-shell">
+
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">DA</div>
+      Diagram Alley
+    </div>
+    <button class="sidebar-new-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New Diagram
+    </button>
+    <a href="dashboard.html" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a href="library.html" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Library
+    </a>
+    <a href="templates.html" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      Templates
+    </a>
+    <a href="projects.html" class="nav-item active">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      Projects
+    </a>
+    <div class="sidebar-footer">
+      <a href="settings-providers.html" class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>
+        Providers
+      </a>
+      <a href="billing.html" class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Billing
+      </a>
+      <div class="nav-item" style="margin-top:auto;">
+        <div class="avatar">PR</div>
+        <div class="flex-1 overflow-hidden">
+          <div class="truncate subhead">Priya R.</div>
+          <div class="truncate" style="font-size:11px; color:var(--text-tertiary);">Trial · 12 days left</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <div class="header-bar">
+      <div class="header-title" style="display:flex; align-items:center; gap: var(--sp-2);">
+        <a href="projects.html" style="color: var(--text-secondary); text-decoration:none; font-size:14px; font-weight:400;">Projects</a>
+        <span style="color: var(--text-tertiary);">/</span>
+        <span>Inventory Management System</span>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-ghost btn-sm">Rename</button>
+        <button class="btn btn-ghost btn-sm">Archive</button>
+        <button class="btn btn-primary btn-sm">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add diagram
+        </button>
+      </div>
+    </div>
+
+    <div class="page-scroll">
+      <div class="page-content">
+
+        <!-- Project meta -->
+        <div style="display:flex; align-items:center; gap: var(--sp-4); margin-bottom: var(--sp-6); padding-bottom: var(--sp-6); border-bottom: 1px solid var(--border-subtle);">
+          <div style="width:52px; height:52px; border-radius:var(--r-m); background: var(--accent-muted); display:flex; align-items:center; justify-content:center; font-size:24px;">📦</div>
+          <div>
+            <div class="title3" style="margin-bottom:2px;">Inventory Management System</div>
+            <div class="footnote text-secondary">4 diagrams · Last updated 2 hours ago · Created May 10, 2026</div>
+          </div>
+        </div>
+
+        <!-- Diagrams in this project -->
+        <div class="section-header">
+          <div class="section-title">Diagrams</div>
+        </div>
+        <div class="grid-3">
+
+          <a href="editor-saved.html" style="text-decoration:none;">
+            <div class="diagram-card">
+              <div class="diagram-card-thumb">
+                <pre>+-------------------+
+| Inventory API     |
+| service           |
++--------+----------+
+         |
+         v
++-------------------+
+| Postgres DB       |
+| database          |
++-------------------+</pre>
+              </div>
+              <div class="diagram-card-body">
+                <div class="diagram-card-title">System Architecture</div>
+                <div class="diagram-card-meta">Architecture · 2 hours ago · v8</div>
+                <div class="mt-2 flex gap-1">
+                  <span class="badge badge-blue">architecture</span>
+                </div>
+              </div>
+            </div>
+          </a>
+
+          <a href="editor-saved.html" style="text-decoration:none;">
+            <div class="diagram-card">
+              <div class="diagram-card-thumb">
+                <pre>+--------------------+
+| items              |
++--------------------+
+| id      PK         |
+| sku     TEXT       |
+| qty     INT        |
++--------------------+
+       |
+       v
++--------------------+
+| locations          |
++--------------------+</pre>
+              </div>
+              <div class="diagram-card-body">
+                <div class="diagram-card-title">Database Schema</div>
+                <div class="diagram-card-meta">Database · Yesterday · v3</div>
+                <div class="mt-2 flex gap-1">
+                  <span class="badge badge-gray">database</span>
+                </div>
+              </div>
+            </div>
+          </a>
+
+          <a href="editor-saved.html" style="text-decoration:none;">
+            <div class="diagram-card">
+              <div class="diagram-card-thumb">
+                <pre>+-------------------------------+
+| Header: Inventory Dashboard   |
++----------+--------------------+
+| Sidebar  | Main               |
+|          | +--------+------+  |
+| - Items  | | On Hand| Low  |  |
+| - Inbnd  | +--------+------+  |
+| - Outbnd |                    |
++----------+--------------------+</pre>
+              </div>
+              <div class="diagram-card-body">
+                <div class="diagram-card-title">Dashboard Wireframe</div>
+                <div class="diagram-card-meta">UI Wireframe · 3 days ago · v2</div>
+                <div class="mt-2 flex gap-1">
+                  <span class="badge badge-gray">wireframe</span>
+                </div>
+              </div>
+            </div>
+          </a>
+
+          <a href="editor-saved.html" style="text-decoration:none;">
+            <div class="diagram-card">
+              <div class="diagram-card-thumb">
+                <pre>[Start]
+   |
+   v
+[Receive]
+   |
+   v
+[Validate]
+   |
+  / \
+Yes   No
+ |     |
+[OK] [Err]</pre>
+              </div>
+              <div class="diagram-card-body">
+                <div class="diagram-card-title">Inbound Flow</div>
+                <div class="diagram-card-meta">Flowchart · 3 days ago · v1</div>
+                <div class="mt-2 flex gap-1">
+                  <span class="badge badge-gray">flowchart</span>
+                </div>
+              </div>
+            </div>
+          </a>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<div class="mockup-note">project-detail · /projects/:projectId</div>
+</body>
+</html>

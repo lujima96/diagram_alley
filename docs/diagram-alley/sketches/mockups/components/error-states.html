@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Error States — Diagram Alley Component Mockup</title>
+<link rel="stylesheet" href="../_shared.css">
+<style>
+  body { padding: var(--sp-8); background: var(--bg-base); }
+  h1 { font-family: var(--font-display); font-size:22px; font-weight:800; margin-bottom: var(--sp-2); }
+  .subtitle { color: var(--text-secondary); font-size:13px; margin-bottom: var(--sp-8); }
+  .state-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color: var(--text-tertiary); margin-bottom: var(--sp-2); }
+  .error-code { font-family: var(--font-mono); font-size:11px; font-weight:700; color: var(--text-tertiary); }
+  .spec-ref { font-size:11px; color: var(--text-tertiary); }
+  .state-block { margin-bottom: var(--sp-8); }
+  .context-note { font-size:12px; color: var(--text-tertiary); margin-bottom: var(--sp-3); padding: var(--sp-2) var(--sp-3); background: var(--bg-surface); border-radius: var(--r-s); border: 1px solid var(--border-subtle); }
+
+  /* Inline banner style errors (shown inside the workspace) */
+  .error-banner { border-radius: var(--r-m); padding: var(--sp-4); display:flex; align-items:flex-start; gap: var(--sp-3); }
+  .error-banner.error { background: #FFF0F0; border: 1px solid #FFCDD2; }
+  .error-banner.warning { background: #FFF8E1; border: 1px solid #FFE082; }
+  .error-banner.info { background: #E3F2FD; border: 1px solid #90CAF9; }
+
+  /* Full-panel error state */
+  .panel-error { display:flex; flex-direction:column; align-items:center; justify-content:center; padding: var(--sp-12) var(--sp-8); text-align:center; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--r-l); }
+
+  /* Workspace frame mockup */
+  .workspace-frame { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--r-l); overflow:hidden; max-width:640px; }
+  .workspace-frame-header { background: var(--bg-base); border-bottom: 1px solid var(--border-subtle); padding: var(--sp-3) var(--sp-4); display:flex; align-items:center; gap: var(--sp-2); }
+  .workspace-frame-body { padding: var(--sp-4); }
+</style>
+</head>
+<body>
+  <h1>Error States</h1>
+  <p class="subtitle">F5 §9.1 — Error banners and full-panel error states for key failure modes. Shown as isolated component states.</p>
+
+  <!-- 1. SPEC_VALIDATION_FAILED -->
+  <div class="state-block">
+    <div class="state-label">SPEC_VALIDATION_FAILED — inline banner in workspace preview panel</div>
+    <div class="spec-ref">F5 §9.1 · Shown when: AI generation returns an invalid spec that cannot be auto-repaired</div>
+    <div style="height: var(--sp-3);"></div>
+    <div class="workspace-frame" style="max-width:480px;">
+      <div class="workspace-frame-header">
+        <span class="error-code">SPEC_VALIDATION_FAILED</span>
+        <span style="font-size:12px; color: var(--text-secondary);">· Generation returned an invalid spec</span>
+      </div>
+      <div class="workspace-frame-body">
+        <div class="error-banner error">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D32F2F" stroke-width="2" style="flex-shrink:0; margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          <div style="flex:1;">
+            <div style="font-size:13px; font-weight:700; color:#9A1C1C; margin-bottom: var(--sp-2);">Diagram spec is invalid</div>
+            <div style="font-size:12px; color:#9A1C1C; margin-bottom: var(--sp-2);">The AI returned a spec with 2 errors that could not be auto-repaired:</div>
+            <ul style="font-size:12px; color:#9A1C1C; padding-left: var(--sp-4); margin:0; margin-bottom: var(--sp-3);">
+              <li>Edge "api → auth_service" references missing node "auth_service"</li>
+              <li>Node "postgres_db" ID is duplicated</li>
+            </ul>
+            <div style="display:flex; gap: var(--sp-2);">
+              <button class="btn btn-secondary btn-sm">View in Validation tab</button>
+              <button class="btn btn-ghost btn-sm">Edit prompt and retry</button>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:11px; color: var(--text-tertiary); margin-top: var(--sp-3);">Your previous diagram is unchanged. Use the Validation tab to fix errors manually.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. PROVIDER_UNAVAILABLE -->
+  <div class="state-block">
+    <div class="state-label">PROVIDER_UNAVAILABLE — inline banner during generation</div>
+    <div class="spec-ref">F5 §9.1 · Shown when: AI provider returns 502 or connection timeout</div>
+    <div style="height: var(--sp-3);"></div>
+    <div class="workspace-frame" style="max-width:480px;">
+      <div class="workspace-frame-header">
+        <span class="error-code">PROVIDER_UNAVAILABLE</span>
+        <span style="font-size:12px; color: var(--text-secondary);">· GPT-4o (BYOK) could not be reached</span>
+      </div>
+      <div class="workspace-frame-body">
+        <div class="error-banner warning">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F57C00" stroke-width="2" style="flex-shrink:0; margin-top:1px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div style="flex:1;">
+            <div style="font-size:13px; font-weight:700; color:#7A4F00; margin-bottom: var(--sp-2);">AI provider unavailable</div>
+            <div style="font-size:12px; color:#7A4F00; margin-bottom: var(--sp-3);">GPT-4o (BYOK) did not respond. Check your API key and endpoint, or switch to a different provider.</div>
+            <div style="display:flex; gap: var(--sp-2);">
+              <button class="btn btn-secondary btn-sm">Retry</button>
+              <button class="btn btn-ghost btn-sm">Change provider</button>
+              <button class="btn btn-ghost btn-sm">Edit manually</button>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:11px; color: var(--text-tertiary); margin-top: var(--sp-3);">Your diagram was not changed. The workspace remains fully functional for manual editing.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. SUBSCRIPTION_REQUIRED -->
+  <div class="state-block">
+    <div class="state-label">SUBSCRIPTION_REQUIRED — upgrade banner (post-trial access gate)</div>
+    <div class="spec-ref">F5 §9.1 · D7 §2.3 · Shown when: trial expired and user tries to save or use AI</div>
+    <div style="height: var(--sp-3);"></div>
+    <div class="workspace-frame" style="max-width:480px;">
+      <div class="workspace-frame-header">
+        <span class="error-code">SUBSCRIPTION_REQUIRED</span>
+        <span style="font-size:12px; color: var(--text-secondary);">· Trial has expired</span>
+      </div>
+      <div class="workspace-frame-body">
+        <div class="error-banner error">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D32F2F" stroke-width="2" style="flex-shrink:0; margin-top:1px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <div style="flex:1;">
+            <div style="font-size:13px; font-weight:700; color:#9A1C1C; margin-bottom: var(--sp-2);">Your trial has expired</div>
+            <div style="font-size:12px; color:#9A1C1C; margin-bottom: var(--sp-3);">Saving and AI generation require an active Pro subscription. Your diagrams are safe and can still be viewed and exported.</div>
+            <button class="btn btn-primary btn-sm">Upgrade to Pro</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. RATE_LIMITED -->
+  <div class="state-block">
+    <div class="state-label">RATE_LIMITED — inline banner (429 from provider or app)</div>
+    <div class="spec-ref">F5 §9.1 · Shown when: too many AI generation requests in a short window</div>
+    <div style="height: var(--sp-3);"></div>
+    <div class="workspace-frame" style="max-width:480px;">
+      <div class="workspace-frame-header">
+        <span class="error-code">RATE_LIMITED</span>
+        <span style="font-size:12px; color: var(--text-secondary);">· Too many requests</span>
+      </div>
+      <div class="workspace-frame-body">
+        <div class="error-banner warning">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F57C00" stroke-width="2" style="flex-shrink:0; margin-top:1px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <div style="flex:1;">
+            <div style="font-size:13px; font-weight:700; color:#7A4F00; margin-bottom: var(--sp-2);">Too many requests</div>
+            <div style="font-size:12px; color:#7A4F00; margin-bottom: var(--sp-3);">Your AI provider returned a rate limit error. Please wait a moment before generating again.</div>
+            <div style="display:flex; gap: var(--sp-2); align-items:center;">
+              <button class="btn btn-secondary btn-sm" disabled>Retry in 18s</button>
+              <span style="font-size:11px; color: var(--text-tertiary);">or edit manually while waiting</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Full-panel empty state — no provider configured -->
+  <div class="state-block">
+    <div class="state-label">PROVIDER_NOT_CONFIGURED — full panel empty state in prompt panel</div>
+    <div class="spec-ref">D1 §5 · Shown when: user opens workspace and no AI provider is set up</div>
+    <div style="height: var(--sp-3);"></div>
+    <div class="panel-error" style="max-width:320px;">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="1.5" style="margin-bottom: var(--sp-3); opacity:0.5;"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M8.46 15.54a5 5 0 0 1 0-7.07"/></svg>
+      <div style="font-size:14px; font-weight:700; color: var(--text-primary); margin-bottom: var(--sp-2);">No AI provider configured</div>
+      <div style="font-size:12px; color: var(--text-secondary); margin-bottom: var(--sp-5); max-width:240px;">Connect an Ollama endpoint or add a cloud API key to use AI generation. Manual editing is always available.</div>
+      <div style="display:flex; flex-direction:column; gap: var(--sp-2); width:100%;">
+        <button class="btn btn-primary btn-sm">Set up a provider</button>
+        <button class="btn btn-ghost btn-sm">Edit manually</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup-note">error-states · component · F5 §9.1 · D1 §5 · D7 §2.3</div>
+</body>
+</html>

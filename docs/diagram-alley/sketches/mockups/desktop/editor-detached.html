@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workspace — Detached ASCII Export — Diagram Alley Mockup</title>
+<link rel="stylesheet" href="../_shared.css">
+<style>
+  .prompt-section { padding: var(--sp-4); border-bottom: 1px solid var(--border-subtle); }
+  .prompt-section-title { font-size: 11px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: var(--sp-2); }
+  .select-sm { font-size: 12px; padding: 4px var(--sp-2); border-radius: var(--r-s); border: 1px solid var(--border); background: var(--bg-surface); color: var(--text-primary); cursor: pointer; width: 100%; }
+  .canvas-node { position:absolute; background: var(--bg-surface); border: 1.5px solid var(--border); border-radius: var(--r-s); padding: var(--sp-2) var(--sp-4); font-size: 12px; text-align: center; box-shadow: var(--shadow-s); min-width: 140px; }
+  .canvas-node .node-label { font-weight: 600; font-size: 12px; color: var(--text-primary); }
+  .canvas-node .node-kind { font-size: 10px; color: var(--text-tertiary); margin-top: 1px; }
+  .detached-banner { background: #FFF3CD; border-bottom: 1px solid #FFD54F; padding: var(--sp-3) var(--sp-4); display:flex; align-items:flex-start; gap: var(--sp-3); }
+  .detached-banner-icon { color: #F57C00; flex-shrink:0; margin-top:1px; }
+  .detached-banner-text { flex:1; }
+  .detached-banner-title { font-size:13px; font-weight:700; color: #7A4F00; margin-bottom:2px; }
+  .detached-banner-desc { font-size:12px; color: #7A4F00; }
+  .ascii-edit-active { background: #FFFDE7; border: 1px solid #FFD54F; }
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">DA</div>
+      Diagram Alley
+    </div>
+    <button class="sidebar-new-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New Diagram
+    </button>
+    <a href="dashboard.html" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a href="library.html" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Library
+    </a>
+    <div class="sidebar-footer">
+      <a href="settings-providers.html" class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/></svg>
+        Providers
+      </a>
+      <div class="nav-item" style="margin-top:auto;">
+        <div class="avatar">PR</div>
+        <div class="flex-1 overflow-hidden">
+          <div class="truncate subhead">Priya R.</div>
+          <div class="truncate" style="font-size:11px; color: var(--text-tertiary);">Trial · 12 days left</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <div class="header-bar">
+      <div class="header-title">
+        <input type="text" value="Inventory API Architecture">
+      </div>
+      <div class="header-actions">
+        <span class="badge badge-yellow">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:2px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Detached ASCII
+        </span>
+        <button class="btn btn-ghost btn-sm">History</button>
+        <button class="btn btn-ghost btn-sm">Share</button>
+        <button class="btn btn-secondary btn-sm">Export</button>
+        <button class="btn btn-primary btn-sm">Save</button>
+      </div>
+    </div>
+
+    <div class="workspace" style="flex:1; grid-template-rows: 1fr 56px;">
+
+      <!-- Prompt panel -->
+      <div class="workspace-prompt-panel">
+        <div class="prompt-section">
+          <div class="prompt-section-title">Diagram type</div>
+          <select class="select-sm"><option>🏗️ Architecture</option></select>
+        </div>
+        <div class="prompt-section">
+          <div class="prompt-section-title">AI provider</div>
+          <select class="select-sm"><option>GPT-4o (BYOK)</option></select>
+        </div>
+        <div class="prompt-section" style="flex:1; display:flex; flex-direction:column;">
+          <div class="prompt-section-title">Modify with AI</div>
+          <textarea class="textarea" style="flex:1; min-height:80px; resize:none; font-size:13px;" placeholder="Describe a change…"></textarea>
+        </div>
+        <div style="padding: var(--sp-3) var(--sp-4); border-top: 1px solid var(--border-subtle); display:flex; gap: var(--sp-2);">
+          <button class="btn btn-primary w-full">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Improve
+          </button>
+          <button class="btn btn-secondary btn-sm">Regenerate</button>
+        </div>
+      </div>
+
+      <!-- Canvas — unchanged, spec is still the source of truth -->
+      <div class="workspace-canvas" style="position:relative; opacity:0.75;">
+        <div class="workspace-canvas-grid"></div>
+
+        <div class="canvas-node" style="left:50%; top:40px; transform:translateX(-50%);">
+          <div class="node-label">React Frontend</div>
+          <div class="node-kind">frontend</div>
+        </div>
+
+        <svg style="position:absolute; left:0; top:0; width:100%; height:100%; pointer-events:none;" overflow="visible">
+          <defs>
+            <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L8,3 z" fill="var(--text-tertiary)"/>
+            </marker>
+          </defs>
+          <line x1="50%" y1="102" x2="50%" y2="158" stroke="var(--border-strong)" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <text x="52%" y="134" font-size="10" fill="var(--text-tertiary)" font-family="var(--font-mono)">HTTP</text>
+          <line x1="50%" y1="210" x2="50%" y2="268" stroke="var(--border-strong)" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <text x="52%" y="244" font-size="10" fill="var(--text-tertiary)" font-family="var(--font-mono)">SQL</text>
+        </svg>
+
+        <div class="canvas-node" style="left:50%; top:158px; transform:translateX(-50%);">
+          <div class="node-label">Inventory API</div>
+          <div class="node-kind">service</div>
+        </div>
+
+        <div class="canvas-node" style="left:50%; top:268px; transform:translateX(-50%);">
+          <div class="node-label">Postgres DB</div>
+          <div class="node-kind">database</div>
+        </div>
+
+        <!-- Canvas note -->
+        <div style="position:absolute; bottom: var(--sp-4); left:50%; transform:translateX(-50%); font-size:11px; color: var(--text-tertiary); white-space:nowrap; background: var(--bg-surface); padding: 4px 10px; border-radius: var(--r-m); border: 1px solid var(--border-subtle);">
+          Canvas reflects spec · ASCII is detached
+        </div>
+      </div>
+
+      <!-- Preview panel — detached ASCII state -->
+      <div class="workspace-preview-panel">
+        <div class="tabs" style="padding: 0 var(--sp-3);">
+          <div class="tab active" style="color: #F57C00; border-bottom-color: #F57C00;">ASCII ⚠</div>
+          <div class="tab">Visual</div>
+          <div class="tab">Mermaid</div>
+          <div class="tab">JSON</div>
+        </div>
+
+        <!-- Detached warning banner -->
+        <div class="detached-banner">
+          <svg class="detached-banner-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div class="detached-banner-text">
+            <div class="detached-banner-title">Detached export</div>
+            <div class="detached-banner-desc">This ASCII has been manually edited with changes beyond label edits. It is no longer synced with the diagram spec. Copy it now, or re-render to discard manual changes.</div>
+          </div>
+        </div>
+
+        <div style="flex:1; overflow:auto; padding: var(--sp-3);">
+          <!-- Manually edited ASCII — different from what the spec would generate -->
+          <div class="code-block ascii-edit-active">
+            <pre>+--------------------+
+| React Frontend     |  &lt;-- was edited
+| frontend           |
++--------+-----------+
+         |
+         | HTTPS (v2)   &lt;-- manual addition
+         v
++--------------------+
+| Inventory API v2   |  &lt;-- label changed manually
+| service            |
++--------+-----------+
+         |
+         | SQLAlchemy
+         v
++--------------------+
+| Postgres DB        |
+| database           |
++--------------------+</pre>
+          </div>
+        </div>
+
+        <div style="padding: var(--sp-3); border-top: 1px solid #FFD54F; background: #FFFDE7; display:flex; flex-direction:column; gap: var(--sp-2);">
+          <button class="btn btn-secondary w-full btn-sm">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy ASCII (detached)
+          </button>
+          <button class="btn btn-ghost w-full btn-sm" style="color: #7A4F00;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Re-render from spec (discards edits)
+          </button>
+        </div>
+      </div>
+
+      <!-- Inspector -->
+      <div class="workspace-inspector" style="height:56px; flex-direction:column; align-items:flex-start; justify-content:center; gap:2px; background: #FFF8E1; border-top: 1px solid #FFD54F;">
+        <div style="display:flex; align-items:center; gap:var(--sp-3);">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F57C00" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+          <span style="font-size:12px; font-weight:600; color:#7A4F00;">Detached export — ASCII edits beyond label changes are not synced to the spec</span>
+        </div>
+        <div style="font-size:11px; color:#9A6B00; margin-left: var(--sp-7);">Spec and canvas remain unchanged. Copy the ASCII now, or Re-render to discard manual edits.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div class="mockup-note">editor-detached · /workspace/:id — detached export state (ASCII manually edited beyond label changes)</div>
+</body>
+</html>

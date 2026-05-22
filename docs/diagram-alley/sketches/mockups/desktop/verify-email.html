@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verify Email — Diagram Alley Mockup</title>
+<link rel="stylesheet" href="../_shared.css">
+<style>
+  body { display:flex; align-items:center; justify-content:center; min-height:100vh; background: var(--bg-base); }
+  .auth-card { background: var(--bg-surface); border-radius: var(--r-xl); box-shadow: var(--shadow-l); width: 400px; padding: var(--sp-10) var(--sp-8); text-align:center; }
+  .auth-logo { display:flex; align-items:center; justify-content:center; gap: var(--sp-2); margin-bottom: var(--sp-8); font-size:17px; font-weight:700; font-family:var(--font-display); }
+  .email-icon { width:64px; height:64px; border-radius: var(--r-full); background: var(--accent-muted); display:flex; align-items:center; justify-content:center; margin: 0 auto var(--sp-6); }
+</style>
+</head>
+<body>
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="logo-mark">DA</div>
+      Diagram Alley
+    </div>
+
+    <div class="email-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+        <polyline points="22,6 12,13 2,6"/>
+      </svg>
+    </div>
+
+    <h1 class="title3" style="margin-bottom: var(--sp-2);">Check your email</h1>
+    <p class="body" style="color: var(--text-secondary); margin-bottom: var(--sp-8);">
+      We sent a confirmation link to<br>
+      <strong style="color: var(--text-primary);">priya@example.com</strong>
+    </p>
+
+    <div class="notice notice-info" style="text-align:left; margin-bottom: var(--sp-6);">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0; margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span>Click the link in the email to activate your account and start your 14-day free trial.</span>
+    </div>
+
+    <button class="btn btn-secondary w-full" style="margin-bottom: var(--sp-3);">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      Resend email
+    </button>
+    <a href="login.html" class="btn btn-ghost w-full">Back to login</a>
+
+    <p class="footnote" style="color: var(--text-tertiary); margin-top: var(--sp-6);">
+      Didn't receive it? Check your spam folder or <a href="#">contact support</a>.
+    </p>
+  </div>
+<div class="mockup-note">verify-email · /verify-email</div>
+</body>
+</html>

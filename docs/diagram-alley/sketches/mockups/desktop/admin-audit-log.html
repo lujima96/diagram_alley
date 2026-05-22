@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Audit Log — Diagram Alley Mockup</title>
+<link rel="stylesheet" href="../_shared.css">
+<style>
+  .admin-shell { display:grid; grid-template-columns: 200px 1fr; height:100vh; }
+  .admin-sidebar { background: #1D1D1F; color: #F5F5F7; padding: var(--sp-5) var(--sp-4); display:flex; flex-direction:column; gap: var(--sp-1); }
+  .admin-logo { font-size:14px; font-weight:700; font-family:var(--font-display); color:#F5F5F7; margin-bottom: var(--sp-6); display:flex; align-items:center; gap:var(--sp-2); }
+  .admin-logo .logo-mark { background: var(--accent); }
+  .admin-nav-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:rgba(255,255,255,0.3); margin: var(--sp-3) 0 var(--sp-1); }
+  .admin-nav-item { font-size:13px; color:rgba(255,255,255,0.7); padding: var(--sp-2) var(--sp-3); border-radius: var(--r-s); display:flex; align-items:center; gap:var(--sp-2); cursor:pointer; text-decoration:none; }
+  .admin-nav-item:hover { color:#F5F5F7; background:rgba(255,255,255,0.08); }
+  .admin-nav-item.active { color:#F5F5F7; background:rgba(255,255,255,0.12); font-weight:600; }
+  .admin-main { display:flex; flex-direction:column; background: var(--bg-base); overflow:hidden; }
+  .admin-header { background: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); padding: 0 var(--sp-6); height:52px; display:flex; align-items:center; gap: var(--sp-3); flex-shrink:0; }
+  .admin-badge { font-size:11px; font-weight:700; background:#FF3B30; color:#fff; padding: 2px 8px; border-radius:99px; }
+  .filter-bar { display:flex; gap: var(--sp-3); align-items:center; padding: var(--sp-4) var(--sp-6); background: var(--bg-surface); border-bottom: 1px solid var(--border-subtle); flex-shrink:0; flex-wrap:wrap; }
+  .data-table { width:100%; border-collapse:collapse; }
+  .data-table th { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color: var(--text-tertiary); padding: var(--sp-2) var(--sp-4); text-align:left; border-bottom: 1px solid var(--border-subtle); white-space:nowrap; }
+  .data-table td { font-size:12px; color: var(--text-primary); padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border-subtle); vertical-align: middle; }
+  .data-table tr:last-child td { border-bottom:none; }
+  .data-table tr:hover td { background: var(--bg-base); }
+  .mono { font-family: var(--font-mono); font-size:11px; color: var(--text-tertiary); }
+</style>
+</head>
+<body style="margin:0; padding:0;">
+<div class="admin-shell">
+
+  <div class="admin-sidebar">
+    <div class="admin-logo">
+      <div class="logo-mark">DA</div>
+      Admin
+    </div>
+    <div class="admin-nav-label">Overview</div>
+    <a href="admin.html" class="admin-nav-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <div class="admin-nav-label">Users</div>
+    <a href="admin-users.html" class="admin-nav-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      All Users
+    </a>
+    <div class="admin-nav-label">Logs</div>
+    <a href="admin-audit-log.html" class="admin-nav-item active">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Audit Log
+    </a>
+    <div style="margin-top:auto;">
+      <a href="dashboard.html" class="admin-nav-item" style="color:rgba(255,255,255,0.4); font-size:12px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 18l-6-6 6-6"/></svg>
+        Back to app
+      </a>
+    </div>
+  </div>
+
+  <div class="admin-main">
+    <div class="admin-header">
+      <span style="font-size:15px; font-weight:700; font-family:var(--font-display);">Audit Log</span>
+      <span class="admin-badge">INTERNAL</span>
+      <span style="font-size:13px; color: var(--text-secondary); margin-left: var(--sp-2);">Append-only · all user and admin actions</span>
+    </div>
+
+    <div class="filter-bar">
+      <input class="input" placeholder="Filter by user email…" style="width:220px; font-size:13px; padding: 6px var(--sp-3);">
+      <select class="select" style="font-size:13px; padding: 6px var(--sp-3); width:auto;">
+        <option>All event types</option>
+        <optgroup label="User events">
+          <option>user.registered</option>
+          <option>user.login</option>
+          <option>user.trial_started</option>
+          <option>user.subscription_upgraded</option>
+          <option>user.subscription_canceled</option>
+        </optgroup>
+        <optgroup label="Diagram events">
+          <option>diagram.created</option>
+          <option>diagram.updated</option>
+          <option>diagram.deleted</option>
+          <option>diagram.exported</option>
+          <option>diagram.shared</option>
+          <option>diagram.ai_generated</option>
+        </optgroup>
+        <optgroup label="Admin events">
+          <option>admin.subscription_overridden</option>
+          <option>admin.user_deleted</option>
+        </optgroup>
+      </select>
+      <input class="input" type="date" value="2026-05-15" style="font-size:13px; padding: 6px var(--sp-3); width:auto;">
+      <span style="font-size:12px; color: var(--text-tertiary);">to</span>
+      <input class="input" type="date" value="2026-05-22" style="font-size:13px; padding: 6px var(--sp-3); width:auto;">
+      <button class="btn btn-secondary btn-sm">Apply</button>
+      <div style="margin-left:auto; font-size:12px; color: var(--text-tertiary);">Showing 1–50 of 48,291 events</div>
+    </div>
+
+    <div style="flex:1; overflow:auto;">
+      <div style="padding: var(--sp-4) var(--sp-6);">
+        <div class="card" style="padding:0; overflow:hidden;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Timestamp (UTC)</th>
+                <th>Event</th>
+                <th>Actor</th>
+                <th>Resource ID</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="mono">2026-05-22 14:03:21</td>
+                <td><span class="badge badge-blue">diagram.created</span></td>
+                <td style="font-size:12px;">priya.ramesh@techcorp.io</td>
+                <td class="mono">diag_9c1f2b</td>
+                <td style="font-size:12px; color: var(--text-secondary);">type: architecture</td>
+              </tr>
+              <tr>
+                <td class="mono">2026-05-22 14:01:08</td>
+                <td><span class="badge badge-blue">diagram.ai_generated</span></td>
+                <td style="font-size:12px;">priya.ramesh@techcorp.io</td>
+                <td class="mono">diag_9c1f2b</td>
+                <td style="font-size:12px; color: var(--text-secondary);">provider: openai, model: gpt-4o</td>
+              </tr>
+              <tr>
+                <td class="mono">2026-05-22 13:58:44</td>
+                <td><span class="badge badge-blue">diagram.exported</span></td>
+                <td style="font-size:12px;">priya.ramesh@techcorp.io</td>
+                <td class="mono">diag_8b2e4a</td>
+                <td style="font-size:12px; color: var(--text-secondary);">format: ascii</td>
+              </tr>
+              <tr>
+                <td class="mono">2026-05-22 13:44:17</td>
+                <td><span class="badge badge-yellow">admin.subscription_overridden</span></td>
+                <td style="font-size:12px;">admin@diagramalley.com</td>
+                <td class="mono">usr_7f3a19c</td>
+                <td style="font-size:12px; color: var(--text-secondary);">plan: pro, status: active, ends: 2026-12-31</td>
+              </tr>
+              <tr>
+                <td class="mono">2026-05-22 12:20:03</td>
+                <td><span class="badge badge-blue">diagram.shared</span></td>
+                <td style="font-size:12px;">sam.okafor@financeapp.net</td>
+                <td class="mono">diag_4d8f1c</td>
+                <td style="font-size:12px; color: var(--text-secondary);">token: shr_Xk2p9m, expires_at: null</td>
+              </tr>
+              <tr>
+                <td class="mono">2026-05-22 11:55:30</td>
+                <td><span class="badge badge-green">user.subscription_upgraded</span></td>
+                <td style="font-size:12px;">diana.chen@startup.io</td>
+                <td class="mono">usr_2a8d4f</td>
+                <td style="font-size:12px; color: var(--text-secondary);">plan: pro, stripe_id: sub_Xf9k3j</td>
+              </tr>
+              <tr>
+                <td class="mono">2026-05-22 10:12:44</td>
+                <td><span class="badge badge-green">user.trial_started</span></td>
+                <td style="font-size:12px;">priya.ramesh@techcorp.io</td>
+                <td class="mono">usr_7f3a19c</td>
+                <td style="font-size:12px; color: var(--text-secondary);">expires_at: 2026-06-05</td>
+              </tr>
+              <tr>
+                <td class="mono">2026-05-22 10:12:41</td>
+                <td><span class="badge badge-green">user.registered</span></td>
+                <td style="font-size:12px;">priya.ramesh@techcorp.io</td>
+                <td class="mono">usr_7f3a19c</td>
+                <td style="font-size:12px; color: var(--text-secondary);">method: email</td>
+              </tr>
+              <tr>
+                <td class="mono">2026-05-22 09:33:12</td>
+                <td><span class="badge badge-red">user.subscription_canceled</span></td>
+                <td style="font-size:12px;">marcus.w@freelance.dev</td>
+                <td class="mono">usr_1e7c3b</td>
+                <td style="font-size:12px; color: var(--text-secondary);">cancel_at_period_end: true</td>
+              </tr>
+              <tr>
+                <td class="mono">2026-05-22 08:14:55</td>
+                <td><span class="badge badge-blue">diagram.updated</span></td>
+                <td style="font-size:12px;">robin.hall@corp.net</td>
+                <td class="mono">diag_7a3c9d</td>
+                <td style="font-size:12px; color: var(--text-secondary);">version: v12 → v13</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:center; gap: var(--sp-2); margin-top: var(--sp-4);">
+          <button class="btn btn-ghost btn-sm" disabled>Previous</button>
+          <span style="font-size:12px; color: var(--text-secondary);">Page 1 of 967</span>
+          <button class="btn btn-ghost btn-sm">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<div class="mockup-note">admin-audit-log · /admin/audit-log</div>
+</body>
+</html>

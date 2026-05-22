@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workspace — AI Improve Proposal — Diagram Alley Mockup</title>
+<link rel="stylesheet" href="../_shared.css">
+<style>
+  .prompt-section { padding: var(--sp-4); border-bottom: 1px solid var(--border-subtle); }
+  .prompt-section-title { font-size: 11px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: var(--sp-2); }
+  .select-sm { font-size: 12px; padding: 4px var(--sp-2); border-radius: var(--r-s); border: 1px solid var(--border); background: var(--bg-surface); color: var(--text-primary); cursor: pointer; width: 100%; }
+  .canvas-node { position:absolute; background: var(--bg-surface); border: 1.5px solid var(--border); border-radius: var(--r-s); padding: var(--sp-2) var(--sp-4); font-size: 12px; text-align: center; box-shadow: var(--shadow-s); min-width: 140px; }
+  .canvas-node .node-label { font-weight: 600; font-size: 12px; color: var(--text-primary); }
+  .canvas-node .node-kind { font-size: 10px; color: var(--text-tertiary); margin-top: 1px; }
+  /* Diff state styles */
+  .canvas-node.diff-added { border-color: #34C759; background: #F0FBF4; box-shadow: 0 0 0 2px rgba(52,199,89,0.2); }
+  .canvas-node.diff-added .node-label { color: #1A7A35; }
+  .canvas-node.diff-added .node-kind { color: #34C759; }
+  /* Proposal overlay */
+  .proposal-overlay { position:absolute; inset:0; background: rgba(245,245,247,0.88); backdrop-filter: blur(2px); display:flex; align-items:center; justify-content:center; z-index:10; }
+  .proposal-card { background: var(--bg-surface); border-radius: var(--r-xl); box-shadow: var(--shadow-l); width: 520px; overflow:hidden; }
+  .proposal-header { padding: var(--sp-5) var(--sp-6); border-bottom: 1px solid var(--border-subtle); display:flex; align-items:center; gap: var(--sp-3); }
+  .proposal-title { font-size:16px; font-weight:700; color: var(--text-primary); }
+  .proposal-body { padding: var(--sp-5) var(--sp-6); }
+  .diff-section { margin-bottom: var(--sp-4); }
+  .diff-section-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color: var(--text-tertiary); margin-bottom: var(--sp-2); }
+  .diff-item { display:flex; align-items:center; gap: var(--sp-3); padding: var(--sp-2) var(--sp-3); border-radius: var(--r-s); font-size:13px; margin-bottom: var(--sp-1); }
+  .diff-item.added { background: #F0FBF4; color: #1A7A35; }
+  .diff-item.changed { background: #FFF8E1; color: #7A5C00; }
+  .diff-item.removed { background: #FFF0F0; color: #9A1C1C; }
+  .diff-icon { font-size:14px; flex-shrink:0; }
+  .proposal-footer { padding: var(--sp-4) var(--sp-6); border-top: 1px solid var(--border-subtle); display:flex; gap: var(--sp-3); align-items:center; }
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">DA</div>
+      Diagram Alley
+    </div>
+    <button class="sidebar-new-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New Diagram
+    </button>
+    <a href="dashboard.html" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a href="library.html" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Library
+    </a>
+    <a href="templates.html" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      Templates
+    </a>
+    <a href="projects.html" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      Projects
+    </a>
+    <div class="sidebar-footer">
+      <a href="settings-providers.html" class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/></svg>
+        Providers
+      </a>
+      <div class="nav-item" style="margin-top:auto;">
+        <div class="avatar">PR</div>
+        <div class="flex-1 overflow-hidden">
+          <div class="truncate subhead">Priya R.</div>
+          <div class="truncate" style="font-size:11px; color: var(--text-tertiary);">Trial · 12 days left</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <div class="header-bar">
+      <div class="header-title">
+        <input type="text" value="Inventory API Architecture">
+      </div>
+      <div class="header-actions">
+        <span class="badge badge-yellow">Review proposal</span>
+        <button class="btn btn-ghost btn-sm">History</button>
+        <button class="btn btn-ghost btn-sm">Share</button>
+        <button class="btn btn-secondary btn-sm">Export</button>
+        <button class="btn btn-primary btn-sm" disabled>Save</button>
+      </div>
+    </div>
+
+    <div class="workspace" style="flex:1; grid-template-rows: 1fr 56px; position:relative;">
+
+      <!-- Prompt panel — showing the improve request that was submitted -->
+      <div class="workspace-prompt-panel">
+        <div class="prompt-section">
+          <div class="prompt-section-title">Diagram type</div>
+          <select class="select-sm"><option>🏗️ Architecture</option></select>
+        </div>
+        <div class="prompt-section">
+          <div class="prompt-section-title">AI provider</div>
+          <select class="select-sm"><option>GPT-4o (BYOK)</option></select>
+        </div>
+        <div class="prompt-section" style="flex:1; display:flex; flex-direction:column;">
+          <div class="prompt-section-title">Modify with AI</div>
+          <textarea class="textarea" style="flex:1; min-height:80px; resize:none; font-size:13px;" disabled>Add a Redis cache between the Inventory API and Postgres database</textarea>
+        </div>
+        <div style="padding: var(--sp-3) var(--sp-4); border-top: 1px solid var(--border-subtle);">
+          <div style="font-size:11px; color: var(--text-tertiary); text-align:center;">Review the proposal above before accepting.</div>
+        </div>
+      </div>
+
+      <!-- Canvas — showing the proposed new state with diff highlights -->
+      <div class="workspace-canvas" style="position:relative; filter: brightness(0.97);">
+        <div class="workspace-canvas-grid"></div>
+
+        <div class="canvas-node" style="left:50%; top:40px; transform:translateX(-50%);">
+          <div class="node-label">React Frontend</div>
+          <div class="node-kind">frontend</div>
+        </div>
+
+        <svg style="position:absolute; left:0; top:0; width:100%; height:100%; pointer-events:none;" overflow="visible">
+          <defs>
+            <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L8,3 z" fill="var(--text-tertiary)"/>
+            </marker>
+            <marker id="arrow-green" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L8,3 z" fill="#34C759"/>
+            </marker>
+          </defs>
+          <line x1="50%" y1="102" x2="50%" y2="155" stroke="var(--border-strong)" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <text x="52%" y="132" font-size="10" fill="var(--text-tertiary)" font-family="var(--font-mono)">HTTP</text>
+          <!-- API → Redis (new) -->
+          <line x1="42%" y1="208" x2="32%" y2="268" stroke="#34C759" stroke-width="1.5" marker-end="url(#arrow-green)" stroke-dasharray="4 2"/>
+          <text x="32%" y="245" font-size="10" fill="#34C759" font-family="var(--font-mono)">cache</text>
+          <!-- Redis → Postgres (new) -->
+          <line x1="32%" y1="320" x2="68%" y2="268" stroke="#34C759" stroke-width="1.5" marker-end="url(#arrow-green)" stroke-dasharray="4 2"/>
+          <!-- API → Postgres (unchanged) -->
+          <line x1="58%" y1="208" x2="72%" y2="268" stroke="var(--border-strong)" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <text x="66%" y="245" font-size="10" fill="var(--text-tertiary)" font-family="var(--font-mono)">SQL</text>
+        </svg>
+
+        <div class="canvas-node" style="left:50%; top:155px; transform:translateX(-50%);">
+          <div class="node-label">Inventory API</div>
+          <div class="node-kind">service</div>
+        </div>
+
+        <!-- Redis — new node -->
+        <div class="canvas-node diff-added" style="left:28%; top:268px; transform:translateX(-50%);">
+          <div style="font-size:9px; font-weight:700; color:#34C759; margin-bottom:2px;">+ ADDED</div>
+          <div class="node-label">Redis Cache</div>
+          <div class="node-kind">cache</div>
+        </div>
+
+        <div class="canvas-node" style="left:72%; top:268px; transform:translateX(-50%);">
+          <div class="node-label">Postgres DB</div>
+          <div class="node-kind">database</div>
+        </div>
+      </div>
+
+      <!-- Preview panel -->
+      <div class="workspace-preview-panel">
+        <div class="tabs" style="padding: 0 var(--sp-3);">
+          <div class="tab active">ASCII</div>
+          <div class="tab">Visual</div>
+          <div class="tab">Mermaid</div>
+          <div class="tab">JSON</div>
+        </div>
+        <div style="flex:1; overflow:auto; padding: var(--sp-3); filter:blur(1px); opacity:0.5;">
+          <div class="code-block">
+            <pre>+--------------------+
+| React Frontend     |
++--------+-----------+
+         |
+         | HTTP
+         v
++--------------------+
+| Inventory API      |
++------+------+------+
+       |             |
+       | cache       | SQL
+       v             v
++----------+  +----------+
+| Redis    |  | Postgres |
+| cache    |  | database |
++----------+  +----------+</pre>
+          </div>
+        </div>
+        <div style="padding: var(--sp-2) var(--sp-3); border-top: 1px solid var(--border-subtle);">
+          <div style="font-size:11px; color: var(--text-tertiary); text-align:center;">Preview updates after accepting</div>
+        </div>
+      </div>
+
+      <!-- Inspector -->
+      <div class="workspace-inspector" style="height:56px; flex-direction:column; align-items:flex-start; justify-content:center; gap:2px;">
+        <div style="font-size:12px; font-weight:600; color: var(--text-primary);">Proposal preview — canvas shows proposed changes highlighted in green</div>
+        <div style="font-size:11px; color: var(--text-tertiary);">Accept to apply and create a version snapshot · Reject to discard and keep the current diagram</div>
+      </div>
+
+      <!-- Proposal review overlay -->
+      <div class="proposal-overlay">
+        <div class="proposal-card">
+          <div class="proposal-header">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <div>
+              <div class="proposal-title">AI Improve Proposal</div>
+              <div style="font-size:12px; color: var(--text-secondary);">GPT-4o · gpt-4o · Diagram will be versioned on accept</div>
+            </div>
+          </div>
+
+          <div class="proposal-body">
+            <div style="font-size:13px; color: var(--text-secondary); margin-bottom: var(--sp-5); padding: var(--sp-3); background: var(--bg-base); border-radius: var(--r-m); font-style:italic;">
+              "Add a Redis cache between the Inventory API and Postgres database"
+            </div>
+
+            <div class="diff-section">
+              <div class="diff-section-label">Nodes added (1)</div>
+              <div class="diff-item added">
+                <span class="diff-icon">+</span>
+                <div>
+                  <div style="font-weight:600;">Redis Cache</div>
+                  <div style="font-size:11px; opacity:0.8;">id: redis_cache · kind: cache</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="diff-section">
+              <div class="diff-section-label">Edges added (2)</div>
+              <div class="diff-item added">
+                <span class="diff-icon">+</span>
+                <div>inventory_api → redis_cache · label: "cache"</div>
+              </div>
+              <div class="diff-item added">
+                <span class="diff-icon">+</span>
+                <div>redis_cache → postgres_db · label: "miss fallthrough"</div>
+              </div>
+            </div>
+
+            <div class="diff-section">
+              <div class="diff-section-label">Nodes changed (0) &nbsp;·&nbsp; Nodes removed (0)</div>
+              <div style="font-size:12px; color: var(--text-tertiary); padding: var(--sp-2) 0;">No existing nodes or edges were modified or removed.</div>
+            </div>
+          </div>
+
+          <div class="proposal-footer">
+            <button class="btn btn-primary" style="flex:1;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Accept — apply &amp; save version
+            </button>
+            <button class="btn btn-secondary" style="flex:1;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              Reject — keep current
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div class="mockup-note">editor-improve · /workspace/:id — AI propose state · diff highlighted on canvas + proposal card overlay</div>
+</body>
+</html>
