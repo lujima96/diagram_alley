@@ -1,50 +1,126 @@
 {
-  "version": "1.0",
-  "description": "Machine-readable registry of all Phase 6 mockup files. Matches F4 route map.",
-  "groups": [
+  "version": "1.1",
+  "description": "Machine-readable registry of all Phase 6 mockup files. Organized by route; each route lists all surface variants. Matches F4 route map.",
+  "routes": [
     {
-      "label": "Desktop — Public",
-      "screens": [
-        { "id": "landing",        "file": "desktop/landing.html",           "route": "/",                        "auth": false },
-        { "id": "login",          "file": "desktop/login.html",             "route": "/login",                   "auth": false },
-        { "id": "register",       "file": "desktop/register.html",          "route": "/register",                "auth": false }
+      "route": "/",
+      "name": "Landing Page",
+      "auth": false,
+      "spec": ["F4", "D7"],
+      "surfaces": [
+        { "surface": "desktop", "id": "landing",   "file": "desktop/landing.html",    "status": "active" },
+        { "surface": "mobile",  "id": "landing-m",  "file": null,                      "status": "planned", "note": "V2 scope" }
       ]
     },
     {
-      "label": "Desktop — Authenticated",
-      "screens": [
-        { "id": "dashboard",      "file": "desktop/dashboard.html",         "route": "/dashboard",               "auth": true },
-        { "id": "editor-new",     "file": "desktop/editor.html",            "route": "/workspace/new",           "auth": true },
-        { "id": "editor-saved",   "file": "desktop/editor-saved.html",      "route": "/workspace/:diagramId",    "auth": true },
-        { "id": "library",        "file": "desktop/library.html",           "route": "/library",                 "auth": true },
-        { "id": "templates",      "file": "desktop/templates.html",         "route": "/templates",               "auth": true },
-        { "id": "billing",        "file": "desktop/billing.html",           "route": "/settings/billing",        "auth": true },
-        { "id": "settings-providers", "file": "desktop/settings-providers.html", "route": "/settings/providers", "auth": true }
+      "route": "/login",
+      "name": "Login",
+      "auth": false,
+      "spec": ["F3"],
+      "surfaces": [
+        { "surface": "desktop", "id": "login",      "file": "desktop/login.html",      "status": "active" },
+        { "surface": "mobile",  "id": "login-m",    "file": null,                      "status": "planned", "note": "V2 scope" }
       ]
     },
     {
-      "label": "Desktop — Overlays and States",
-      "screens": [
-        { "id": "version-history","file": "desktop/version-history.html",   "route": "/workspace/:id (history drawer open)", "auth": true },
-        { "id": "export-modal",   "file": "desktop/export-modal.html",      "route": "/workspace/:id (export modal open)",   "auth": true },
-        { "id": "trial-expired",  "file": "desktop/trial-expired.html",     "route": "/workspace/:id (trial expired state)", "auth": true }
+      "route": "/register",
+      "name": "Register / Sign Up",
+      "auth": false,
+      "spec": ["F3", "D7"],
+      "surfaces": [
+        { "surface": "desktop", "id": "register",   "file": "desktop/register.html",   "status": "active" },
+        { "surface": "mobile",  "id": "register-m", "file": null,                      "status": "planned", "note": "V2 scope" }
       ]
     },
     {
-      "label": "Mobile",
-      "screens": [
-        { "id": "share-view",     "file": "mobile/share-view.html",         "route": "/share/:shareToken",       "auth": false }
+      "route": "/share/:token",
+      "name": "Shared Diagram View",
+      "auth": false,
+      "spec": ["D6"],
+      "surfaces": [
+        { "surface": "desktop", "id": "share-view-d", "file": "desktop/share-view.html", "status": "active" },
+        { "surface": "mobile",  "id": "share-view-m", "file": "mobile/share-view.html",  "status": "active" }
       ]
     },
     {
-      "label": "Components",
-      "screens": [
-        { "id": "toolbar",         "file": "components/toolbar.html",        "route": "n/a — component",         "auth": false },
-        { "id": "ai-prompt-panel", "file": "components/ai-prompt-panel.html","route": "n/a — component",         "auth": false },
-        { "id": "ascii-panel",     "file": "components/ascii-panel.html",    "route": "n/a — component",         "auth": false },
-        { "id": "version-drawer",  "file": "components/version-drawer.html", "route": "n/a — component",         "auth": false },
-        { "id": "export-modal-c",  "file": "components/export-modal.html",   "route": "n/a — component",         "auth": false }
+      "route": "/dashboard",
+      "name": "Dashboard",
+      "auth": true,
+      "spec": ["F4"],
+      "surfaces": [
+        { "surface": "desktop", "id": "dashboard",  "file": "desktop/dashboard.html",  "status": "active" },
+        { "surface": "mobile",  "id": "dashboard-m","file": null,                      "status": "planned", "note": "V2 scope" }
+      ]
+    },
+    {
+      "route": "/workspace/new",
+      "name": "Workspace — New Diagram",
+      "auth": true,
+      "spec": ["D1", "D2", "F4"],
+      "surfaces": [
+        { "surface": "desktop", "id": "editor-new", "file": "desktop/editor.html",     "status": "active" },
+        { "surface": "mobile",  "id": "editor-new-m","file": null,                     "status": "planned", "note": "V2 scope" }
+      ]
+    },
+    {
+      "route": "/workspace/:id",
+      "name": "Workspace — Saved Diagram",
+      "auth": true,
+      "spec": ["D1", "D2", "D3", "D4", "F4"],
+      "surfaces": [
+        { "surface": "desktop",          "id": "editor-saved",    "file": "desktop/editor-saved.html",    "status": "active" },
+        { "surface": "desktop-overlay",  "id": "version-history", "file": "desktop/version-history.html", "status": "active", "note": "history drawer open" },
+        { "surface": "desktop-overlay",  "id": "export-modal",    "file": "desktop/export-modal.html",    "status": "active", "note": "export modal open" },
+        { "surface": "desktop-state",    "id": "trial-expired",   "file": "desktop/trial-expired.html",   "status": "active", "note": "trial expired overlay" },
+        { "surface": "mobile",           "id": "editor-saved-m",  "file": null,                           "status": "planned", "note": "V2 scope" }
+      ]
+    },
+    {
+      "route": "/library",
+      "name": "Diagram Library",
+      "auth": true,
+      "spec": ["F4"],
+      "surfaces": [
+        { "surface": "desktop", "id": "library",    "file": "desktop/library.html",    "status": "active" },
+        { "surface": "mobile",  "id": "library-m",  "file": null,                      "status": "planned", "note": "V2 scope" }
+      ]
+    },
+    {
+      "route": "/templates",
+      "name": "Template Browser",
+      "auth": true,
+      "spec": ["F4"],
+      "surfaces": [
+        { "surface": "desktop", "id": "templates",  "file": "desktop/templates.html",  "status": "active" },
+        { "surface": "mobile",  "id": "templates-m","file": null,                      "status": "planned", "note": "V2 scope" }
+      ]
+    },
+    {
+      "route": "/settings/billing",
+      "name": "Billing Settings",
+      "auth": true,
+      "spec": ["D7", "F3"],
+      "surfaces": [
+        { "surface": "desktop", "id": "billing",    "file": "desktop/billing.html",    "status": "active" },
+        { "surface": "mobile",  "id": "billing-m",  "file": null,                      "status": "planned", "note": "V2 scope" }
+      ]
+    },
+    {
+      "route": "/settings/providers",
+      "name": "AI Provider Settings",
+      "auth": true,
+      "spec": ["D1", "F3"],
+      "surfaces": [
+        { "surface": "desktop", "id": "settings-providers",   "file": "desktop/settings-providers.html", "status": "active" },
+        { "surface": "mobile",  "id": "settings-providers-m", "file": null,                              "status": "planned", "note": "V2 scope" }
       ]
     }
+  ],
+  "components": [
+    { "id": "toolbar",          "file": "components/toolbar.html",         "states": 6  },
+    { "id": "ai-prompt-panel",  "file": "components/ai-prompt-panel.html", "states": 4  },
+    { "id": "ascii-panel",      "file": "components/ascii-panel.html",     "states": 4  },
+    { "id": "version-drawer",   "file": "components/version-drawer.html",  "states": 4  },
+    { "id": "export-modal",     "file": "components/export-modal.html",    "states": 3  }
   ]
 }

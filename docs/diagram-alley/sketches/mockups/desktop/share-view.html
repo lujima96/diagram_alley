@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Share View (Desktop) — Diagram Alley Mockup</title>
+<link rel="stylesheet" href="../_shared.css">
+<style>
+  body { margin: 0; background: var(--bg-base); min-height: 100vh; display:flex; flex-direction:column; }
+
+  /* Public nav — no sidebar, no auth chrome */
+  .public-nav {
+    height: 52px;
+    background: rgba(245,245,247,0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+    padding: 0 var(--sp-8);
+    gap: var(--sp-4);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .public-nav-logo { display:flex; align-items:center; gap:var(--sp-2); font-size:14px; font-weight:700; color:var(--text-primary); font-family:var(--font-display); text-decoration:none; }
+  .public-nav-spacer { flex:1; }
+  .share-shell { display:flex; flex:1; overflow:hidden; }
+  .share-main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+  .share-meta { padding: var(--sp-5) var(--sp-8); border-bottom: 1px solid var(--border-subtle); background: var(--bg-surface); }
+  .share-meta-title { font-size: 22px; font-weight: 800; color: var(--text-primary); font-family: var(--font-display); }
+  .share-meta-row { display:flex; align-items:center; gap:var(--sp-3); margin-top:var(--sp-2); }
+  .share-meta-sub { font-size: 13px; color: var(--text-tertiary); }
+  .share-content { flex:1; display:flex; overflow:hidden; }
+  .share-panel { flex:1; overflow:auto; padding: var(--sp-6) var(--sp-8); }
+  .share-sidebar { width: 300px; flex-shrink:0; border-left: 1px solid var(--border-subtle); background: var(--bg-surface); display:flex; flex-direction:column; overflow:hidden; }
+  .share-sidebar-header { padding: var(--sp-4) var(--sp-5); border-bottom:1px solid var(--border-subtle); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:var(--text-tertiary); }
+  .share-actions { padding: var(--sp-4) var(--sp-5); border-top: 1px solid var(--border-subtle); display:flex; flex-direction:column; gap: var(--sp-2); margin-top:auto; }
+  .share-info-row { display:flex; flex-direction:column; gap:var(--sp-3); padding: var(--sp-4) var(--sp-5); flex:1; overflow-y:auto; }
+  .info-label { font-size:11px; font-weight:600; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
+  .info-value { font-size:13px; color:var(--text-primary); }
+</style>
+</head>
+<body>
+
+<!-- Public nav: no sidebar, minimal chrome -->
+<nav class="public-nav">
+  <a class="public-nav-logo" href="#">
+    <div class="logo-mark" style="width:26px; height:26px; font-size:11px; font-weight:800;">DA</div>
+    Diagram Alley
+  </a>
+  <div class="public-nav-spacer"></div>
+  <span class="badge" style="background:var(--bg-base); color:var(--text-tertiary); border:1px solid var(--border); font-size:11px;">Read-only</span>
+  <a href="register.html" class="btn btn-primary btn-sm">Sign up free</a>
+</nav>
+
+<div class="share-shell">
+  <div class="share-main">
+    <!-- Diagram meta -->
+    <div class="share-meta">
+      <div class="share-meta-title">Platform Architecture v2</div>
+      <div class="share-meta-row">
+        <span class="badge badge-blue">Architecture</span>
+        <span class="share-meta-sub">Shared by Rafael · Updated 2 hours ago</span>
+      </div>
+    </div>
+
+    <!-- Tabs + content -->
+    <div style="background:var(--bg-surface); border-bottom:1px solid var(--border-subtle);">
+      <div class="tabs" style="padding:0 var(--sp-8);">
+        <div class="tab active">ASCII</div>
+        <div class="tab">Visual</div>
+        <div class="tab">Mermaid</div>
+        <div class="tab">JSON</div>
+      </div>
+    </div>
+
+    <div class="share-content">
+      <!-- ASCII panel (active tab) -->
+      <div class="share-panel">
+        <div class="code-block" style="max-width:640px;">
+          <pre>+--------------------+
+| React Frontend     |
+| frontend           |
++--------+-----------+
+         |
+         | HTTP
+         v
++--------------------+
+| Platform API       |
+| service            |
++------+------+------+
+       |             |
+       | cache       | SQL
+       v             v
++----------+  +-------------------+
+| Redis    |  | Postgres DB       |
+| Cache    |  | database          |
+| cache    |  +-------------------+
++----------+</pre>
+        </div>
+        <div style="margin-top:var(--sp-5); display:flex; gap:var(--sp-3);">
+          <button class="btn btn-primary">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy ASCII
+          </button>
+          <button class="btn btn-secondary">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download
+          </button>
+        </div>
+      </div>
+
+      <!-- Right sidebar: diagram metadata -->
+      <div class="share-sidebar">
+        <div class="share-sidebar-header">Diagram info</div>
+        <div class="share-info-row">
+          <div>
+            <div class="info-label">Shared by</div>
+            <div style="display:flex; align-items:center; gap:var(--sp-2); margin-top:4px;">
+              <div class="avatar" style="width:24px; height:24px; font-size:10px;">RE</div>
+              <div class="info-value">Rafael E.</div>
+            </div>
+          </div>
+          <div>
+            <div class="info-label">Type</div>
+            <div class="info-value">Architecture</div>
+          </div>
+          <div>
+            <div class="info-label">Access</div>
+            <div class="info-value">Anyone with this link</div>
+          </div>
+          <div>
+            <div class="info-label">Last updated</div>
+            <div class="info-value">21 May 2026, 12:04 PM</div>
+          </div>
+          <div>
+            <div class="info-label">Available formats</div>
+            <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:4px;">
+              <span class="badge" style="background:var(--bg-base); border:1px solid var(--border); color:var(--text-secondary); font-family:var(--font-mono); font-size:10px;">ASCII</span>
+              <span class="badge" style="background:var(--bg-base); border:1px solid var(--border); color:var(--text-secondary); font-family:var(--font-mono); font-size:10px;">Mermaid</span>
+              <span class="badge" style="background:var(--bg-base); border:1px solid var(--border); color:var(--text-secondary); font-family:var(--font-mono); font-size:10px;">JSON</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTA for non-users -->
+        <div class="share-actions">
+          <div style="background:var(--accent-muted); border-radius:var(--r-m); padding:var(--sp-4);">
+            <div style="font-size:13px; font-weight:600; color:var(--accent-text); margin-bottom:var(--sp-1);">Create your own diagrams</div>
+            <div style="font-size:12px; color:var(--text-secondary); line-height:1.5; margin-bottom:var(--sp-3);">Generate architecture, DB schema, and flowchart diagrams with AI in seconds.</div>
+            <a href="register.html" class="btn btn-primary w-full" style="display:flex; justify-content:center;">Start free trial</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mockup-note">share-view · /share/:token (desktop)</div>
+</body>
+</html>

@@ -643,16 +643,26 @@ Examples:
 
 When mockups are file-based HTML, create a `sketches/mockups/index.html` entry point. This gives users, developers, and AI assistants one browser-openable place to inspect the whole UI corpus without hunting through folders.
 
+**Organize the index by route or page, not by surface.** Group all surface variants of the same route together. A route that exists on desktop, tablet, and mobile should show all three links in one row or card cluster, labeled by surface. This makes it immediately obvious which routes have surface gaps and lets reviewers compare variants without hunting through separate surface sections.
+
+Each route group should show:
+
+- the canonical route path
+- the page title or screen name
+- one link per surface variant (desktop, tablet, mobile, embedded, etc.), each labeled by surface
+- access level badge (public, auth, admin)
+- persona or spec reference
+- short purpose note
+
 The index should:
 
-- group screens by surface, such as desktop, tablet, mobile, customer, and components
-- link directly to every mockup file
-- show route, persona, owner spec, and short purpose for each screen
-- distinguish active mockups from deferred or archived mockups
-- include a search or filter when the mockup count is large
-- optionally show each screen in an iframe preview
-- work from `file://` if no dev server is required
+- open directly from `file://` without a dev server
 - avoid build steps unless the project already has a frontend toolchain
+- distinguish active mockups from deferred or archived mockups
+- list reusable component mockups in a separate section at the bottom, since they are not tied to a single route
+- include a filter or section jump when the route count is large
+
+**Surface coverage rule:** every route that a user can reach on more than one surface must have a mockup for each surface. If a surface variant does not yet exist, mark it as `[planned]` in the index rather than omitting it. This makes gaps visible and prevents the index from silently misrepresenting coverage.
 
 Recommended files:
 
@@ -691,19 +701,21 @@ Route-map entry template:
 
 Index quality checks:
 
-- every route-map path exists
+- every route-map path exists as a file
 - every active mockup is listed in the route map
-- every listed mockup has a valid surface
+- every listed mockup has a valid surface label
+- routes accessible on multiple surfaces show all surface variants in one group
+- missing surface variants are marked `[planned]`, not silently omitted
 - deferred mockups live under `_deferred/` or are marked `status: deferred`
-- component mockups are listed separately from full screens
+- component mockups are listed separately from full-screen routes
 - links work from the index page
 
 Outputs:
 
 - mockup README
 - screen files
-- browser index page
-- reusable components
+- browser index page organized by route
+- reusable components section
 - route map
 
 ### Phase 7: Schema Proposals and Consolidation

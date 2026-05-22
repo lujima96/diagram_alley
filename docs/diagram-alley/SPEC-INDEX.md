@@ -100,6 +100,7 @@ Write in the order listed. Each spec depends on the foundation specs shown.
 | `sketches/mockups/_route-map.json` | Machine-readable route registry | **Done** |
 | `sketches/mockups/_shared.css` | Shared design system tokens + component classes | **Done** |
 | `sketches/mockups/design-system.md` | Design language reference (Apple-vibe aesthetic, tokens, conventions) | **Done** |
+| `sketches/mockups/desktop/share-view.html` | Desktop read-only share view (/share/:token) | **Done** |
 | `sketches/mockups/desktop/landing.html` | Public landing page | **Done** |
 | `sketches/mockups/desktop/login.html` | Login screen | **Done** |
 | `sketches/mockups/desktop/register.html` | Registration + trial start | **Done** |

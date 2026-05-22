@@ -6,28 +6,74 @@
 <title>Diagram Alley — Mockup Index</title>
 <link rel="stylesheet" href="_shared.css">
 <style>
-  body { padding: var(--sp-10) var(--sp-8); max-width: 900px; margin: 0 auto; }
+  body { padding: var(--sp-10) var(--sp-8); max-width: 960px; margin: 0 auto; }
   h1 { font-family: var(--font-display); font-size: 28px; font-weight: 800; color: var(--text-primary); margin-bottom: var(--sp-2); }
-  .subtitle { color: var(--text-secondary); font-size: 14px; margin-bottom: var(--sp-10); }
-  .group { margin-bottom: var(--sp-10); }
-  .group-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-tertiary); margin-bottom: var(--sp-3); }
-  .screen-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--sp-3); }
-  .screen-link {
-    display: block;
-    background: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--r-m);
-    padding: var(--sp-4);
-    text-decoration: none;
+  .subtitle { color: var(--text-secondary); font-size: 14px; margin-bottom: var(--sp-10); line-height: 1.6; }
+
+  /* Section headers */
+  .section { margin-bottom: var(--sp-10); }
+  .section-title {
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;
+    color: var(--text-tertiary); margin-bottom: var(--sp-4);
+    padding-bottom: var(--sp-2); border-bottom: 1px solid var(--border-subtle);
+  }
+
+  /* Route row: one route = one card spanning all surfaces */
+  .route-row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--sp-4);
+    padding: var(--sp-4) 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .route-row:last-child { border-bottom: none; }
+
+  /* Left column: route meta */
+  .route-meta { width: 220px; flex-shrink: 0; padding-top: 2px; }
+  .route-path {
+    font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+    color: var(--text-primary); margin-bottom: 4px; word-break: break-all;
+  }
+  .route-name { font-size: 13px; color: var(--text-secondary); margin-bottom: var(--sp-2); }
+  .route-spec { font-size: 11px; color: var(--text-tertiary); font-family: var(--font-mono); }
+
+  /* Right column: surface chips */
+  .surface-chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); flex: 1; }
+  .surface-chip {
+    display: inline-flex; flex-direction: column;
+    text-decoration: none; border-radius: var(--r-m);
+    border: 1px solid var(--border-subtle); background: var(--bg-surface);
+    padding: var(--sp-2) var(--sp-3); min-width: 120px;
     transition: box-shadow var(--normal) var(--ease), border-color var(--normal) var(--ease), transform var(--normal) var(--ease);
     box-shadow: var(--shadow-xs);
   }
-  .screen-link:hover { box-shadow: var(--shadow-m); border-color: var(--border); transform: translateY(-2px); text-decoration: none; }
-  .screen-id { font-size: 11px; font-family: var(--font-mono); color: var(--text-tertiary); margin-bottom: var(--sp-1); }
-  .screen-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
-  .screen-route { font-size: 11px; font-family: var(--font-mono); color: var(--text-secondary); margin-top: 2px; }
-  .badge-auth { display: inline-block; font-size: 10px; font-weight: 600; background: var(--accent-muted); color: var(--accent-text); padding: 1px 6px; border-radius: 99px; margin-top: var(--sp-2); }
-  .badge-public { display: inline-block; font-size: 10px; font-weight: 600; background: var(--bg-base); color: var(--text-tertiary); padding: 1px 6px; border-radius: 99px; border: 1px solid var(--border); margin-top: var(--sp-2); }
+  .surface-chip:hover { box-shadow: var(--shadow-m); border-color: var(--border); transform: translateY(-1px); }
+  .surface-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-tertiary); margin-bottom: 2px; }
+  .surface-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  .surface-note { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
+  /* Planned (gap) chip */
+  .surface-chip.planned { background: var(--bg-base); border-style: dashed; cursor: default; pointer-events: none; }
+  .surface-chip.planned .surface-title { color: var(--text-tertiary); }
+  /* Overlay state chip */
+  .surface-chip.overlay { background: var(--bg-base); border-color: var(--border); }
+
+  /* Access badges */
+  .badge-auth { display: inline-block; font-size: 10px; font-weight: 600; background: var(--accent-muted); color: var(--accent-text); padding: 1px 6px; border-radius: 99px; }
+  .badge-public { display: inline-block; font-size: 10px; font-weight: 600; background: var(--bg-base); color: var(--text-tertiary); padding: 1px 6px; border-radius: 99px; border: 1px solid var(--border); }
+
+  /* Component grid (not route-bound) */
+  .comp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--sp-3); }
+  .comp-card {
+    display: flex; flex-direction: column; text-decoration: none;
+    background: var(--bg-surface); border: 1px solid var(--border-subtle);
+    border-radius: var(--r-m); padding: var(--sp-4);
+    transition: box-shadow var(--normal) var(--ease), border-color var(--normal) var(--ease), transform var(--normal) var(--ease);
+    box-shadow: var(--shadow-xs);
+  }
+  .comp-card:hover { box-shadow: var(--shadow-m); border-color: var(--border); transform: translateY(-2px); }
+  .comp-id { font-size: 11px; font-family: var(--font-mono); color: var(--text-tertiary); margin-bottom: var(--sp-1); }
+  .comp-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+  .comp-desc { font-size: 11px; color: var(--text-secondary); margin-top: 4px; line-height: 1.4; }
 </style>
 </head>
 <body>
@@ -38,147 +84,288 @@
     </div>
   </div>
   <h1>Mockup Index</h1>
-  <p class="subtitle">Phase 6 planning mockups. Open any screen to preview the layout. Source of truth: <code>_shared.css</code> and <code>sketches/design-system.md</code>.</p>
+  <p class="subtitle">
+    Organized by route. Each row shows all surface variants for that URL — click any chip to open the mockup.
+    Dashed chips are planned gaps. Source of truth: <code>_shared.css</code> and <code>sketches/design-system.md</code>.
+  </p>
 
-  <div class="group">
-    <div class="group-title">Desktop — Public</div>
-    <div class="screen-grid">
-      <a class="screen-link" href="desktop/landing.html">
-        <div class="screen-id">landing</div>
-        <div class="screen-name">Landing Page</div>
-        <div class="screen-route">/</div>
-        <span class="badge-public">public</span>
+  <!-- ─── Public Routes ──────────────────────────────── -->
+  <div class="section">
+    <div class="section-title">Public routes <span class="badge-public" style="vertical-align:middle; margin-left:6px;">no auth required</span></div>
+
+    <div class="route-row">
+      <div class="route-meta">
+        <div class="route-path">/</div>
+        <div class="route-name">Landing Page</div>
+        <div class="route-spec">F4 · D7</div>
+      </div>
+      <div class="surface-chips">
+        <a class="surface-chip" href="desktop/landing.html">
+          <div class="surface-label">Desktop</div>
+          <div class="surface-title">Landing</div>
+          <div class="surface-note">Hero, features, CTA</div>
+        </a>
+        <div class="surface-chip planned">
+          <div class="surface-label">Mobile</div>
+          <div class="surface-title">[planned]</div>
+          <div class="surface-note">V2 scope</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="route-row">
+      <div class="route-meta">
+        <div class="route-path">/login</div>
+        <div class="route-name">Login</div>
+        <div class="route-spec">F3</div>
+      </div>
+      <div class="surface-chips">
+        <a class="surface-chip" href="desktop/login.html">
+          <div class="surface-label">Desktop</div>
+          <div class="surface-title">Login</div>
+          <div class="surface-note">Email + Google SSO</div>
+        </a>
+        <div class="surface-chip planned">
+          <div class="surface-label">Mobile</div>
+          <div class="surface-title">[planned]</div>
+          <div class="surface-note">V2 scope</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="route-row">
+      <div class="route-meta">
+        <div class="route-path">/register</div>
+        <div class="route-name">Register / Sign Up</div>
+        <div class="route-spec">F3 · D7</div>
+      </div>
+      <div class="surface-chips">
+        <a class="surface-chip" href="desktop/register.html">
+          <div class="surface-label">Desktop</div>
+          <div class="surface-title">Register</div>
+          <div class="surface-note">Trial perks, Google SSO</div>
+        </a>
+        <div class="surface-chip planned">
+          <div class="surface-label">Mobile</div>
+          <div class="surface-title">[planned]</div>
+          <div class="surface-note">V2 scope</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="route-row">
+      <div class="route-meta">
+        <div class="route-path">/share/:token</div>
+        <div class="route-name">Shared Diagram View</div>
+        <div class="route-spec">D6</div>
+      </div>
+      <div class="surface-chips">
+        <a class="surface-chip" href="desktop/share-view.html">
+          <div class="surface-label">Desktop</div>
+          <div class="surface-title">Share View</div>
+          <div class="surface-note">All tabs, sidebar meta, CTA</div>
+        </a>
+        <a class="surface-chip" href="mobile/share-view.html">
+          <div class="surface-label">Mobile</div>
+          <div class="surface-title">Share View</div>
+          <div class="surface-note">ASCII default, copy action</div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Authenticated Routes ──────────────────────── -->
+  <div class="section">
+    <div class="section-title">Authenticated routes <span class="badge-auth" style="vertical-align:middle; margin-left:6px;">login required</span></div>
+
+    <div class="route-row">
+      <div class="route-meta">
+        <div class="route-path">/dashboard</div>
+        <div class="route-name">Dashboard</div>
+        <div class="route-spec">F4</div>
+      </div>
+      <div class="surface-chips">
+        <a class="surface-chip" href="desktop/dashboard.html">
+          <div class="surface-label">Desktop</div>
+          <div class="surface-title">Dashboard</div>
+          <div class="surface-note">Quick start, recent diagrams</div>
+        </a>
+        <div class="surface-chip planned">
+          <div class="surface-label">Mobile</div>
+          <div class="surface-title">[planned]</div>
+          <div class="surface-note">V2 scope</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="route-row">
+      <div class="route-meta">
+        <div class="route-path">/workspace/new</div>
+        <div class="route-name">Workspace — New Diagram</div>
+        <div class="route-spec">D1 · D2 · F4</div>
+      </div>
+      <div class="surface-chips">
+        <a class="surface-chip" href="desktop/editor.html">
+          <div class="surface-label">Desktop</div>
+          <div class="surface-title">Editor — New</div>
+          <div class="surface-note">Prompt panel, empty canvas</div>
+        </a>
+        <div class="surface-chip planned">
+          <div class="surface-label">Mobile</div>
+          <div class="surface-title">[planned]</div>
+          <div class="surface-note">V2 scope</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="route-row">
+      <div class="route-meta">
+        <div class="route-path">/workspace/:id</div>
+        <div class="route-name">Workspace — Saved Diagram</div>
+        <div class="route-spec">D1 · D2 · D3 · D4 · F4</div>
+      </div>
+      <div class="surface-chips">
+        <a class="surface-chip" href="desktop/editor-saved.html">
+          <div class="surface-label">Desktop</div>
+          <div class="surface-title">Editor — Saved</div>
+          <div class="surface-note">Nodes, ASCII panel, inspector</div>
+        </a>
+        <a class="surface-chip overlay" href="desktop/version-history.html">
+          <div class="surface-label">Desktop · Overlay</div>
+          <div class="surface-title">Version History</div>
+          <div class="surface-note">Drawer open, entry selected</div>
+        </a>
+        <a class="surface-chip overlay" href="desktop/export-modal.html">
+          <div class="surface-label">Desktop · Overlay</div>
+          <div class="surface-title">Export Modal</div>
+          <div class="surface-note">Format list, preview, download</div>
+        </a>
+        <a class="surface-chip overlay" href="desktop/trial-expired.html">
+          <div class="surface-label">Desktop · State</div>
+          <div class="surface-title">Trial Expired</div>
+          <div class="surface-note">Upgrade overlay, read-only</div>
+        </a>
+        <div class="surface-chip planned">
+          <div class="surface-label">Mobile</div>
+          <div class="surface-title">[planned]</div>
+          <div class="surface-note">V2 scope</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="route-row">
+      <div class="route-meta">
+        <div class="route-path">/library</div>
+        <div class="route-name">Diagram Library</div>
+        <div class="route-spec">F4</div>
+      </div>
+      <div class="surface-chips">
+        <a class="surface-chip" href="desktop/library.html">
+          <div class="surface-label">Desktop</div>
+          <div class="surface-title">Library</div>
+          <div class="surface-note">Search, filter, card grid</div>
+        </a>
+        <div class="surface-chip planned">
+          <div class="surface-label">Mobile</div>
+          <div class="surface-title">[planned]</div>
+          <div class="surface-note">V2 scope</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="route-row">
+      <div class="route-meta">
+        <div class="route-path">/templates</div>
+        <div class="route-name">Template Browser</div>
+        <div class="route-spec">F4</div>
+      </div>
+      <div class="surface-chips">
+        <a class="surface-chip" href="desktop/templates.html">
+          <div class="surface-label">Desktop</div>
+          <div class="surface-title">Templates</div>
+          <div class="surface-note">Type tabs, system + user templates</div>
+        </a>
+        <div class="surface-chip planned">
+          <div class="surface-label">Mobile</div>
+          <div class="surface-title">[planned]</div>
+          <div class="surface-note">V2 scope</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="route-row">
+      <div class="route-meta">
+        <div class="route-path">/settings/billing</div>
+        <div class="route-name">Billing Settings</div>
+        <div class="route-spec">D7 · F3</div>
+      </div>
+      <div class="surface-chips">
+        <a class="surface-chip" href="desktop/billing.html">
+          <div class="surface-label">Desktop</div>
+          <div class="surface-title">Billing</div>
+          <div class="surface-note">Trial status, plan cards</div>
+        </a>
+        <div class="surface-chip planned">
+          <div class="surface-label">Mobile</div>
+          <div class="surface-title">[planned]</div>
+          <div class="surface-note">V2 scope</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="route-row">
+      <div class="route-meta">
+        <div class="route-path">/settings/providers</div>
+        <div class="route-name">AI Provider Settings</div>
+        <div class="route-spec">D1 · F3</div>
+      </div>
+      <div class="surface-chips">
+        <a class="surface-chip" href="desktop/settings-providers.html">
+          <div class="surface-label">Desktop</div>
+          <div class="surface-title">Provider Settings</div>
+          <div class="surface-note">BYOK, Ollama, add provider form</div>
+        </a>
+        <div class="surface-chip planned">
+          <div class="surface-label">Mobile</div>
+          <div class="surface-title">[planned]</div>
+          <div class="surface-note">V2 scope</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Components ────────────────────────────────── -->
+  <div class="section">
+    <div class="section-title">Reusable components <span style="font-size:10px; font-weight:500; color:var(--text-tertiary); margin-left:6px; text-transform:none; letter-spacing:0;">Not tied to a single route — shown in isolation with all states</span></div>
+    <div class="comp-grid">
+      <a class="comp-card" href="components/toolbar.html">
+        <div class="comp-id">toolbar</div>
+        <div class="comp-name">Toolbar</div>
+        <div class="comp-desc">6 states: clean, unsaved, saving, title edit, new, trial expired</div>
       </a>
-      <a class="screen-link" href="desktop/login.html">
-        <div class="screen-id">login</div>
-        <div class="screen-name">Login</div>
-        <div class="screen-route">/login</div>
-        <span class="badge-public">public</span>
+      <a class="comp-card" href="components/ai-prompt-panel.html">
+        <div class="comp-id">ai-prompt-panel</div>
+        <div class="comp-name">AI Prompt Panel</div>
+        <div class="comp-desc">4 states: new diagram, modify mode, generating, no provider</div>
       </a>
-      <a class="screen-link" href="desktop/register.html">
-        <div class="screen-id">register</div>
-        <div class="screen-name">Register / Sign Up</div>
-        <div class="screen-route">/register</div>
-        <span class="badge-public">public</span>
+      <a class="comp-card" href="components/ascii-panel.html">
+        <div class="comp-id">ascii-panel</div>
+        <div class="comp-name">ASCII Panel</div>
+        <div class="comp-desc">4 states: read-only, edit mode, detached export, repair notice</div>
+      </a>
+      <a class="comp-card" href="components/version-drawer.html">
+        <div class="comp-id">version-drawer</div>
+        <div class="comp-name">Version Drawer</div>
+        <div class="comp-desc">4 states: entry selected, restoring, empty, list only</div>
+      </a>
+      <a class="comp-card" href="components/export-modal.html">
+        <div class="comp-id">export-modal</div>
+        <div class="comp-name">Export Modal</div>
+        <div class="comp-desc">3 states: ASCII selected, PNG selected, copy success</div>
       </a>
     </div>
   </div>
 
-  <div class="group">
-    <div class="group-title">Desktop — Authenticated</div>
-    <div class="screen-grid">
-      <a class="screen-link" href="desktop/dashboard.html">
-        <div class="screen-id">dashboard</div>
-        <div class="screen-name">Dashboard</div>
-        <div class="screen-route">/dashboard</div>
-        <span class="badge-auth">auth</span>
-      </a>
-      <a class="screen-link" href="desktop/editor.html">
-        <div class="screen-id">editor-new</div>
-        <div class="screen-name">Workspace — New</div>
-        <div class="screen-route">/workspace/new</div>
-        <span class="badge-auth">auth</span>
-      </a>
-      <a class="screen-link" href="desktop/editor-saved.html">
-        <div class="screen-id">editor-saved</div>
-        <div class="screen-name">Workspace — Saved</div>
-        <div class="screen-route">/workspace/:id</div>
-        <span class="badge-auth">auth</span>
-      </a>
-      <a class="screen-link" href="desktop/library.html">
-        <div class="screen-id">library</div>
-        <div class="screen-name">Library</div>
-        <div class="screen-route">/library</div>
-        <span class="badge-auth">auth</span>
-      </a>
-      <a class="screen-link" href="desktop/templates.html">
-        <div class="screen-id">templates</div>
-        <div class="screen-name">Templates</div>
-        <div class="screen-route">/templates</div>
-        <span class="badge-auth">auth</span>
-      </a>
-      <a class="screen-link" href="desktop/billing.html">
-        <div class="screen-id">billing</div>
-        <div class="screen-name">Billing</div>
-        <div class="screen-route">/settings/billing</div>
-        <span class="badge-auth">auth</span>
-      </a>
-      <a class="screen-link" href="desktop/settings-providers.html">
-        <div class="screen-id">settings-providers</div>
-        <div class="screen-name">Provider Settings</div>
-        <div class="screen-route">/settings/providers</div>
-        <span class="badge-auth">auth</span>
-      </a>
-    </div>
-  </div>
-
-  <div class="group">
-    <div class="group-title">Desktop — Overlay States</div>
-    <div class="screen-grid">
-      <a class="screen-link" href="desktop/version-history.html">
-        <div class="screen-id">version-history</div>
-        <div class="screen-name">Version History Drawer</div>
-        <div class="screen-route">/workspace/:id (history open)</div>
-        <span class="badge-auth">auth</span>
-      </a>
-      <a class="screen-link" href="desktop/export-modal.html">
-        <div class="screen-id">export-modal</div>
-        <div class="screen-name">Export Modal</div>
-        <div class="screen-route">/workspace/:id (export open)</div>
-        <span class="badge-auth">auth</span>
-      </a>
-      <a class="screen-link" href="desktop/trial-expired.html">
-        <div class="screen-id">trial-expired</div>
-        <div class="screen-name">Trial Expired State</div>
-        <div class="screen-route">/workspace/:id (expired)</div>
-        <span class="badge-auth">auth</span>
-      </a>
-    </div>
-  </div>
-
-  <div class="group">
-    <div class="group-title">Mobile</div>
-    <div class="screen-grid">
-      <a class="screen-link" href="mobile/share-view.html">
-        <div class="screen-id">share-view</div>
-        <div class="screen-name">Share View</div>
-        <div class="screen-route">/share/:token</div>
-        <span class="badge-public">public</span>
-      </a>
-    </div>
-  </div>
-
-  <div class="group">
-    <div class="group-title">Components</div>
-    <div class="screen-grid">
-      <a class="screen-link" href="components/toolbar.html">
-        <div class="screen-id">toolbar</div>
-        <div class="screen-name">Toolbar</div>
-        <div class="screen-route">component</div>
-      </a>
-      <a class="screen-link" href="components/ai-prompt-panel.html">
-        <div class="screen-id">ai-prompt-panel</div>
-        <div class="screen-name">AI Prompt Panel</div>
-        <div class="screen-route">component</div>
-      </a>
-      <a class="screen-link" href="components/ascii-panel.html">
-        <div class="screen-id">ascii-panel</div>
-        <div class="screen-name">ASCII Panel</div>
-        <div class="screen-route">component</div>
-      </a>
-      <a class="screen-link" href="components/version-drawer.html">
-        <div class="screen-id">version-drawer</div>
-        <div class="screen-name">Version Drawer</div>
-        <div class="screen-route">component</div>
-      </a>
-      <a class="screen-link" href="components/export-modal.html">
-        <div class="screen-id">export-modal-c</div>
-        <div class="screen-name">Export Modal</div>
-        <div class="screen-route">component</div>
-      </a>
-    </div>
-  </div>
-
-  <div class="mockup-note">Phase 6 Mockup Index · Diagram Alley</div>
+  <div class="mockup-note">Phase 6 Mockup Index · Diagram Alley · organized by route</div>
 </body>
 </html>
