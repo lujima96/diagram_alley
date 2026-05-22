@@ -147,10 +147,13 @@ Restores the diagram to the state captured in version `{vid}`.
     "ascii_cache": "...rendered ASCII...",
     "mermaid_cache": "...rendered Mermaid...",
     "restored_from_version_id": "uuid",
-    "new_version_id": "uuid"
+    "pre_restore_version_id": "uuid",
+    "restored_version_id": "uuid"
   }
 }
 ```
+
+`pre_restore_version_id` is the snapshot created in step 5. `restored_version_id` is the post-restore snapshot created in step 10 (DEC-032).
 
 ### 4.3 Restore Does Not Delete History
 

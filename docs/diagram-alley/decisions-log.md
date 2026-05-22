@@ -17,6 +17,32 @@ This file is the canonical record of all user-approved decisions. It **overrides
 
 ---
 
+## 2026-05-22 — Phase 7 Schema Roundup Reconciliation
+
+### DEC-032: Restore Response Includes Both Created Version IDs
+
+**Decision:** The version restore response returns both `pre_restore_version_id` and `restored_version_id`. `pre_restore_version_id` identifies the snapshot of the pre-restore current state. `restored_version_id` identifies the post-restore snapshot created after applying the restored spec.
+
+**Source:** Phase 7 schema roundup, user decision 2026-05-22.
+
+**Rationale:** D3 restore creates two version rows. Returning both IDs removes ambiguity from the API contract without changing the database schema.
+
+**Affects:** D3 (restore response contract)
+
+---
+
+### DEC-031: Warning and Repair Persistence — Transient Only
+
+**Decision:** AI/import warnings and repair details are transient response data plus optional audit-event detail. V1 does not add a `diagrams.last_diagnostics`, `diagram_metadata`, or equivalent persistence column for latest warnings/repairs.
+
+**Source:** Phase 7 schema roundup, user decision 2026-05-22.
+
+**Rationale:** Persisting latest diagnostics would create stale-state complexity. The immediate UI can use response payloads, and analytics/debug history can use audit event details owned by F3.
+
+**Affects:** F1 (no schema addition), D1 (generation warning wording), D5 (import warning persistence expectation)
+
+---
+
 ## 2026-05-22 — Phase 10 Mockup Audit Reconciliation
 
 ### DEC-030: Visual Editor — File Structure and UI Wireframe Rendering

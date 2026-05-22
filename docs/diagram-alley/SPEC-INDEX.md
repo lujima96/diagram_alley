@@ -141,7 +141,7 @@ Write in the order listed. Each spec depends on the foundation specs shown.
 
 | File | Purpose | Status |
 |------|---------|--------|
-| `sketches/flows/schema-roundup.md` | Deduplicated schema changes from flow work | Planned |
+| `sketches/flows/schema-roundup.md` | Deduplicated schema changes from flow work | **Done** |
 | Per-flow proposal files | Created on demand during Phase 4 if flows discover schema gaps | Planned |
 
 ---

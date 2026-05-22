@@ -129,7 +129,7 @@ If the model returns JSON with an edge that references a node ID that does not e
 2. The repair pass removes the invalid edge and adds it to the `warnings` array.
 3. The workspace renders the diagram with a **yellow repair banner** at the top of the preview panel: "1 repair was made: edge 'api→db' was removed because node 'db' does not exist. Check your diagram."
 4. Priya can accept the diagram as-is or use the inspector to add the missing node manually.
-5. The repair warning is stored in the diagram metadata but does not block saving.
+5. The repair warning is response data for the current UI state and may be recorded in audit event detail; it is not stored on the diagram row (DEC-031).
 
 ## Alternate Path: Generation Fails Completely (D1 AI failure handling)
 

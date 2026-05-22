@@ -129,7 +129,7 @@ This ensures the pre-edit state is always recoverable, even if the user immediat
 
 ## Version Pruning
 
-Version history is unlimited for Pro subscribers in V1. Free trial users have unlimited snapshots during the trial. If pruning is ever introduced, it will be decided in a future spec revision — it is not in scope for V1 planning (D3 notes this as deferred).
+Version history keeps up to 100 snapshots per diagram in V1 (F1 §4.4, D3 acceptance criteria). When the 101st snapshot is created, the oldest snapshot is pruned so exactly 100 remain.
 
 ---
 
