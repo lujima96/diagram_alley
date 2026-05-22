@@ -150,7 +150,7 @@ Write in the order listed. Each spec depends on the foundation specs shown.
 
 | File | Purpose | Status |
 |------|---------|--------|
-| `sketches/flows/golden-paths.md` | Trial signup → first diagram; prompt → export → Git commit; free limit → upgrade; version restore → re-export | **Draft** |
+| `sketches/flows/golden-paths.md` | Trial signup → first diagram; prompt → export → Git commit; free limit → upgrade; version restore → re-export | **Done** |
 
 ---
 

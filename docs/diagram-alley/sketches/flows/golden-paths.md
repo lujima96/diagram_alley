@@ -1,7 +1,7 @@
 ---
 phase: 8
 artifact: golden-paths
-status: draft
+status: complete
 depends-on: [F1, F2, F3, F4, F5, D1, D2, D3, D4, D5, D6, D7, A1, schema-roundup]
 ---
 
@@ -25,7 +25,8 @@ These are not new product decisions. They are acceptance paths that combine alre
 | GP-06 | Share link → public view → revoke | Engineering lead | Collaboration without accounts | Important |
 | GP-07 | ASCII label sync → detached-state boundary | Solo developer | Clear V1 reverse-sync boundary | Important |
 | GP-08 | Admin support lookup → subscription override/audit review | Operator/admin | Support readiness | Important |
-| GP-09 | Export → Git workflow | Developer | Documentation delivery | Stretch |
+| GP-09 | Import → preview warnings → save | Technical writer | Bring existing diagrams into Alley safely | Important |
+| GP-10 | Export → Git workflow | Developer | Documentation delivery | Stretch |
 
 ---
 
@@ -315,7 +316,46 @@ A1, F1, F3, F5.
 
 ---
 
-## 10. GP-09 — Export to Git Workflow (Stretch)
+## 10. GP-09 — Import to Preview to Save
+
+**Goal:** A user imports an external Mermaid/JSON/YAML diagram, reviews warnings, and saves a clean Diagram Alley diagram without corrupting existing work.
+
+**Persona:** Marcus, technical writer.
+
+**Start:** User has Mermaid, JSON, or YAML diagram content.
+
+**End:** A new saved diagram exists, or import fails without writing partial data.
+
+### Required Steps
+
+1. User opens Import from sidebar, library, or workspace drag-and-drop.
+2. User selects `input_format` and provides content.
+3. User clicks Preview.
+4. Backend calls `POST /api/v1/diagrams/import` with `preview_only=true`.
+5. Backend converts, validates, repairs if possible, renders ASCII preview, and returns warnings.
+6. User reviews converted preview and warning list.
+7. User clicks Import & Save.
+8. Backend creates a new `diagrams` row and render caches in a transaction.
+9. Backend emits `DIAGRAM_IMPORTED`.
+10. User lands in `/workspace/:diagramId`.
+
+### Acceptance Criteria
+
+- Preview mode never creates a `diagrams` row.
+- Import always creates a new diagram and never overwrites an existing diagram.
+- Unsupported Mermaid types return `IMPORT_UNSUPPORTED_FORMAT`.
+- Parse failures return `IMPORT_PARSE_FAILED`.
+- Validation failures after repair return `SPEC_VALIDATION_FAILED` and write no partial rows.
+- Warnings are visible in the import UI but are not persisted on the diagram row (DEC-031).
+- `_export_meta` from D4 JSON exports is stripped before validation.
+
+### Owners
+
+D5, F1, F2, F3, F5, DEC-006, DEC-031.
+
+---
+
+## 11. GP-10 — Export to Git Workflow (Stretch)
 
 **Goal:** A developer gets Diagram Alley output into a repository workflow.
 
@@ -352,7 +392,7 @@ D4, D8, DEC-007.
 
 ---
 
-## 11. Cross-Path Launch Gates
+## 12. Cross-Path Launch Gates
 
 These must hold across all critical golden paths:
 
@@ -360,6 +400,7 @@ These must hold across all critical golden paths:
 - `spec_json` remains the canonical source for diagram state.
 - Auto-save and version snapshots remain distinct.
 - Exports never mutate diagram state.
+- Imports never overwrite existing diagram state.
 - Public share never exposes raw `spec_json`.
 - Trial-expired users retain view/export/share management access only.
 - Every write that owner specs require to be audited emits the correct audit event.
@@ -367,6 +408,6 @@ These must hold across all critical golden paths:
 
 ---
 
-## 12. Phase 8 Status
+## 13. Phase 8 Status
 
-Phase 8 is draft until these golden paths are reviewed against the implementation handoff slices in Phase 11. No new decisions were discovered while drafting this artifact.
+Phase 8 is complete. No new decisions were discovered while drafting this artifact.
