@@ -17,6 +17,28 @@ This file is the canonical record of all user-approved decisions. It **overrides
 
 ---
 
+## 2026-05-23 — Phase 11 Implementation Slice Format
+
+### DEC-033: Implementation Slice Files — One Per Spec, Three Sections
+
+**Decision:** Phase 11 produces one implementation slice file per spec (F0, F1, F2, F3, F4, F5, D1, D2, D3, D4, D5, D6, D7, A1). Each slice file contains exactly three sections:
+
+1. **Pre-conditions** — what must exist or be deployed before this slice can begin.
+2. **Build sequence** — ordered list of what to implement first within this slice, with spec section references.
+3. **Done criteria** — acceptance conditions drawn from golden paths and specs that define when this slice is complete.
+
+Slice files do not repeat spec content. They sequence and gate it.
+
+**Source:** User decision 2026-05-23.
+
+**Rationale:** One-per-spec granularity maps cleanly to the existing spec hierarchy. Three sections keep files lightweight while providing enough context for a developer starting cold. Avoids duplicating the specs themselves.
+
+**Affects:** SPEC-INDEX (Phase 11 table), the slice file template.
+
+**Rejected:** Two-layer (foundations + domains) — less precise sequencing. Stage-based (3–4 files) — too coarse for day-to-day task reference. Full implementation spec — duplicates specs and creates a second sync burden. Checklist-only — insufficient context.
+
+---
+
 ## 2026-05-22 — Phase 7 Schema Roundup Reconciliation
 
 ### DEC-032: Restore Response Includes Both Created Version IDs

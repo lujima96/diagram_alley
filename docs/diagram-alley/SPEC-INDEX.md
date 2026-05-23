@@ -158,7 +158,7 @@ Write in the order listed. Each spec depends on the foundation specs shown.
 
 | File | Purpose | Status |
 |------|---------|--------|
-| `sketches/flows/failure-modes.md` | Failure catalog: AI outage, validation failure, import corruption, payment failure, version conflict | Planned |
+| `sketches/flows/failure-modes.md` | Failure catalog: AI outage, validation failure, import corruption, payment failure, version conflict | **Done** |
 
 ---
 
@@ -175,9 +175,26 @@ Run audits after Phase 1, after Phase 2, and after Phase 6 mockups.
 
 ## Phase 11 — Implementation Handoff
 
+One slice file per spec. Format defined by DEC-033. Files live in `specs/slices/`.
+
 | File | Purpose | Status |
 |------|---------|--------|
-| Per-domain slice files | One implementation slice file per domain, created when build begins | Planned |
+| `specs/SLICE-TEMPLATE.md` | Slice file template, sequencing guide, fill-in instructions | **Done** |
+| `specs/slices/slice-F0.md` | F0 — Tech stack, runtime environment, deployment | **Done** |
+| `specs/slices/slice-F1.md` | F1 — Data model, diagram spec schema, migrations | **Done** |
+| `specs/slices/slice-F2.md` | F2 — Renderers, validation, repair pass | **Done** |
+| `specs/slices/slice-F3.md` | F3 — Auth, BYOK credential storage, billing foundation | **Done** |
+| `specs/slices/slice-F4.md` | F4 — UI surface, workspace layout, React Flow wiring | **Done** |
+| `specs/slices/slice-F5.md` | F5 — API standards, error handling, rate limiting | **Done** |
+| `specs/slices/slice-D1.md` | D1 — AI generation and improve flows | **Done** |
+| `specs/slices/slice-D2.md` | D2 — Diagram editor interactions, auto-save | **Done** |
+| `specs/slices/slice-D3.md` | D3 — Version history, save, restore | **Done** |
+| `specs/slices/slice-D4.md` | D4 — Export (all formats) | **Done** |
+| `specs/slices/slice-D5.md` | D5 — Import and conversion | **Done** |
+| `specs/slices/slice-D6.md` | D6 — Sharing and publishing | **Done** |
+| `specs/slices/slice-D7.md` | D7 — Billing and subscription | **Done** |
+| `specs/slices/slice-A1.md` | A1 — Admin console | **Done** |
+| `specs/slices/slice-D8.md` | D8 — GitHub integration (stretch; write last) | Planned |
 
 ---
 
