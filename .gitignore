@@ -1,0 +1,43 @@
+# ── Secrets and environment ───────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ── Python (backend/) ─────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+htmlcov/
+.coverage
+*.sqlite3
+
+# ── Node / pnpm (frontend/) ───────────────────────────────────────────────────
+node_modules/
+dist/
+.pnpm-store/
+pnpm-lock.yaml.bak
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── Editors and OS ────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ── Repo-root scratch files ───────────────────────────────────────────────────
+neon_connection_param.md
+package-lock.json
