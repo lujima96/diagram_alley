@@ -62,7 +62,7 @@ These checks run before type-specific checks:
 | Rule | Error message |
 |------|--------------|
 | `spec_version` must be present and recognized | `"spec_version is missing or unrecognized: {value}"` |
-| `diagram_type` must be one of the six defined values | `"diagram_type '{value}' is not supported"` |
+| `diagram_type` must be one of the five defined values (DEC-035) | `"diagram_type '{value}' is not supported"` |
 | `title` must be present and non-empty | `"title is required"` |
 
 ### 2.2 Architecture Diagram Validation
@@ -104,18 +104,7 @@ These checks run before type-specific checks:
 | Transition `from` and `to` must reference existing step ids | ERROR | Transition references unknown step |
 | Decision steps should have exactly two outgoing transitions | WARNING | `"Decision step '{id}' has {n} outgoing transitions; expected 2"` |
 
-### 2.5 UI Wireframe Validation
-
-| Rule | Severity | Error |
-|------|----------|-------|
-| Component `id` unique across entire tree | ERROR | Duplicate component id |
-| `root` must be present | ERROR | `"root is required for ui_wireframe"` |
-| Root `kind` must be `page` | ERROR | `"root kind must be 'page'"` |
-| Component `kind` must be valid | ERROR | Unknown component kind |
-| Component `label` non-empty | ERROR | Empty label |
-| `layout` must be `column`, `row`, or null if present | WARNING | Unknown layout value |
-
-### 2.6 File Structure Validation
+### 2.5 File Structure Validation
 
 | Rule | Severity | Error |
 |------|----------|-------|
@@ -124,7 +113,9 @@ These checks run before type-specific checks:
 | File nodes must have no children | WARNING | `"File '{id}' has children; files cannot have children"` |
 | Node `label` non-empty | ERROR | Empty label |
 
-### 2.7 Network Diagram Validation
+### 2.6 Network Diagram Validation
+
+**V1 scope (DEC-041):** Network diagrams in V1 represent simple cloud/infrastructure relationships — services, servers, load balancers, databases, and firewalls as abstract nodes connected by labeled edges, optionally grouped into zones/environments. IP subnets, VLANs, routing tables, physical device specifications, and port mapping are out of V1 scope.
 
 | Rule | Severity | Error |
 |------|----------|-------|
@@ -134,7 +125,7 @@ These checks run before type-specific checks:
 | Connection `from` and `to` must reference existing device ids | ERROR | Connection references unknown device |
 | Zone `device_ids` must all reference existing devices | WARNING | Zone references unknown device |
 
-### 2.8 Validation Output Shape
+### 2.7 Validation Output Shape
 
 ```json
 {
@@ -312,6 +303,25 @@ When the Visual Grid Editor provides `position.col` and `position.row` for nodes
 
 When positions are absent, the renderer assigns positions automatically using a simple top-down flow layout (each edge adds one row between source and target).
 
+### 4.8 Automatic Layout Contract (DEC-046)
+
+**"Automatic layout by default" is a core product promise.** The layout engine owns final positioning. Visual editing adjusts structure, grouping, ordering, and layout hints — not fragile pixel-perfect coordinates. Given the same spec and the same layout hints, the renderer always produces the same layout — deterministic, not canvas-positioned.
+
+`position.col` and `position.row` on spec nodes are **layout hints**, not absolute positions. The renderer uses them as starting points but overrides them to satisfy the invariants below. Users never need to manually align nodes. The following rules are invariants, not best-efforts:
+
+| Rule | Behaviour |
+|------|-----------|
+| No overlapping nodes | Two nodes may never occupy the same `(col, row)` grid cell. Auto-layout bumps conflicting nodes to the next available cell. |
+| Consistent node sizing | Node box width = max(label length + padding, MIN_BOX_WIDTH=16). Node height is always one row. No node is ever truncated in ASCII output. |
+| Consistent spacing | Horizontal gap between adjacent nodes: 2 characters. Vertical gap between rows: 1 blank line. |
+| Direction modes | `direction: top_down` → rows flow top to bottom. `direction: left_right` → columns flow left to right. All node and edge rendering respects this setting. |
+| Group / container rendering | Nodes with `group_id` are drawn inside a shared container box. Container label appears above the group. Groups do not overlap other groups or ungrouped nodes. |
+| Readable edge routing | Edges between same-row nodes are drawn horizontally below the row. Edges between rows are drawn as vertical connectors in the gap between rows. Crossing edges are avoided by the auto-layout algorithm; where unavoidable, crossings are drawn with `+` at the intersection. |
+| Label wrapping | Labels longer than 30 characters are wrapped at word boundaries inside the node box. The box expands to accommodate wrapped lines. |
+| One-click clean layout | The `auto_layout` repair action (F2 §7.2) recalculates all node positions from scratch using the automatic layout algorithm, resolving any user-introduced overlaps. Available in the workspace via "Clean Up Layout" in the Validation inspector tab. |
+
+These rules apply equally to ASCII output, SVG export, and the React Flow visual editor (which snaps to the same grid).
+
 ---
 
 ## 5. Mermaid Renderer
@@ -324,8 +334,7 @@ When positions are absent, the renderer assigns positions automatically using a 
   - `architecture` → `graph TD` or `graph LR` (based on direction)
   - `database` → `erDiagram`
   - `flowchart` → `flowchart TD` or `flowchart LR`
-  - `ui_wireframe` → Not supported in V1 (export returns an error with explanation)
-  - `file_structure` → Not supported in V1
+  - `file_structure` → Not supported in V1 (export returns an error with explanation)
   - `network` → `graph TD` (best effort)
 
 ### 5.2 Architecture → Mermaid
@@ -416,13 +425,7 @@ For `file_structure` diagrams (DEC-030), the visual renderer converts each folde
 - Tree depth maps to horizontal indentation; order follows the source `children` arrays.
 - Label edits update the corresponding file/folder entry in `spec_json`.
 
-For `ui_wireframe` diagrams (DEC-030), the visual renderer converts each component into a nested-box node:
-- Container components render as boxes that can contain child component boxes.
-- Leaf components render as labeled boxes with the component type annotation.
-- Nesting follows the source component tree.
-- Label/property edits update the corresponding component entry in `spec_json`.
-
-These renderings are intentionally schematic, not pixel-perfect UI or file explorer clones. They preserve deterministic structure and editability.
+These renderings are intentionally schematic, not pixel-perfect file explorer clones. They preserve deterministic structure and editability.
 
 ### 6.4 Edge Appearance in React Flow
 

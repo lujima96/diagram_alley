@@ -9,7 +9,7 @@ status: planned
 
 ## Pre-conditions
 
-- [ ] Slice F1 complete — all ORM models exist, `alembic upgrade head` runs cleanly, Pydantic spec schemas are defined for all six diagram types.
+- [ ] Slice F1 complete — all ORM models exist, `alembic upgrade head` runs cleanly, Pydantic spec schemas are defined for all five diagram types (DEC-035).
 
 ---
 
@@ -25,13 +25,13 @@ status: planned
 
 5. **UTF-8 text mode** — Add `mode: str = "ascii"` parameter to `render_text`. When `mode="utf8"`, allow Unicode tree/box glyphs. Strict ASCII mode must contain only printable ASCII + `\n` — enforce with an assertion in tests. Document that UTF-8 output is never labeled as ASCII output (DEC-023). (→ F2 §4.1, DEC-023)
 
-6. **Mermaid renderer** — Implement `app/renderers/mermaid/renderer.py::render_mermaid(spec: dict) -> str`. Cover `architecture` (→ `graph TD/LR`) and `database` (→ `erDiagram`) first, then `flowchart` (→ `flowchart TD/LR`) and `network` (→ `graph TD` best-effort). Return `UnsupportedDiagramTypeError` for `ui_wireframe` and `file_structure`. Apply the Mermaid node shape map (F2 §5.2) and ER relationship type map (F2 §5.3). (→ F2 §5)
+6. **Mermaid renderer** — Implement `app/renderers/mermaid/renderer.py::render_mermaid(spec: dict) -> str`. Cover `architecture` (→ `graph TD/LR`) and `database` (→ `erDiagram`) first, then `flowchart` (→ `flowchart TD/LR`) and `network` (→ `graph TD` best-effort). Return `UnsupportedDiagramTypeError` for `file_structure` (DEC-035 removes `ui_wireframe` from V1). Apply the Mermaid node shape map (F2 §5.2) and ER relationship type map (F2 §5.3). (→ F2 §5)
 
 7. **SVG renderer** — Implement `app/renderers/visual/svg_renderer.py::render_svg(spec: dict) -> str`. Generates a standalone SVG string using the same grid coordinate system as the React Flow canvas (F2 §6.2 constants: `CELL_WIDTH=220`, `CELL_HEIGHT=120`, `CELL_PADDING=40`). Node kind border styles from F2 §4.3 are expressed as SVG `rect` attributes. No browser dependency — this runs server-side for export. (→ F2 §6.1–6.3)
 
 8. **PNG renderer** — Implement `render_png(spec: dict) -> bytes` that calls `render_svg` then converts the SVG to PNG bytes using `cairosvg` (F0 §2.1). Confirm PNG bytes are valid via `PIL.Image.open(BytesIO(...))` in tests. (→ F2 §6.1, F0 §2.1, DEC-019)
 
-9. **React Flow visual renderer (frontend)** — Create `frontend/src/renderers/visual/` with the grid coordinate constants (`constants.ts`), a `specToFlow(spec)` function that converts a Diagram Spec to React Flow `nodes[]` and `edges[]`, and custom node components for each kind (styled `div`s matching the border styles in F2 §4.3). Enable `snapToGrid` with `[CELL_WIDTH, CELL_HEIGHT]` so drags resolve to integer grid positions. For `file_structure` and `ui_wireframe`, implement the tree-row and nested-box rendering per F2 §6.3 (DEC-030). (→ F2 §6.2–6.4)
+9. **React Flow visual renderer (frontend)** — Create `frontend/src/renderers/visual/` with the grid coordinate constants (`constants.ts`), a `specToFlow(spec)` function that converts a Diagram Spec to React Flow `nodes[]` and `edges[]`, and custom node components for each kind (styled `div`s matching the border styles in F2 §4.3). Enable `snapToGrid` with `[CELL_WIDTH, CELL_HEIGHT]` so drags resolve to integer grid positions. For `file_structure`, implement the tree-row rendering per F2 §6.3 (DEC-030). (`ui_wireframe` rendering is V2 per DEC-035.) (→ F2 §6.2–6.4)
 
 10. **Reverse sync — label change detection** — Implement `app/services/reverse_sync.py`. On ASCII edit, compare the edited string against the original rendered output using a `sync_map` (rendered label → node/edge ID). If only label-position changes are detected, update `spec_json` labels and persist. If any non-label change is detected, set `diagrams.ascii_is_detached = true` and store the edited ASCII in `ascii_cache` without touching `spec_json`. (→ F2 §7.1–7.3, DEC-005)
 

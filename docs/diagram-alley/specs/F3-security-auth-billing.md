@@ -30,7 +30,7 @@ Define authentication, session management, BYOK credential storage, permission c
 
 ## Owned Concepts
 
-Auth flow; JWT token model; BYOK encryption; permission key convention; audit event convention and constants; Stripe setup; trial enforcement; `subscriptions` state machine consumption (table and states owned by F1).
+Auth flow; JWT token model; BYOK encryption; permission key convention; audit event convention and constants; Stripe setup; free tier and Pro feature gate enforcement; `subscriptions` state machine consumption (table and states owned by F1).
 
 ---
 
@@ -66,7 +66,7 @@ FastAPI Users handles registration. The flow:
 2. FastAPI Users creates a `users` row with `is_verified = false`
 3. A verification email is sent with a one-time token link
 4. `POST /auth/verify` with the token sets `is_verified = true`
-5. `is_verified = false` users can log in but see a verification banner in the UI. They cannot use AI generation (pro feature) or save more than 3 diagrams until verified.
+5. `is_verified = false` users can log in but see a persistent verification banner in the UI. AI generation and new diagram creation are available once verified; unverified users cannot create diagrams or use AI generation until they verify.
 
 **Email sending:** In V1, use a transactional email provider with a free tier. **Resend** (free up to 3000 emails/month) is recommended. SMTP credentials are env vars.
 
@@ -182,10 +182,9 @@ Audit events are stored in the lightweight `audit_log` table owned by F1 §4.10 
 | `SHARE_ACCESSED` | Public share viewed | system (anonymous) | diagram_shares |
 | `DIAGRAM_AI_GENERATED` | AI generation succeeded | user | diagrams |
 | `DIAGRAM_AI_IMPROVE_PROPOSED` | AI improve proposal returned | user | diagrams |
-| `SUBSCRIPTION_TRIAL_STARTED` | Registration | system | subscriptions |
-| `SUBSCRIPTION_UPGRADED` | Payment succeeded | user/stripe | subscriptions |
-| `SUBSCRIPTION_CANCELED` | Canceled | user/stripe | subscriptions |
-| `SUBSCRIPTION_EXPIRED` | Trial ended | stripe | subscriptions |
+| `SUBSCRIPTION_UPGRADED` | Payment succeeded; plan upgraded to Pro | user/stripe | subscriptions |
+| `SUBSCRIPTION_CANCELED` | Pro canceled (reverts to free tier at period end) | user/stripe | subscriptions |
+| `USER_FREE_TIER_LIMIT_REACHED` | Free user attempted to create a 6th private diagram | user | diagrams |
 
 ### 3.3 Audit Log Storage
 
@@ -194,6 +193,20 @@ F1 §4.10 owns the `audit_log` table shape. F3 owns the event constants above an
 ---
 
 ## 4. BYOK Credential Storage
+
+### 4.0 Supported AI Providers at Launch (DEC-042)
+
+V1 supports three provider types:
+
+| Provider type | `provider_type` value | Notes |
+|---|---|---|
+| OpenAI and OpenAI-compatible endpoints | `openai_compatible` | Includes Azure OpenAI, OpenRouter, local OpenAI-compatible servers |
+| Anthropic (Claude) | `anthropic` | Direct Anthropic API |
+| Ollama / llama.cpp | `ollama` | Local models; no API key required |
+
+Product copy should say "Supports OpenAI, Anthropic, and Ollama at launch" — not "any AI provider." A provider adapter system for additional integrations is planned for V1.x.
+
+**Security statement for product copy (DEC-048):** OpenAI and Anthropic API keys are encrypted server-side before storage. Requests to those providers route through the Diagram Alley backend — your keys are never sent to the browser. Ollama uses a local connection for localhost instances and does not require storing an API key. Diagram Alley does not resell model usage or maintain AI credits on your behalf.
 
 ### 4.1 Threat Model
 
@@ -217,45 +230,47 @@ Users can set `store_credentials = false` on a `model_providers` row. When this 
 
 ## 5. Billing
 
-### 5.1 Stripe Setup (DEC-004)
+### 5.1 Stripe Setup (DEC-004, DEC-037)
+
+**Free tier users do not require a Stripe Customer.** A Stripe Customer is created lazily the first time a user initiates a checkout session (upgrade to Pro).
 
 **Stripe objects to create before launch:**
 
 | Object | Name | Config |
 |--------|------|--------|
-| Stripe Customer | created on trial start | `metadata: {user_id: "<uuid>"}` |
+| Stripe Customer | created on first checkout | `metadata: {user_id: "<uuid>"}` |
 | Stripe Product | Diagram Alley Pro | — |
-| Stripe Price | Pro Monthly | Recurring, monthly, amount TBD |
+| Stripe Price | Pro Monthly | Recurring, monthly, **$9.00 USD** (DEC-037) |
 
 **Env vars:** `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID_PRO` (set via `fly secrets set`)
 
-### 5.2 Trial Lifecycle (DEC-010)
+### 5.2 Free Tier Lifecycle (DEC-034, replaces DEC-010)
 
 On user registration, the backend:
-1. Creates a Stripe Customer with the user's email
-2. Creates a `subscriptions` row with `plan = 'trial'`, `status = 'trialing'`, `trial_ends_at = now() + 14 days`, `access_ends_at = trial_ends_at`, `stripe_customer_id = <id>`
-3. Emits `SUBSCRIPTION_TRIAL_STARTED` audit event
+1. Creates a `subscriptions` row with `plan = 'free'`, `status = 'active'` — no Stripe interaction required at registration
+2. Emits `USER_REGISTERED` audit event (no separate subscription event)
 
-On trial expiry (daily job check against `trial_ends_at`):
-1. Update `subscriptions.status = 'canceled'`
-2. Emit `SUBSCRIPTION_EXPIRED` audit event
-3. User loses access to AI generation, AI modification, spec editing, and new diagram creation (DEC-022)
+There is no trial expiry job. Free tier is permanent. The daily job that previously checked `trial_ends_at` is removed.
 
-**Trial access rules:**
+**Free tier access rules:**
 - Full editor access: yes
 - AI generation: yes (requires BYOK/Ollama — no hosted AI, DEC-010)
-- Unlimited saved diagrams: yes
-- All export formats: yes
-- After trial expires: AI generation and spec editing disabled; saved diagrams remain viewable, exportable, and shareable; upgrade prompt shown (DEC-022)
+- Private diagrams: up to 5 (hard cap enforced by feature gate in §5.5)
+- Public diagrams: unlimited
+- Export formats: Mermaid, PNG, SVG downloads; ASCII/Markdown copy with attribution comment (DEC-038, DEC-049); JSON/YAML, ASCII/Markdown file download, and Documentation Bundle are Pro-only
+- GitHub commit: not available (Pro only, DEC-039)
+- Version history: 14-day rolling window; versions older than 14 days are pruned (DEC-040)
+- After 5 private diagrams: diagram creation blocked with `403 DIAGRAM_LIMIT_REACHED`; existing diagrams remain fully editable
 
 ### 5.3 Upgrade to Pro
 
 1. Frontend calls `POST /billing/checkout-session`
-2. Backend creates a Stripe Checkout Session for the Pro price
-3. Frontend redirects to Stripe-hosted checkout
-4. On success, Stripe fires `checkout.session.completed` webhook
-5. Backend creates Stripe Subscription, updates `subscriptions` row: `plan = 'pro'`, `status = 'active'`
-6. Emits `SUBSCRIPTION_UPGRADED`
+2. Backend creates (or retrieves) a Stripe Customer for the user, storing `stripe_customer_id` in the `subscriptions` row
+3. Backend creates a Stripe Checkout Session for the Pro price with the customer ID
+4. Frontend redirects to Stripe-hosted checkout
+5. On success, Stripe fires `checkout.session.completed` webhook
+6. Backend updates `subscriptions` row: `plan = 'pro'`, `status = 'active'`, `stripe_subscription_id = <id>`
+7. Emits `SUBSCRIPTION_UPGRADED`
 
 ### 5.4 Webhook Handling
 
@@ -266,39 +281,67 @@ All Stripe webhooks arrive at `POST /webhooks/stripe`. The backend:
    - `invoice.payment_succeeded` → extend `current_period_end`
    - `invoice.payment_failed` → set `status = 'past_due'`
    - `customer.subscription.updated` with `cancel_at_period_end=true` → keep `status = 'active'`, set `cancel_at_period_end = true`, set `access_ends_at = current_period_end`
-   - `customer.subscription.deleted` → set `status = 'canceled'`, set `canceled_at = now()`
+   - `customer.subscription.deleted` → revert `plan = 'free'`, `status = 'active'`, clear `stripe_subscription_id`, set `canceled_at = now()` (DEC-034: downgrade to free, not hard lock)
 
 Webhook endpoint is **not** auth-protected (Stripe calls it externally). It is signature-verified only.
 
-### 5.5 Feature Gate
+### 5.5 Feature Gate (DEC-034)
 
-The service layer checks subscription status before permitting AI generation:
+The service layer enforces plan-based limits. Two gate functions:
 
 ```python
-def require_active_subscription(user: User, db: Session) -> None:
+def require_verified(user: User) -> None:
+    """Blocks diagram creation and AI generation for unverified users."""
+    if not user.is_verified:
+        raise UnverifiedError("Email verification required")
+
+def require_diagram_quota(user: User, db: Session) -> None:
+    """Blocks private diagram creation when free user hits 5-diagram cap."""
     sub = db.query(Subscription).filter_by(user_id=user.id).first()
-    if not sub or sub.status not in ('trialing', 'active'):
-        raise SubscriptionRequiredError("Active subscription or trial required")
+    if sub and sub.plan == 'free':
+        count = db.query(func.count(Diagram.id)).filter_by(
+            project__user_id=user.id, is_archived=False
+        ).scalar()
+        if count >= 5:
+            emit_audit(user.id, 'USER_FREE_TIER_LIMIT_REACHED')
+            raise DiagramLimitError("Free plan limit reached: upgrade to Pro for unlimited diagrams")
+
+def require_pro(user: User, db: Session) -> None:
+    """Blocks access to Pro-only features (blueprint exports, GitHub commit)."""
+    sub = db.query(Subscription).filter_by(user_id=user.id).first()
+    if not sub or sub.plan != 'pro':
+        raise PlanRequiredError("This feature requires a Pro plan")
+
+def require_active_for_ai(user: User, db: Session) -> None:
+    """AI generation requires verified email. Available on free and Pro plans."""
+    require_verified(user)
+    sub = db.query(Subscription).filter_by(user_id=user.id).first()
+    if not sub or sub.status not in ('active',):
+        raise SubscriptionError("Active subscription required")
     if sub.access_ends_at and sub.access_ends_at <= now():
-        raise SubscriptionRequiredError("Active subscription or trial required")
+        raise SubscriptionError("Subscription access has ended")
 ```
 
-Gated features in V1:
-- AI diagram generation (`diagram.ai.generate`)
-- AI diagram modification (`diagram.ai.modify`)
+**Feature availability by plan:**
 
-Available to authenticated users with `status IN ('trialing', 'active')`:
-- Manual editor and spec updates
-- New diagram creation
-- Version snapshot creation
-
-Available after trial expiry/cancellation (read-only access):
-- Existing diagram viewing
-- All export formats
-- Share link management
-- Version history read
-- Provider configuration
-- Billing upgrade flow
+| Feature | Unverified | Free (verified) | Pro |
+|---------|-----------|-----------------|-----|
+| Diagram creation (private) | Blocked | Up to 5 | Unlimited |
+| Diagram creation (public) | Blocked | Unlimited | Unlimited |
+| Manual editor and spec updates | Blocked | Yes | Yes |
+| AI generation / modification | Blocked | Yes (BYOK required) | Yes (BYOK required) |
+| Basic exports (Mermaid, PNG, SVG) | Yes | Yes | Yes |
+| ASCII/Markdown copy (with attribution) | No | Yes | Yes (clean) |
+| ASCII/Markdown file download | No | No | Yes |
+| Blueprint exports (JSON, YAML) | No | No | Yes |
+| Documentation Bundle (ZIP) | No | No | Yes |
+| GitHub commit | No | No | Yes |
+| Version history window | — | 14 days | Unlimited |
+| Viewing existing diagrams | Yes | Yes | Yes |
+| Share link management | Yes | Yes | Yes |
+| Public link branding | — | Diagram Alley branded | Unbranded |
+| Provider configuration | Yes | Yes | Yes |
+| Billing upgrade flow | Yes | Yes | Yes |
 
 ---
 
@@ -325,12 +368,14 @@ None. All F3 decisions are locked.
 
 ## Acceptance Criteria
 
-- `POST /auth/register` creates a user with `is_verified = false` and a `subscriptions` row with `status = 'trialing'`.
+- `POST /auth/register` creates a user with `is_verified = false` and a `subscriptions` row with `plan = 'free'`, `status = 'active'` (no `trial_ends_at`).
 - `POST /auth/login` returns an access token that expires in 15 minutes and sets a refresh cookie.
 - A request with an expired access token but a valid refresh cookie receives a new access token.
 - `POST /auth/refresh` with an already-used refresh token returns 401 (token rotation enforced).
 - Accessing `GET /diagrams` without a token returns 401.
 - Accessing a diagram owned by a different user returns 403 (ownership check in service layer).
-- A user with `status = 'canceled'` subscription calling `POST /diagrams/generate` receives 403 with a clear upgrade message.
-- A Stripe `checkout.session.completed` webhook with a valid signature updates the subscription to `status = 'active'`.
+- A free user who already has 5 private diagrams calling `POST /diagrams` receives 403 `DIAGRAM_LIMIT_REACHED`.
+- An unverified user calling `POST /diagrams` receives 403 `EMAIL_VERIFICATION_REQUIRED`.
+- A Stripe `checkout.session.completed` webhook with a valid signature updates the subscription to `plan = 'pro'`, `status = 'active'`.
+- A `customer.subscription.deleted` webhook reverts the subscription to `plan = 'free'`, `status = 'active'`.
 - `model_providers.api_key_encrypted` decrypts to the original API key value using the server's encryption key.

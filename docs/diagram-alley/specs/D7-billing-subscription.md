@@ -17,7 +17,7 @@ tags: [billing, stripe, subscription, trial, upgrade, downgrade]
 
 ## Purpose
 
-Define the full billing domain: free trial lifecycle, Pro subscription, Stripe checkout, upgrade, downgrade, trial expiry, and the billing settings page. The Stripe setup and feature gate are defined in F3 §5; this spec defines the domain workflows and UI contract that build on that foundation.
+Define the full billing domain: free tier UX, Pro subscription, Stripe checkout, upgrade, downgrade/revert to free, and the billing settings page. The Stripe setup and feature gate are defined in F3 §5; this spec defines the domain workflows and UI contract that build on that foundation.
 
 ## Non-Goals
 
@@ -30,63 +30,55 @@ Define the full billing domain: free trial lifecycle, Pro subscription, Stripe c
 
 ## Owned Concepts
 
-Billing page UI; trial countdown and expiry UX; upgrade flow (Stripe Checkout); downgrade / cancellation flow; billing portal session; subscription status display; billing-related error states.
+Billing page UI; free tier usage indicator; upgrade flow (Stripe Checkout); downgrade to free / cancellation flow; billing portal session; subscription status display; billing-related error states.
 
 ---
 
 ## 1. Subscription States and Plans
 
-From F1 §4.9 and F3 §5.2:
+From F1 §4.9 and F3 §5.2 (DEC-034):
 
 | `plan` | `status` | Meaning |
 |--------|----------|---------|
-| `trial` | `trialing` | Active 14-day trial |
-| `trial` | `canceled` | Trial expired, no payment |
+| `free` | `active` | Permanent free tier (default for all new users) |
 | `pro` | `active` | Paid Pro subscription |
-| `pro` | `active` + `cancel_at_period_end=true` | Canceled in Stripe portal, access continues until `access_ends_at` |
+| `pro` | `active` + `cancel_at_period_end=true` | Canceled in Stripe portal; access continues until `access_ends_at`, then reverts to `free` |
 | `pro` | `past_due` | Payment failed; Stripe retrying |
-| `pro` | `canceled` | Access ended after cancellation or payment retries exhausted |
+| `free` | `active` | Pro expired / all retries exhausted; reverted to free |
 | `pro` | `incomplete` | Checkout started but not completed |
 
-AI generation is gated on `status IN ('trialing', 'active')` (F3 §5.5).
+AI generation requires `status = 'active'` and a verified email (F3 §5.5). Free and Pro users both have access to AI generation with BYOK.
 
 ---
 
-## 2. Trial Lifecycle UX
+## 2. Free Tier Usage UX (DEC-034)
 
-### 2.1 Trial Start
+### 2.1 Free Tier Registration
 
 On registration:
-1. A `subscriptions` row is created with `plan='trial'`, `status='trialing'`, `trial_ends_at = now() + 14 days` (F3 §5.2).
-2. No Stripe subscription is created at trial start — Stripe Customer ID is created and stored.
-3. The user sees a "14 days left in your trial" badge in the header (F4 §3.3).
+1. A `subscriptions` row is created with `plan='free'`, `status='active'` (F3 §5.2). No Stripe interaction.
+2. No countdown badge is shown. The free tier is permanent.
+3. A diagram usage indicator appears in the app shell header once the user creates their first diagram.
 
-### 2.2 Trial Countdown
+### 2.2 Diagram Usage Indicator
 
-The trial badge in the header counts down daily. Thresholds:
-- > 7 days: neutral badge ("14 days left")
-- 4–7 days: orange badge ("6 days left — upgrade to keep access")
-- 1–3 days: red badge ("2 days left — upgrade now")
-- Expired: red badge ("Trial expired — upgrade to continue")
+The indicator in the header shows the user's private diagram count vs. the free limit.
 
-The countdown is computed from `subscriptions.trial_ends_at` relative to the current browser time.
+Thresholds (free users only; hidden for Pro users):
+- 0–3 diagrams: hidden (no badge)
+- 4/5 diagrams: orange badge ("4 of 5 diagrams used — upgrade for unlimited")
+- 5/5 diagrams: red badge ("5 of 5 diagrams used — upgrade to create more")
 
-### 2.3 Trial Feature Restrictions
+The count is fetched from `GET /api/v1/billing/subscription` → `private_diagram_count` / `private_diagram_limit`. Badge links to `/settings/billing`.
 
-During `trialing`:
-- Full editor access: ✓
-- All export formats: ✓
-- AI generation (with configured provider): ✓
-- All other features: ✓
+### 2.3 Diagram Limit Overlay
 
-On trial expiry (`plan = 'trial'`, `status = 'canceled'`):
-- AI generation: blocked (403 SUBSCRIPTION_REQUIRED on all AI endpoints)
-- Existing saved diagrams: read-only (can view, export, share — not edit spec)
-- Editor: shows a banner "Your trial has expired. Upgrade to continue editing."
-
-This state means an expired trial, not a canceled Pro subscription. A canceled Pro subscription remains `plan = 'pro'`, `status = 'active'`, `cancel_at_period_end = true` until access ends (DEC-025).
-
-**Read-only enforcement for expired users:** The frontend may proactively render read-only controls or an upgrade overlay, but the API gate is authoritative. The PATCH /api/v1/diagrams/{id} endpoint checks subscription status. If `status = 'canceled'`, spec updates are blocked with `403 SUBSCRIPTION_REQUIRED`. Title updates and archiving are still permitted.
+When a free user with 5 private diagrams tries to create a new private diagram:
+- API returns `403 DIAGRAM_LIMIT_REACHED`
+- The "New Diagram" flow shows an inline upgrade prompt: "You've used all 5 free diagrams. Upgrade to Pro for unlimited private diagrams."
+- An "Upgrade to Pro — $9/month" button opens the checkout flow.
+- The overlay is a UX layer — the API gate (F3 §5.5) is authoritative.
+- Existing diagrams remain fully editable; only creation of new private diagrams is blocked.
 
 ---
 
@@ -108,13 +100,14 @@ No request body.
 Service steps:
 ```
 1. Load user's subscriptions row
-2. If status = 'active' → return 400 ALREADY_SUBSCRIBED (no-op)
-3. Create Stripe Checkout Session:
+2. If plan = 'pro' AND status = 'active' → return 400 ALREADY_SUBSCRIBED (no-op)
+3. Create or retrieve Stripe Customer (F3 §5.3)
+4. Create Stripe Checkout Session:
    - price: STRIPE_PRICE_ID_PRO
    - customer: subscriptions.stripe_customer_id
    - success_url: https://<frontend>/settings/billing?session_id={CHECKOUT_SESSION_ID}
    - cancel_url: https://<frontend>/settings/billing?checkout=canceled
-4. Return session URL
+5. Return session URL
 ```
 
 Response:
@@ -152,23 +145,41 @@ If the user cancels at Stripe checkout, they are redirected to `/settings/billin
 
 Returns the current subscription state for the billing settings page.
 
+Free tier example:
 ```json
 {
   "data": {
-    "plan": "trial",
-    "status": "trialing",
-    "trial_ends_at": "2026-06-03T10:00:00Z",
+    "plan": "free",
+    "status": "active",
+    "private_diagram_count": 3,
+    "private_diagram_limit": 5,
     "current_period_start": null,
     "current_period_end": null,
     "cancel_at_period_end": false,
-    "access_ends_at": "2026-06-03T10:00:00Z",
-    "canceled_at": null,
-    "days_remaining": 14
+    "access_ends_at": null,
+    "canceled_at": null
   }
 }
 ```
 
-`days_remaining`: computed server-side from `trial_ends_at - now()` for trialing; null for non-trial plans.
+Pro example:
+```json
+{
+  "data": {
+    "plan": "pro",
+    "status": "active",
+    "private_diagram_count": 47,
+    "private_diagram_limit": null,
+    "current_period_start": "2026-05-20T00:00:00Z",
+    "current_period_end": "2026-06-20T00:00:00Z",
+    "cancel_at_period_end": false,
+    "access_ends_at": null,
+    "canceled_at": null
+  }
+}
+```
+
+`private_diagram_count`: computed server-side (COUNT of non-archived diagrams owned by user). `private_diagram_limit`: `5` for free users, `null` for Pro (unlimited).
 
 ---
 
@@ -204,13 +215,13 @@ Frontend redirects to `portal_url`. Stripe hosts the portal page.
 
 Cancellation is handled via the Stripe Billing Portal (§5). The user navigates to the portal, cancels the subscription, and Stripe fires:
 
-- `customer.subscription.updated` with `cancel_at_period_end=true` → webhook keeps `subscriptions.status = 'active'`, sets `cancel_at_period_end = true`, and sets `access_ends_at = current_period_end`
-- `customer.subscription.deleted` when access actually ends → webhook updates `subscriptions.status = 'canceled'`, sets `canceled_at = now()`
+- `customer.subscription.updated` with `cancel_at_period_end=true` → webhook keeps `plan='pro'`, `status='active'`, sets `cancel_at_period_end=true`, sets `access_ends_at=current_period_end`
+- `customer.subscription.deleted` when access actually ends → webhook reverts to `plan='free'`, `status='active'`, clears `stripe_subscription_id`, sets `canceled_at=now()` (DEC-034)
 - Emit `SUBSCRIPTION_CANCELED` audit event (F3 §3.2)
 
-After cancel-at-period-end, the user retains active access until `access_ends_at` (Stripe's standard behavior). The frontend shows: "Your Pro subscription will end on <date>. After that, you'll lose editing and AI access."
+After cancel-at-period-end, the user retains full Pro access until `access_ends_at`. The frontend shows: "Your Pro subscription will end on <date>. After that, you'll return to the free tier."
 
-Diagram data is never deleted on cancellation.
+On revert to free, diagrams beyond the 5-private limit become read-only. Diagram data is never deleted.
 
 ---
 
@@ -222,44 +233,50 @@ When a renewal payment fails, Stripe retries according to its retry schedule and
 The frontend shows a persistent "Your payment failed" banner on the billing page with a [Manage Billing] button (→ portal).
 
 After all retries exhausted, Stripe fires `customer.subscription.deleted`:
-- Sets `status = 'canceled'`
-- Same access restrictions as trial expiry apply
+- Webhook reverts to `plan='free'`, `status='active'` (DEC-034)
+- User retains free tier access; diagrams beyond the 5-private limit become read-only
 
 ---
 
 ## 8. Resubscription
 
-A user with `status = 'canceled'` can resubscribe:
-- The `POST /api/v1/billing/checkout-session` endpoint works for canceled users (only blocked for `status = 'active'`).
-- On successful checkout, `status` updates to `active` and AI features are immediately re-enabled.
+A user on `plan='free'` (whether they started free or were reverted from Pro) can upgrade to Pro at any time:
+- `POST /api/v1/billing/checkout-session` is available to all free users (blocked only for active Pro: `plan='pro'`, `status='active'`, `cancel_at_period_end=false`).
+- On successful checkout, `plan` updates to `'pro'`, `status` to `'active'`, and all Pro features are immediately re-enabled.
+- Diagrams that were read-only due to the free tier limit become editable again once upgraded.
 
-If `plan = 'pro'`, `status = 'active'`, and `cancel_at_period_end = true`, the user still has active access and does not use the checkout-session resubscribe flow. They use Stripe Billing Portal to resume/reactivate renewal before `access_ends_at`. When Stripe sends `customer.subscription.updated` with `cancel_at_period_end=false`, the webhook clears `cancel_at_period_end` and `access_ends_at`.
+If `plan = 'pro'`, `status = 'active'`, and `cancel_at_period_end = true`, the user still has active Pro access. They use the Stripe Billing Portal to reactivate renewal before `access_ends_at`. When Stripe sends `customer.subscription.updated` with `cancel_at_period_end=false`, the webhook clears `cancel_at_period_end` and `access_ends_at`.
 
 ---
 
 ## 9. Billing Settings Page (`/settings/billing`)
 
-### 9.1 Trialing State
+### 9.1 Free Tier State (`plan='free'`)
 
 ```
 +------------------------------------------------------------------+
 | Subscription                                                     |
 +------------------------------------------------------------------+
-| Plan: Free Trial                                                 |
-| Status: Trialing                                                 |
-| Trial ends: June 3, 2026 (14 days remaining)                    |
+| Plan: Free                                                       |
+| Private diagrams: 3 of 5 used                                   |
 |                                                                  |
-| [Upgrade to Pro — $X/month]                                     |
+| [Upgrade to Pro — $9/month]                                     |
 |                                                                  |
 | What's included in Pro:                                          |
+| ✓ Unlimited private diagrams                                     |
 | ✓ AI generation with your own API key (BYOK)                     |
-| ✓ Unlimited diagrams                                             |
-| ✓ All export formats                                             |
-| ✓ Version history                                                |
+| ✓ All export formats + Documentation Bundle (.zip)               |
+| ✓ Unlimited version history                                      |
+| ✓ No Diagram Alley branding on public links                      |
 +------------------------------------------------------------------+
 ```
 
-### 9.2 Active Pro State
+When `private_diagram_count = 5`, the count line changes to:
+```
+| Private diagrams: 5 of 5 used (limit reached)                  |
+```
+
+### 9.2 Active Pro State (`plan='pro'`, `status='active'`)
 
 ```
 +------------------------------------------------------------------+
@@ -277,26 +294,28 @@ If `cancel_at_period_end = true`, replace the renewal line with:
 
 ```
 | Ends: June 20, 2026                                              |
-| Your Pro access remains active until this date.                  |
+| After this date you'll return to the free tier.                  |
 ```
 
-### 9.3 Expired / Canceled State
+### 9.3 Reverted to Free After Pro (`plan='free'`, `canceled_at` is set)
+
+Shown when a user was previously Pro and was reverted to free via cancellation or payment failure:
 
 ```
 +------------------------------------------------------------------+
 | Subscription                                                     |
 +------------------------------------------------------------------+
-| Plan: Free Trial                                                 |
-| Status: Expired                                                  |
+| Plan: Free                                                       |
+| Private diagrams: 5 of 5 used                                   |
 |                                                                  |
-| Your trial has ended. Upgrade to continue editing and using AI. |
-| Your diagrams are safe and will remain accessible.              |
+| Your Pro subscription has ended. Your diagrams are safe.        |
+| Diagrams beyond the free limit are read-only.                   |
 |                                                                  |
-| [Upgrade to Pro — $X/month]                                     |
+| [Upgrade to Pro — $9/month]                                     |
 +------------------------------------------------------------------+
 ```
 
-### 9.4 Past Due State
+### 9.4 Past Due State (`plan='pro'`, `status='past_due'`)
 
 ```
 +------------------------------------------------------------------+
@@ -321,12 +340,14 @@ None. All D7 decisions are locked.
 
 ## Acceptance Criteria
 
-- `POST /api/v1/billing/checkout-session` returns a Stripe Checkout URL for a trialing user.
-- `POST /api/v1/billing/checkout-session` returns `400 ALREADY_SUBSCRIBED` for an active Pro user.
-- A `checkout.session.completed` webhook with a valid signature updates `subscriptions.status` to `active`.
-- A `customer.subscription.updated` webhook with `cancel_at_period_end=true` keeps `status='active'` and sets `access_ends_at = current_period_end`.
-- A `customer.subscription.deleted` webhook updates `subscriptions.status` to `canceled`.
-- `GET /api/v1/billing/subscription` returns `days_remaining = 14` for a newly created trial user.
-- `PATCH /api/v1/diagrams/{id}` with spec changes by a `status='canceled'` user returns `403 SUBSCRIPTION_REQUIRED`.
-- The billing page shows the correct state for trialing, active, past_due, and canceled subscriptions.
+- `POST /api/v1/billing/checkout-session` returns a Stripe Checkout URL for a free tier user.
+- `POST /api/v1/billing/checkout-session` returns `400 ALREADY_SUBSCRIBED` for an active Pro user (`plan='pro'`, `status='active'`, `cancel_at_period_end=false`).
+- A `checkout.session.completed` webhook with a valid signature updates `subscriptions` to `plan='pro'`, `status='active'`.
+- A `customer.subscription.updated` webhook with `cancel_at_period_end=true` keeps `status='active'` and sets `access_ends_at=current_period_end`.
+- A `customer.subscription.deleted` webhook reverts `subscriptions` to `plan='free'`, `status='active'`.
+- `GET /api/v1/billing/subscription` returns `private_diagram_count=0`, `private_diagram_limit=5` for a newly registered free user.
+- `GET /api/v1/billing/subscription` returns `private_diagram_limit=null` for an active Pro user.
+- The diagram usage badge shows orange at 4/5 and red at 5/5 for free users; hidden for Pro users.
+- The billing page shows the correct state for free, active Pro, past_due, and cancel-at-period-end subscriptions.
 - After checkout cancellation, the subscriptions row is unchanged and a cancellation banner is shown.
+- A free user who upgrades to Pro and then cancels sees the "returning to free tier" message while `cancel_at_period_end=true`.

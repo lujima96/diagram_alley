@@ -55,7 +55,7 @@ Write in the order listed. Each spec depends on the foundation specs shown.
 | D6 | `specs/D6-sharing-publishing.md` | Public share links, embed, view-only access | **Draft 0.1** | F1, F3, F5 |
 | D7 | `specs/D7-billing-subscription.md` | Free trial, Pro subscription, Stripe checkout, upgrade/downgrade, trial expiry | **Draft 0.1** | F1, F3, F5 |
 | A1 | `specs/A1-admin-console.md` | User management, audit log review, subscription overrides, support tools, bulk export | **Draft 0.1** | F1, F3 |
-| D8 | `specs/D8-github-integration.md` | GitHub OAuth, repo selection, commit diagram spec+exports, open PR workflow — **stretch goal; write only after D1–D7 and A1 are complete** | Planned | F1, F3, F5 |
+| D8 | `specs/D8-github-integration.md` | GitHub OAuth, repo selection, commit diagram spec+exports to repo — **V1 scope (DEC-036)** | **Draft 0.1** | F1, F3, F5 |
 
 ---
 
@@ -194,7 +194,7 @@ One slice file per spec. Format defined by DEC-033. Files live in `specs/slices/
 | `specs/slices/slice-D6.md` | D6 — Sharing and publishing | **Done** |
 | `specs/slices/slice-D7.md` | D7 — Billing and subscription | **Done** |
 | `specs/slices/slice-A1.md` | A1 — Admin console | **Done** |
-| `specs/slices/slice-D8.md` | D8 — GitHub integration (stretch; write last) | Planned |
+| `specs/slices/slice-D8.md` | D8 — GitHub integration (V1 scope per DEC-036) | **Done** |
 
 ---
 
@@ -272,3 +272,7 @@ Quick lookup for "who owns this concept." If a concept is not listed here, add i
 | Subscription override | A1 |
 | Audit log query interface | A1 |
 | GitHub integration | D8 |
+| GitHub connection storage | D8 |
+| Commit operation | D8 |
+| Export Pack | D4 |
+| Free tier limits | F3 |

@@ -184,24 +184,40 @@ The workspace is the most complex page. It must be specced before any domain UI 
 
 ### 5.1 Panel Arrangement
 
+The workspace has three main panels. The center panel is the primary editing surface (DEC-044):
+
 ```
 +------------------------------------------------------------------+
 | Header: [Logo] [Project / Diagram name] [Save] [Export] [...]   |
 +------------------------------------------------------------------+
-| Prompt panel  | Visual Grid Editor (React Flow)  | Preview panel |
-| (300px)       | (flex, fills remaining width)    | (320px)       |
-|               |                                   |               |
-|               |                                   | [ASCII]       |
-|               |                                   | [Mermaid]     |
-|               |                                   | [Visual]      |
-|               |                                   | [JSON/YAML]   |
-|               |                                   |               |
-|               |                                   | [Copy] [DL]   |
+| Prompt panel  | [Visual] [Spec]          | Preview panel         |
+| (300px)       | Center panel             | (320px)               |
+|               | (flex, fills remaining)  |                       |
+|               |                          | [ASCII]               |
+| AI/prompt     | — Visual mode:           | [Mermaid]             |
+| textarea      |   React Flow grid editor | [Visual]              |
+| [Generate]    |                          | [JSON/YAML]           |
+| [Improve]     | — Spec mode:             |                       |
+|               |   CodeMirror YAML/JSON   | [Copy] [DL]           |
+|               |   (live, synced)         |                       |
 +------------------------------------------------------------------+
 | Inspector panel (full width, collapsible, 200px default height)  |
-| Node/edge properties | Validation warnings | Spec escape hatch   |
+| Node/edge properties | Validation warnings                       |
 +------------------------------------------------------------------+
 ```
+
+**Center panel modes (DEC-044):** The `[Visual]` / `[Spec]` tab toggles between:
+- **Visual mode** — React Flow structural editor; add/remove/rename nodes and edges, connect nodes, group nodes, change direction, reorder within rows, assign layout hints. Drag snaps to grid cells — the layout engine owns final positioning (DEC-046).
+- **Spec mode** — CodeMirror 6 editor showing the full live spec in YAML (default) or JSON; syntax highlighting, inline validation markers, format button.
+
+**Source of truth (DEC-047):** `diagramStore.spec_json` is always canonical. Every editing path produces a spec change:
+```
+AI prompt    → spec (full replacement)
+visual edit  → spec patch (structural change)
+spec edit    → spec update (direct)
+spec         → all outputs (Mermaid, SVG, PNG, ASCII, Markdown are derived, not editable)
+```
+Switching from Spec mode to Visual mode re-renders from the current spec. There is no bidirectional sync between outputs and the spec — outputs are always regenerated. The Spec mode is not an "escape hatch" — it is a first-class primary interface for developers who prefer editing structured data directly.
 
 Panel resizing: the side panels have drag handles. Minimum widths: Prompt 240px, Preview 260px, Editor 400px.
 
@@ -244,14 +260,15 @@ Contents per tab:
 - **ASCII:** monospace `<pre>` block, horizontal scroll, line/char count, Copy button, Download button
 - **Mermaid:** monospace block, Copy button, Download button; "Not available for this diagram type" for wireframe/file structure
 - **Visual:** React Flow in read-only mode (no drag), Export SVG button, Export PNG button
-- **JSON/YAML:** CodeMirror read-only (editable in inspector panel escape hatch)
+- **JSON/YAML:** CodeMirror read-only preview (full editable spec editor is in the center panel Spec tab)
 
 ### 5.5 Inspector Panel
 
 Tabs:
-- **Selection:** When a node or edge is selected in the React Flow editor, shows its editable properties (label, kind for nodes; label, style for edges)
+- **Selection:** When a node or edge is selected in the Visual grid editor, shows its editable properties (label, kind for nodes; label, style for edges)
 - **Validation:** Live validation status: error list, warning list, auto-fix button
-- **Spec editor:** CodeMirror 6 with JSON syntax highlighting; format button, validate button, apply changes button. This is the "escape hatch" for power users.
+
+The full spec editor is in the center panel's Spec tab (DEC-044). The inspector does not duplicate it.
 
 ---
 
@@ -308,14 +325,19 @@ Each Diagram Spec edge becomes a React Flow edge:
 }
 ```
 
-### 6.3 React Flow Node → Spec Round-Trip
+### 6.3 React Flow Node → Spec Round-Trip (DEC-046, DEC-047)
+
+The visual editor is a structural editor. Dragging a node sets a layout hint in the spec (`position.col`, `position.row`); the layout engine may adjust adjacent nodes to satisfy invariants (no overlap, consistent spacing). The spec is always the authority.
 
 When the user drags a node, the `onNodeDragStop` callback:
 1. Receives the new `position: { x, y }` from React Flow
 2. Converts to grid: `col = Math.round((x - 40) / 220)`, `row = Math.round((y - 40) / 120)`
-3. Updates the Zustand `diagramStore` with the new `position` on the corresponding node
-4. Triggers a debounced `spec_json` patch to the backend (300ms debounce)
-5. Triggers an ASCII re-render (async, non-blocking)
+3. Runs conflict check: if the target cell is occupied, bumps the conflicting node to the nearest free cell
+4. Updates the Zustand `diagramStore` spec with the new `position` on the affected nodes
+5. Triggers a debounced `spec_json` patch to the backend (300ms debounce)
+6. Triggers an ASCII re-render (async, non-blocking)
+
+React Flow's internal `x, y` pixel positions are derived from the spec on every render — they are never persisted as primary state (DEC-047).
 
 ### 6.4 Custom Node Components
 

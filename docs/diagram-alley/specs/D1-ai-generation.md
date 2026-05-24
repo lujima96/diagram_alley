@@ -345,7 +345,17 @@ Ollama and llama.cpp adapters follow the same ProviderAdapter protocol. Configur
 - `model`: model name (for logging; llama.cpp serves one model at a time)
 - Optional `api_key_encrypted` if the server is configured with auth
 
-**Browser-direct:** Not supported in V1. All provider calls go through the backend. This prevents CORS issues and keeps credentials server-side.
+**Routing (DEC-048):** Routing depends on the `base_url` of the configured provider:
+
+| Provider | `base_url` | Call origin | Reason |
+|----------|-----------|-------------|--------|
+| OpenAI / Anthropic / OpenAI-compatible | Any (cloud endpoint) | Backend | API key must not reach browser |
+| Remote Ollama | Public URL / VPS / Docker | Backend | Backend can reach it; consistent with cloud routing |
+| Local Ollama | `127.0.0.1` or `::1` (localhost) | **Browser direct** | Backend cannot reach user's localhost; no API key to protect |
+
+For local Ollama (`base_url` resolves to a loopback address), the frontend calls `{base_url}/api/chat` directly from the browser. Ollama handles CORS for local connections. The backend stores the provider config (base_url, model) but does not proxy the call.
+
+**Security implication:** Local Ollama requires no API key — there is nothing sensitive to protect. The "all API keys are encrypted server-side" guarantee applies to cloud providers only. The product should make this distinction explicit in the provider settings UI.
 
 ---
 

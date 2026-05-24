@@ -22,7 +22,7 @@ status: planned
 
 2. **Refresh token cookie delivery** — Configure FastAPI Users to set an httpOnly, Secure, SameSite=Lax cookie for the refresh token on login. Access token is returned in the response body only — not set as a cookie. Confirm a login response sets the cookie and a `/auth/refresh` call with the cookie returns a new access token and rotates the refresh token. (→ F3 §1.1)
 
-3. **`on_after_register` hook** — In `UserManager.on_after_register`, create a Stripe Customer (via `stripe.Customer.create(email=user.email, metadata={"user_id": str(user.id)})`), create the `subscriptions` row (`plan='trial'`, `status='trialing'`, `trial_ends_at=now()+14d`, `access_ends_at=trial_ends_at`, `stripe_customer_id=<id>`), create the `user_settings` row with defaults, and emit the `SUBSCRIPTION_TRIAL_STARTED` and `USER_REGISTERED` audit events. (→ F3 §5.2, F1 §4.9, DEC-010)
+3. **`on_after_register` hook** — In `UserManager.on_after_register`, create the `subscriptions` row (`plan='free'`, `status='active'`, no `trial_ends_at`, no Stripe interaction), create the `user_settings` row with defaults, and emit the `USER_REGISTERED` audit event. Stripe Customer creation is deferred to the first checkout session (F3 §5.3). (→ F3 §5.2, F1 §4.9, DEC-034)
 
 4. **Audit log write helper** — Create `app/services/audit_service.py::log_event(db, event, entity_type, entity_id, user_id, detail, ip_address)`. Uses the event constants from F3 §3.2, stored as string literals in `app/constants/audit_events.py`. Confirm appending a row and that no update/delete paths exist on the audit log. (→ F3 §3.1–3.3)
 
@@ -32,25 +32,27 @@ status: planned
 
 7. **Superuser guard** — Create a `require_superuser(current_user)` dependency that raises HTTP 403 if `user.is_superuser` is false. Apply to all `/api/v1/admin/*` routes. (→ F3 §2.2)
 
-8. **Subscription feature gate** — Implement `require_active_subscription(user, db)` in `app/services/billing_service.py` exactly as specified in F3 §5.5: check `sub.status in ('trialing', 'active')` and `sub.access_ends_at > now()`. Raises `SubscriptionRequiredError` caught by the API layer as `403 SUBSCRIPTION_REQUIRED`. Apply to AI generation endpoints only in this slice; domain specs wire it to their own endpoints. (→ F3 §5.5)
+8. **Subscription feature gate** — Implement four gate functions in `app/services/billing_service.py` per F3 §5.5: `require_verified(user)` (blocks diagram creation and AI for unverified users), `require_diagram_quota(user, db)` (counts non-archived private diagrams; raises `DiagramLimitError` → `403 DIAGRAM_LIMIT_REACHED` at 5 for free users), `require_pro(user, db)` (raises `PlanRequiredError` → `403 PLAN_REQUIRED` for free users; applied to JSON/YAML/ASCII/Markdown export and GitHub commit), `require_active_for_ai(user, db)` (checks verified + active status). Apply diagram quota gate to diagram creation endpoints; apply AI gate to AI generation endpoints; apply Pro gate to blueprint export and GitHub commit endpoints. (→ F3 §5.5, DEC-034, DEC-038, DEC-039)
 
-9. **Stripe webhook handler** — Implement `POST /webhooks/stripe` in `app/api/webhooks.py`. Verify signature with `stripe.Webhook.construct_event`. Dispatch on event type per F3 §5.4: `checkout.session.completed`, `invoice.payment_succeeded`, `invoice.payment_failed`, `customer.subscription.updated`, `customer.subscription.deleted`. Handler must be idempotent — processing the same event twice must produce the same DB state. Emit the appropriate audit event for each. (→ F3 §5.4)
-
-10. **Trial expiry job** — Create a simple daily check in `app/jobs/expire_trials.py`: query `subscriptions` rows where `plan='trial'`, `status='trialing'`, `trial_ends_at <= now()`, update `status='canceled'`, emit `SUBSCRIPTION_EXPIRED`. Wire as a FastAPI startup background task or, preferably, as a Fly.io cron machine (one daily `fly machine run` invocation). (→ F3 §5.2)
+9. **Stripe webhook handler** — Implement `POST /webhooks/stripe` in `app/api/webhooks.py`. Verify signature with `stripe.Webhook.construct_event`. Dispatch on event type per F3 §5.4: `checkout.session.completed` (upgrade to Pro), `invoice.payment_succeeded` (extend period), `invoice.payment_failed` (past_due), `customer.subscription.updated` (cancel_at_period_end), `customer.subscription.deleted` (revert to `plan='free', status='active'`). Handler must be idempotent — processing the same event twice must produce the same DB state. Emit the appropriate audit event for each. (→ F3 §5.4, DEC-034)
 
 ---
 
 ## Done Criteria
 
-- [ ] `POST /auth/register` creates a user with `is_verified = false` and a `subscriptions` row with `status = 'trialing'`. (→ F3 Acceptance Criteria)
+- [ ] `POST /auth/register` creates a user with `is_verified = false` and a `subscriptions` row with `plan = 'free'`, `status = 'active'` (no `trial_ends_at`). (→ F3 Acceptance Criteria, DEC-034)
 - [ ] `POST /auth/login` returns an access token (response body) and sets a `refresh_token` httpOnly cookie. Access token expires in 15 minutes. (→ F3 Acceptance Criteria)
 - [ ] A request with an expired access token but a valid refresh cookie receives a new access token from `POST /auth/refresh`. (→ F3 Acceptance Criteria)
 - [ ] `POST /auth/refresh` with an already-used refresh token returns 401 (rotation enforced). (→ F3 Acceptance Criteria)
 - [ ] `GET /api/v1/diagrams` without a token returns 401. (→ F3 Acceptance Criteria)
 - [ ] Accessing a diagram owned by a different user returns 403 `FORBIDDEN`. (→ F3 Acceptance Criteria)
 - [ ] `model_providers.api_key_encrypted` decrypts to the original API key using the server's encryption key. (→ F3 Acceptance Criteria)
-- [ ] A user with `status = 'canceled'` calling a gated AI endpoint receives 403 `SUBSCRIPTION_REQUIRED`. (→ F3 Acceptance Criteria)
-- [ ] A Stripe `checkout.session.completed` webhook with a valid signature updates the subscription to `status = 'active'`. (→ F3 Acceptance Criteria)
+- [ ] A free user who already has 5 private diagrams calling `POST /api/v1/diagrams` receives 403 `DIAGRAM_LIMIT_REACHED`. (→ F3 Acceptance Criteria, DEC-034)
+- [ ] A free user calling `POST /api/v1/diagrams/{id}/export` with `format=json` receives 403 `PLAN_REQUIRED`. (→ DEC-038)
+- [ ] A free user calling `POST /api/v1/diagrams/{id}/github-commit` receives 403 `PLAN_REQUIRED`. (→ DEC-039)
+- [ ] An unverified user calling `POST /api/v1/diagrams` receives 403 `EMAIL_VERIFICATION_REQUIRED`. (→ F3 Acceptance Criteria)
+- [ ] A Stripe `checkout.session.completed` webhook with a valid signature updates the subscription to `plan = 'pro'`, `status = 'active'`. (→ F3 Acceptance Criteria)
+- [ ] A `customer.subscription.deleted` webhook reverts the subscription to `plan = 'free'`, `status = 'active'`. (→ F3 Acceptance Criteria, DEC-034)
 - [ ] A Stripe webhook with an invalid signature returns 400 without processing. (→ F3 §5.4)
 - [ ] Processing the same Stripe webhook event twice produces the same DB state (idempotency). (→ FM-04)
 - [ ] Audit log rows are never updated or deleted — only appended. Confirmed by absence of update/delete code paths. (→ F3 §3.3)

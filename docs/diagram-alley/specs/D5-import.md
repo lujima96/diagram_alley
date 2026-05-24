@@ -36,16 +36,20 @@ Import endpoint contract; format detection logic; Mermaid-to-spec converter (flo
 
 ## 1. Supported Import Formats
 
+**Mermaid import promise (scoped):** Diagram Alley supports a common subset of Mermaid syntax. Mermaid has a broad feature set; full import of every construct is not a V1 goal. Unsupported Mermaid features produce import warnings and are dropped; the resulting diagram may require manual cleanup. The product should not promise "full Mermaid import."
+
 | Format | `input_format` value | Scope | Notes |
 |--------|---------------------|-------|-------|
-| Mermaid flowchart | `mermaid` | Best-effort; DEC-006 | Supports `flowchart TD/LR` only; unsupported constructs produce warnings |
-| Mermaid ER | `mermaid` | Best-effort; DEC-006 | Supports `erDiagram` only |
+| Mermaid flowchart | `mermaid` | **Limited — common subset only** | `flowchart TD/LR` with nodes, edges, and basic labels; unsupported constructs (subgraphs with complex nesting, click handlers, style definitions) produce warnings and are dropped |
+| Mermaid ER | `mermaid` | **Limited — common subset only** | `erDiagram` with entity definitions and relationships; attribute types preserved as labels |
 | JSON spec | `json` | Full fidelity | Must conform to F1 §3 schema |
 | YAML spec | `yaml` | Full fidelity | Same as JSON spec; re-serialized to JSON before processing |
 
-**Not supported in V1:**
-- Mermaid sequence, state, class, gantt, etc. → `400 IMPORT_UNSUPPORTED_FORMAT`
-- Lucidchart, draw.io, PlantUML → `400 IMPORT_UNSUPPORTED_FORMAT`
+**Not supported in V1 (returns `400 IMPORT_UNSUPPORTED_FORMAT`):**
+- Mermaid sequence diagrams, state diagrams, class diagrams, gantt charts, pie charts, etc.
+- Lucidchart, draw.io, PlantUML
+
+**Import → spec:** Mermaid import produces a Diagram Alley spec. The spec is what gets edited. The original Mermaid text is not stored. If the import produced warnings, the user edits the spec to fix what was dropped — they do not re-edit the Mermaid source.
 
 ---
 

@@ -59,16 +59,17 @@ The backend checks `spec_version` on load via a version-dispatch table. If the s
 
 ## 2. Diagram Types
 
-Six types are defined in V1. Each has its own JSON schema (§3). `diagram_type` values are snake_case strings:
+Five types are defined in V1 (DEC-035). Each has its own JSON schema (§3). `diagram_type` values are snake_case strings:
 
 | Value | Display name |
 |-------|-------------|
 | `architecture` | Architecture Diagram |
 | `database` | Database Schema |
 | `flowchart` | Flowchart |
-| `ui_wireframe` | UI Wireframe |
 | `file_structure` | File Structure |
 | `network` | Network Diagram |
+
+`ui_wireframe` is deferred to V2 (DEC-035).
 
 ---
 
@@ -215,28 +216,7 @@ generic
 
 ---
 
-### 3.4 UI Wireframe
-
-```json
-{
-  "spec_version": "1.0",
-  "diagram_type": "ui_wireframe",
-  "title": "string (required)",
-  "root": {
-    "id": "string (required, unique within spec)",
-    "kind": "page | header | sidebar | main | footer | card | table | form | button | input | text | container | nav",
-    "label": "string (required)",
-    "layout": "column | row | null",
-    "children": [ "...recursive component objects..." ]
-  }
-}
-```
-
-**Component tree:** The `root` is always `kind: page`. Children can be nested to any depth but the renderer only supports meaningful depth ≤ 4 in V1. Deeper nesting is accepted without error but may not render readably.
-
----
-
-### 3.5 File Structure
+### 3.4 File Structure
 
 ```json
 {
@@ -255,7 +235,7 @@ generic
 
 ---
 
-### 3.6 Network Diagram
+### 3.5 Network Diagram
 
 ```json
 {
@@ -340,7 +320,7 @@ generic
 | `project_id` | UUID | FK → projects.id, NOT NULL | Parent project |
 | `team_id` | UUID | NULLABLE | V2 forward compat (DEC-009) |
 | `title` | TEXT | NOT NULL, max 255 | Diagram title |
-| `diagram_type` | TEXT | NOT NULL | One of six type values (§2) |
+| `diagram_type` | TEXT | NOT NULL | One of five type values (§2) |
 | `spec_json` | JSONB | NOT NULL | The canonical Diagram Spec |
 | `spec_version` | TEXT | NOT NULL | e.g. `"1.0"` |
 | `ascii_cache` | TEXT | NULLABLE | Cached ASCII render (invalidated on spec change) |
@@ -369,7 +349,7 @@ generic
 | `created_at` | TIMESTAMPTZ | NOT NULL, default now() | Version timestamp |
 
 **Index:** `(diagram_id, created_at DESC)` for version list queries.
-**Retention:** No automatic pruning in V1. Soft limit of 100 versions per diagram (enforced at write time; oldest version is pruned if over limit).
+**Retention (DEC-040):** Free users: versions older than 14 days are pruned automatically (rolling window). Pro users: unlimited retention. Hard limit for both plans: 500 versions per diagram (oldest pruned on write if exceeded).
 **Immutability:** Versions are never updated or deleted by normal flows. A restore operation creates a new version with the restored spec; it does not overwrite history.
 
 ---
@@ -389,6 +369,22 @@ generic
 | `is_public` | BOOLEAN | NOT NULL, default false | V2 marketplace — always false in V1 |
 | `created_at` | TIMESTAMPTZ | NOT NULL, default now() | — |
 | `updated_at` | TIMESTAMPTZ | NOT NULL, default now() | — |
+
+**V1 system templates (`is_system=true`):** The following developer-specific templates ship with V1 to give users immediate value. All are available on both Free and Pro plans:
+
+| Title | `diagram_type` | Description |
+|-------|---------------|-------------|
+| React + FastAPI + PostgreSQL | `architecture` | Three-tier web app: React frontend, FastAPI service, PostgreSQL database |
+| Microservice Architecture | `architecture` | Multiple services with API gateway, message queue, and shared database |
+| Authentication Flow | `flowchart` | User login, JWT issuance, token refresh, and logout steps |
+| CI/CD Pipeline | `flowchart` | Commit → build → test → staging → production deployment |
+| API Request Lifecycle | `flowchart` | HTTP request through middleware, auth, route handler, and response |
+| Database ERD (Starter) | `database` | Users, sessions, and audit_log tables with relationships |
+| Monorepo File Structure | `file_structure` | Frontend, backend, and shared packages in a monorepo layout |
+| Docker Compose App | `architecture` | App container, database container, reverse proxy, and volumes |
+| Cloud Deployment | `network` | Load balancer, app servers, managed database, and CDN |
+
+**Pro-only advanced templates:** High-fidelity starting points for complex systems (multi-region deployment, event-driven architecture, full SaaS stack). Added in V1.1+ as the template library grows.
 
 ---
 
@@ -455,12 +451,11 @@ Stores public share links for diagrams. One active link per diagram enforced at 
 |--------|------|-------------|-------------|
 | `id` | UUID | PK | — |
 | `user_id` | UUID | FK → users.id, NOT NULL, UNIQUE | One active subscription per user |
-| `plan` | TEXT | NOT NULL | `trial \| pro` |
-| `status` | TEXT | NOT NULL | `trialing \| active \| past_due \| canceled \| incomplete` |
+| `plan` | TEXT | NOT NULL | `free \| pro` |
+| `status` | TEXT | NOT NULL | `active \| past_due \| canceled \| incomplete` |
 | `stripe_customer_id` | TEXT | NULLABLE | Stripe customer object ID |
 | `stripe_subscription_id` | TEXT | NULLABLE | Stripe subscription object ID |
-| `trial_ends_at` | TIMESTAMPTZ | NULLABLE | Trial expiry timestamp |
-| `current_period_start` | TIMESTAMPTZ | NULLABLE | Billing period start |
+| `current_period_start` | TIMESTAMPTZ | NULLABLE | Billing period start (null for free tier) |
 | `current_period_end` | TIMESTAMPTZ | NULLABLE | Billing period end |
 | `cancel_at_period_end` | BOOLEAN | NOT NULL, default false | True when Pro access remains active until `access_ends_at` after cancellation |
 | `access_ends_at` | TIMESTAMPTZ | NULLABLE | Time paid/trial access ends; for cancel-at-period-end this equals `current_period_end` |
@@ -468,9 +463,11 @@ Stores public share links for diagrams. One active link per diagram enforced at 
 | `created_at` | TIMESTAMPTZ | NOT NULL, default now() | — |
 | `updated_at` | TIMESTAMPTZ | NOT NULL, default now() | — |
 
-**Trial logic:** `status = 'trialing'`, `trial_ends_at` is set 14 days from registration, and `access_ends_at = trial_ends_at` (DEC-010). On expiry, a daily job updates `status` to `canceled` unless the user has upgraded.
+**Free tier logic (DEC-034):** New users start with `plan='free', status='active'`. No Stripe interaction required. Free tier is permanent and has no expiry. Feature limits (5 private diagrams, 14-day version history, Mermaid/PNG/SVG exports only) are enforced by the feature gate in F3 §5.5.
 
-**Cancellation logic:** Pro cancellation at period end keeps `status = 'active'`, sets `cancel_at_period_end = true`, and sets `access_ends_at = current_period_end` until access actually ends (DEC-025).
+**Upgrade logic:** When a user subscribes to Pro via Stripe checkout, `plan` updates to `'pro'` and `status` updates to `'active'` via webhook.
+
+**Cancellation and downgrade logic (DEC-025, DEC-034):** Pro cancellation at period end keeps `status = 'active'`, sets `cancel_at_period_end = true`, and sets `access_ends_at = current_period_end`. When `access_ends_at` is reached, `plan` reverts to `'free'` and `status` returns to `'active'`. Diagrams created during Pro that exceed the free tier private limit become read-only; they are not deleted.
 
 ---
 
@@ -525,18 +522,44 @@ A diagram in `created` state only exists in the browser — it has not been pers
 
 ### 5.2 Subscription States
 
+Free tier is the entry state; there is no time-limited trial (DEC-034).
+
 ```
-trialing → active       (user enters payment details and subscribes)
-trialing → canceled     (trial expires without payment)
-active   → past_due     (payment fails; Stripe retries)
-past_due → active       (payment retry succeeds)
-past_due → canceled     (all retries exhausted)
-active   → active       (user cancels at period end; cancel_at_period_end = true)
-active   → canceled     (access_ends_at reached or subscription deleted immediately)
-canceled → active       (user resubscribes)
+free     → pro          (user completes Stripe checkout; plan='pro', status='active')
+pro      → past_due     (payment fails; Stripe retries)
+past_due → pro          (payment retry succeeds)
+past_due → free         (all retries exhausted; plan reverts to 'free', status='active')
+pro      → pro          (user cancels at period end; cancel_at_period_end=true, status stays 'active')
+pro      → free         (access_ends_at reached; plan reverts to 'free', status='active')
+free     → pro          (canceled user resubscribes)
 ```
 
-### 5.3 Version Snapshot Triggers
+Note: `status='canceled'` is only a transient Stripe webhook state during Pro-to-free transition; once reverted the row settles to `plan='free', status='active'`.
+
+### 5.3 Plan Feature Gate (DEC-034)
+
+Enforcement logic lives in F3 §5.3. The table below defines the limits that F3 gates against:
+
+| Feature | Free (`plan='free'`) | Pro (`plan='pro'`) |
+|---------|----------------------|--------------------|
+| Private diagrams | 5 (hard cap) | Unlimited |
+| Public diagrams | Unlimited | Unlimited |
+| Basic exports (Mermaid, PNG, SVG) | Yes | Yes |
+| ASCII/Markdown copy (with attribution) | Yes | Yes (clean, no attribution) |
+| ASCII/Markdown file download | No | Yes |
+| Blueprint exports (JSON, YAML) | No | Yes |
+| Documentation Bundle (ZIP) | No | Yes |
+| GitHub commit | No | Yes |
+| BYOK AI generation | Yes | Yes |
+| Version history | 14-day rolling window | Unlimited |
+| Public share links | Yes (Diagram Alley branded) | Yes (unbranded) |
+| Advanced templates | No | Yes |
+
+When a free user reaches 5 private diagrams, diagram creation is blocked at the API layer and a `USER_FREE_TIER_LIMIT_REACHED` audit event is emitted. Existing diagrams are never deleted.
+
+---
+
+### 5.4 Version Snapshot Triggers
 
 A new `diagram_versions` row is created when:
 1. User clicks "Save" explicitly.
@@ -544,7 +567,7 @@ A new `diagram_versions` row is created when:
 3. User triggers an AI modification and accepts the result.
 4. User restores a previous version (creates pre-restore and restored snapshots).
 
-A version is **not** created on every keystroke, every render call, or on live auto-save. Auto-save (D2 §5.3) persists the spec via PATCH without creating a version row (DEC-021).
+A version is **not** created on every keystroke, every render call, or on live auto-save. Auto-save (D2 §5.3) persists the spec via PATCH without creating a version row (DEC-021). Free tier users have a 14-day rolling window; versions older than 14 days are pruned (DEC-040). Pro users have unlimited retention up to the 500-version hard limit.
 
 ---
 
@@ -573,4 +596,5 @@ None. All field names in §3 have been verified consistent with F2 validation ru
 - A V1.0 architecture spec loaded from `diagrams.spec_json` passes `spec_version` check and reaches the renderer without error.
 - Creating a user, project, diagram, and version via the API produces rows in all four tables with correct foreign keys.
 - `is_default = true` on `model_providers` is unique per user (partial index enforced; second default insert raises a database error).
-- A `subscriptions` row with `status = 'trialing'` and `trial_ends_at = now() + 14 days` is created automatically on user registration.
+- A `subscriptions` row with `plan = 'free'` and `status = 'active'` is created automatically on user registration (no `trial_ends_at`).
+- A free user who creates a 6th private diagram receives a `403 DIAGRAM_LIMIT_REACHED` error; no diagram row is created.

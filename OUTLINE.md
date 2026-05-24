@@ -2876,47 +2876,46 @@ When using AI to modify an existing diagram, users should be able to preview and
 
 ---
 
-## 22. Suggested Commercial Pricing Direction
+## 22. Commercial Pricing Direction
 
-The current recommended direction is a recurring SaaS subscription with a free trial.
+**Status: Locked.** Pricing model decided via DEC-034 and DEC-037.
 
-### 22.1 Free Trial
+The V1 pricing model is a permanent free tier + Pro subscription.
 
-Purpose:
+### 22.1 Free Tier (DEC-034)
 
-Let developers and technical writers validate the workflow before paying.
+Replaces the original 14-day trial concept (DEC-010 superseded by DEC-034).
 
-Trial should include:
+Free tier includes:
 
-* Core editor access
-* Unlimited saved diagrams during the 14-day trial
-* No hosted AI credits in V1; AI requires BYOK or local model setup
-* Local provider and BYOK setup where practical
-* Full export access
+* 5 private diagrams (hard cap)
+* Unlimited public diagrams
+* Full export access (all formats)
+* BYOK AI generation (OpenAI-compatible, Anthropic, Ollama/llama.cpp)
+* 10 version snapshots per diagram
+* No expiry — permanent
 
-**Resolved decision:** Trial limits are locked by DEC-010: 14 days, unlimited saved diagrams, no hosted AI credits, full editor/export access during trial.
+No hosted AI credits in V1; AI requires BYOK or local model setup (DEC-010).
 
-### 22.2 Pro Subscription
+### 22.2 Pro Subscription — $9/month (DEC-037)
 
 Primary paid plan.
 
-Should include:
+Includes:
 
-* Saved projects and diagrams
-* Version history
-* All major exports
-* Built-in and user-created templates
-* AI generation and modification
-* Local provider support
-* BYOK cloud provider support
-* Optional hosted AI usage allowance if offered
-* GitHub commit/PR integration (stretch goal for V1)
+* Unlimited private diagrams
+* Full export bundle + Export Pack zip
+* Unlimited version history
+* Advanced templates
+* No Diagram Alley branding on public share links
+* GitHub commit integration (V1 scope per DEC-036)
+* BYOK AI generation
 
-### 22.3 Hosted AI Credits
+### 22.3 Hosted AI Credits — V2 Deferred
 
-If Diagram Alley offers built-in hosted AI, usage should be controlled through included monthly credits plus optional credit packs.
+Hosted AI is explicitly prohibited in V1 (DEC-010, F0 §8). Users must bring their own API key or use a local model.
 
-Local providers and BYOK should not be heavily metered because the user bears those model costs.
+If Diagram Alley offers built-in hosted AI in V2, usage would be controlled through included monthly credits plus optional credit packs.
 
 ### 22.4 Team Plan Later
 
@@ -3133,7 +3132,7 @@ Required planning artifacts:
 4. `specs/F0-tech-stack.md`
 5. `specs/F1-diagram-spec-and-data-model.md` — defines spec versioning strategy and exact JSON schema
 6. `specs/F2-rendering-validation-repair.md` — defines validation, text rendering, visual export rendering, and node-kind rendering
-7. `specs/F3-security-auth-billing.md` — defines auth, Stripe setup, free trial limits, permissions, and audit events
+7. `specs/F3-security-auth-billing.md` — defines auth, Stripe setup, free tier limits ($9/mo Pro per DEC-037), feature gate, permissions, and audit events
 8. `specs/F4-ui-surface-workspace.md` — designs the visual grid editor and workspace surface
 9. `specs/F5-api-standards.md`
 10. `specs/D1-ai-generation.md`
@@ -3144,12 +3143,12 @@ Required planning artifacts:
 15. `specs/D6-sharing-publishing.md`
 16. `specs/D7-billing-subscription.md`
 17. `specs/A1-admin-console.md`
-18. `specs/D8-github-integration.md` — stretch goal; write this only after core product is complete
+18. `specs/D8-github-integration.md` — **V1 scope** (elevated from stretch goal per DEC-036)
 
-Remaining open decisions to resolve in spec files:
+Resolved decisions (no longer open):
 
-* Hosted AI credit budget and limits (resolve in F3)
-* Exact JSON/YAML schema format and spec_version migration path (resolve in F1)
-* Which node kinds get distinct rendering vs. collapsing to generic in V1 (resolve in F2)
-* Grid editor library/approach (resolve in F4)
-* Production storage and secret-management details (resolve in F0)
+* ~~Hosted AI credit budget and limits~~ — No hosted AI in V1 (DEC-010); V2 consideration only
+* ~~Exact JSON/YAML schema format and spec_version migration path~~ — Resolved in F1
+* ~~Which node kinds get distinct rendering vs. collapsing to generic in V1~~ — All 20 kinds render distinctly (DEC-012); resolved in F2
+* ~~Grid editor library/approach~~ — React Flow selected (DEC-013); resolved in F4
+* ~~Production storage and secret-management details~~ — Fly.io secrets + Neon (DEC-015); resolved in F0
